@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listening — London Educators</title>
+<link rel="stylesheet" href="/css/exam.css">
+</head>
+<body>
+<div class="exam-shell">
+  <div class="exam-topbar">
+    <div class="tb-left"><span class="module-tag">IELTS Listening</span></div>
+    <div class="tb-mid" id="candidateLabel"></div>
+    <div class="tb-right">
+      <div class="exam-timer" id="timer">30:00</div>
+    </div>
+  </div>
+
+  <div class="exam-body">
+    <div class="exam-pane full" id="questionsPane"></div>
+  </div>
+
+  <div class="exam-bottombar">
+    <div class="q-nav-strip" id="navStrip"></div>
+    <div class="exam-nav-actions">
+      <button class="exam-btn primary" id="submitBtn">Submit Listening</button>
+    </div>
+  </div>
+</div>
+
+<audio id="audioPlayer" style="display:none;"></audio>
+
+<div class="exam-modal-backdrop" id="playModal">
+  <div class="exam-modal">
+    <h2>Ready to begin Listening?</h2>
+    <p>The recording plays automatically and only once, exactly as on test day. There's no pause or rewind. Make sure your sound is on.</p>
+    <div class="modal-actions"><button class="exam-btn primary" id="beginAudioBtn">Start recording</button></div>
+  </div>
+</div>
+
+<div class="exam-modal-backdrop" id="confirmModal" style="display:none;">
+  <div class="exam-modal">
+    <h2>Submit the Listening module?</h2>
+    <p>You've answered <span id="answeredCount">0</span> of <span id="totalCount">0</span> questions. Once submitted, you can't change your Listening answers.</p>
+    <div class="modal-actions">
+      <button class="exam-btn" id="cancelSubmit">Keep working</button>
+      <button class="exam-btn primary" id="confirmSubmit">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/exam-common.js"></script>
+<script>
+let profile, session;
+const answers = new Map();
+let timer;
+let sectionAudioIndex = 0;
+const audioEl = document.getElementById('audioPlayer');
+
+(async () => {
+  profile = await Auth.requireRole('student');
+  if (!profile) return;
+  session = ExamRuntime.getSession();
+  if (!session) return;
+  document.getElementById('candidateLabel').textContent = profile.name;
+  init();
+})();
+
+function allQuestions() { return session.sections.flatMap(s => s.questions); }
+
+function init() {
+  document.getElementById('totalCount').textContent = allQuestions().length;
+  renderAllSections();
+
+  document.getElementById('beginAudioBtn').addEventListener('click', () => {
+    document.getElementById('playModal').style.display = 'none';
+    timer = ExamRuntime.startTimer(session.test.listening_duration_min, onTick, onExpire);
+    playSectionAudio(0);
+  });
+
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    document.getElementById('answeredCount').textContent = [...answers.values()].filter(v => String(v).trim()).length;
+    document.getElementById('confirmModal').style.display = 'flex';
+  });
+  document.getElementById('cancelSubmit').addEventListener('click', () => { document.getElementById('confirmModal').style.display = 'none'; });
+  document.getElementById('confirmSubmit').addEventListener('click', submit);
+
+  audioEl.addEventListener('ended', () => {
+    if (sectionAudioIndex < session.sections.length - 1) {
+      sectionAudioIndex++;
+      playSectionAudio(sectionAudioIndex);
+    } else {
+      updateBanner(-1);
+    }
+  });
+}
+
+function playSectionAudio(idx) {
+  const section = session.sections[idx];
+  updateBanner(idx);
+  if (!section.audio_url) {
+    audioEl.dispatchEvent(new Event('ended'));
+    return;
+  }
+  audioEl.src = section.audio_url;
+  audioEl.play().catch(() => { updateBanner(idx, true); });
+}
+
+function updateBanner(playingIdx, needsManualPlay) {
+  const banner = document.getElementById('audioBanner');
+  if (!banner) return;
+  if (playingIdx === -1) {
+    banner.innerHTML = `<span class="playing-dot idle"></span> All recordings finished. Review your answers, then submit.`;
+    return;
+  }
+  const title = session.sections[playingIdx].title;
+  if (needsManualPlay) {
+    banner.innerHTML = `<span class="playing-dot idle"></span> ${ExamRuntime.escapeHtml(title)} — <button class="exam-btn" onclick="document.getElementById('audioPlayer').play()">Play recording</button>`;
+  } else {
+    banner.innerHTML = `<span class="playing-dot"></span> Now playing: ${ExamRuntime.escapeHtml(title)}`;
+  }
+}
+
+function onTick(secondsLeft) {
+  const el = document.getElementById('timer');
+  el.textContent = ExamRuntime.formatTime(Math.max(secondsLeft, 0));
+  if (secondsLeft <= 300) el.classList.add('low');
+}
+
+function onExpire() { submit(); }
+
+function renderAllSections() {
+  let globalNum = 0;
+  document.getElementById('questionsPane').innerHTML = `
+    <div class="audio-banner" id="audioBanner"><span class="playing-dot idle"></span> Recording will begin shortly.</div>
+    ${session.sections.map(section => {
+      const html = `
+        <div class="section-divider">${ExamRuntime.escapeHtml(section.title)} — Questions ${globalNum + 1}–${globalNum + section.questions.length}</div>
+        ${section.questions.map((q, i) => renderQuestion(q, globalNum + i + 1)).join('')}
+      `;
+      globalNum += section.questions.length;
+      return html;
+    }).join('')}
+  `;
+
+  document.getElementById('questionsPane').querySelectorAll('[data-answer-for]').forEach(el => {
+    el.addEventListener(el.tagName === 'INPUT' && el.type === 'radio' ? 'change' : 'input', (e) => {
+      answers.set(el.dataset.answerFor, el.value);
+      renderNav();
+    });
+  });
+  renderNav();
+}
+
+function renderQuestion(q, num) {
+  const opts = q.options || [];
+  let body = '';
+  if (q.question_type === 'multiple_choice') {
+    body = `<div class="q-options">${opts.map((opt, idx) => `
+      <label><input type="radio" name="q_${q.id}" value="${ExamRuntime.escapeHtml(opt)}" data-answer-for="${q.id}"> ${String.fromCharCode(65 + idx)}. ${ExamRuntime.escapeHtml(opt)}</label>
+    `).join('')}</div>`;
+  } else {
+    body = `<input type="text" class="q-short-input" data-answer-for="${q.id}" placeholder="Your answer">`;
+  }
+  return `
+    <div class="q-item" id="q-${q.id}">
+      <div class="q-text"><span class="q-num-badge">${num}</span>${ExamRuntime.escapeHtml(q.question_text)}</div>
+      ${body}
+    </div>
+  `;
+}
+
+function renderNav() {
+  const flat = allQuestions();
+  ExamRuntime.renderNavStrip(document.getElementById('navStrip'), flat, answers, null, (qid) => {
+    document.getElementById(`q-${qid}`)?.scrollIntoView({ block: 'center' });
+  });
+}
+
+async function submit() {
+  if (timer) timer.clear();
+  document.getElementById('confirmModal').style.display = 'none';
+  const payload = [...answers.entries()].map(([question_id, answer_text]) => ({ question_id, answer_text }));
+  try {
+    await supabase.rpc('submit_listening_answers', { p_submission_id: session.submissionId, p_answers: payload });
+  } catch (e) { /* proceed regardless so the student isn't stuck */ }
+  const nextUrl = ExamRuntime.nextModuleUrl(session, 'listening');
+  if (nextUrl === '/exam/finish.html') {
+    try { await supabase.rpc('finish_submission', { p_submission_id: session.submissionId }); } catch (e) {}
+    sessionStorage.removeItem('le_exam_session');
+  }
+  window.location.href = nextUrl;
+}
+</script>
+</body>
+</html>

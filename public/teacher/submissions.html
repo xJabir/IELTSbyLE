@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submissions — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand">London Educators — Teacher Panel</div>
+  <div class="who">
+    <span id="userName"></span>
+    <a href="/teacher/dashboard.html">← All tests</a>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head"><h1>Submissions</h1></div>
+  <div id="subList"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+const testId = new URLSearchParams(location.search).get('testId');
+
+(async () => {
+  const profile = await Auth.requireRole('teacher');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  load();
+})();
+
+async function load() {
+  const { data: submissions, error } = await supabase
+    .from('submissions')
+    .select('*, profiles(name, email)')
+    .eq('test_id', testId)
+    .neq('status', 'in_progress')
+    .order('submitted_at', { ascending: false });
+
+  const el = document.getElementById('subList');
+  if (error) { el.innerHTML = `<div class="empty-state"><h3>Couldn't load submissions</h3><p>${escapeHtml(error.message)}</p></div>`; return; }
+  if (!submissions || !submissions.length) {
+    el.innerHTML = `<div class="empty-state"><h3>No submissions yet</h3><p>They'll appear here once a student finishes this mock test.</p></div>`;
+    return;
+  }
+  el.innerHTML = submissions.map(s => `
+    <div class="list-row">
+      <div>
+        <div class="title">${escapeHtml(s.profiles.name)}</div>
+        <div class="meta">${escapeHtml(s.profiles.email)} · submitted ${s.submitted_at ? s.submitted_at.slice(0, 16).replace('T', ' ') : '—'}</div>
+      </div>
+      ${s.status === 'graded' ? '<span class="badge done">Graded</span>' : '<span class="badge pending">Needs writing grade</span>'}
+      <a href="/teacher/grade.html?subId=${s.id}" class="button ghost" style="padding:9px 16px;">Open</a>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>

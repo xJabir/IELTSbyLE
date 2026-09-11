@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade Submission — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand">London Educators — Teacher Panel</div>
+  <div class="who">
+    <span id="userName"></span>
+    <a href="#" id="backLink">← Submissions</a>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div id="content"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+const subId = new URLSearchParams(location.search).get('subId');
+let data;
+
+(async () => {
+  const profile = await Auth.requireRole('teacher');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  load();
+})();
+
+async function load() {
+  const { data: submission } = await supabase.from('submissions').select('*, profiles(name, email), tests(title)').eq('id', subId).single();
+  const { data: writingAnswers } = await supabase.from('writing_answers').select('*, writing_tasks(task_number, prompt_text, min_words)').eq('submission_id', subId);
+  const { data: readingAnswers } = await supabase.from('reading_answers').select('*, reading_questions(question_text, correct_answer)').eq('submission_id', subId);
+  const { data: listeningAnswers } = await supabase.from('listening_answers').select('*, listening_questions(question_text, correct_answer)').eq('submission_id', subId);
+
+  data = {
+    submission,
+    writingAnswers: (writingAnswers || []).slice().sort((a, b) => a.writing_tasks.task_number - b.writing_tasks.task_number),
+    readingAnswers: readingAnswers || [],
+    listeningAnswers: listeningAnswers || []
+  };
+
+  document.getElementById('backLink').href = `/teacher/submissions.html?testId=${submission.test_id}`;
+  render();
+}
+
+function render() {
+  const s = data.submission;
+  document.getElementById('content').innerHTML = `
+    <div class="dash-head"><h1>${escapeHtml(s.profiles.name)} — ${escapeHtml(s.tests.title)}</h1></div>
+
+    <div class="stat-row">
+      <div class="stat-cell"><div class="label">Listening (auto)</div><div class="value seal">${fmt(s.listening_band)}</div><div style="font-size:12px;color:var(--ink-soft);">${fmt(s.listening_raw_score)}/40 correct</div></div>
+      <div class="stat-cell"><div class="label">Reading (auto)</div><div class="value seal">${fmt(s.reading_band)}</div><div style="font-size:12px;color:var(--ink-soft);">${fmt(s.reading_raw_score)}/40 correct</div></div>
+      <div class="stat-cell"><div class="label">Writing</div><div class="value seal">${fmt(s.writing_band)}</div></div>
+      <div class="stat-cell"><div class="label">Overall</div><div class="value seal">${fmt(s.overall_band)}</div></div>
+    </div>
+
+    <div class="panel">
+      <h2>Writing — grade against the band descriptors</h2>
+      <p class="panel-sub">Task 2 counts twice as much as Task 1 toward the writing band, matching official IELTS weighting.</p>
+      ${data.writingAnswers.map(w => `
+        <div class="builder-item" style="background:#fff;">
+          <div class="builder-item-head"><span class="tag">Task ${w.writing_tasks.task_number} · ${w.word_count} words</span></div>
+          <p style="font-size:14.5px;line-height:1.6;white-space:pre-wrap;max-height:280px;overflow-y:auto;border:1px solid var(--line);padding:12px;background:var(--paper);">${escapeHtml(w.answer_text) || '<em>No response submitted.</em>'}</p>
+          <div class="inline-row" style="margin-top:14px;">
+            <div class="field" style="flex:0 0 120px;"><label>Band score</label><input type="number" step="0.5" min="0" max="9" id="band-${w.id}" value="${w.band_score ?? ''}"></div>
+            <div class="field"><label>Feedback</label><input type="text" id="feedback-${w.id}" value="${escapeHtml(w.feedback || '')}" placeholder="Notes for the student"></div>
+          </div>
+        </div>
+      `).join('')}
+      <div class="submit-row"><button class="button primary" id="saveGrades" style="padding:10px 20px;">Save grades</button></div>
+    </div>
+
+    <div class="panel">
+      <h2>Reading — auto-marked</h2>
+      <table class="band-table">
+        <thead><tr><th>#</th><th>Question</th><th>Student answer</th><th>Correct answer</th><th></th></tr></thead>
+        <tbody>
+          ${data.readingAnswers.map((a, i) => `
+            <tr>
+              <td>${i + 1}</td><td>${escapeHtml(a.reading_questions.question_text)}</td><td>${escapeHtml(a.answer_text) || '—'}</td><td>${escapeHtml(a.reading_questions.correct_answer)}</td>
+              <td>${a.is_correct ? '✓' : '✗'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Listening — auto-marked</h2>
+      <table class="band-table">
+        <thead><tr><th>#</th><th>Question</th><th>Student answer</th><th>Correct answer</th><th></th></tr></thead>
+        <tbody>
+          ${data.listeningAnswers.map((a, i) => `
+            <tr>
+              <td>${i + 1}</td><td>${escapeHtml(a.listening_questions.question_text)}</td><td>${escapeHtml(a.answer_text) || '—'}</td><td>${escapeHtml(a.listening_questions.correct_answer)}</td>
+              <td>${a.is_correct ? '✓' : '✗'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('saveGrades').addEventListener('click', async () => {
+    const scores = data.writingAnswers.map(w => ({
+      writing_answer_id: w.id,
+      band_score: Number(document.getElementById(`band-${w.id}`).value) || null,
+      feedback: document.getElementById(`feedback-${w.id}`).value
+    }));
+    const { error } = await supabase.rpc('grade_writing', { p_submission_id: subId, p_scores: scores });
+    if (error) { alert(error.message); return; }
+    await load();
+  });
+}
+
+function fmt(v) { return v == null ? '—' : v; }
+</script>
+</body>
+</html>

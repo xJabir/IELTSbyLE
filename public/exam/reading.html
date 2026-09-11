@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading — London Educators</title>
+<link rel="stylesheet" href="/css/exam.css">
+</head>
+<body>
+<div class="exam-shell">
+  <div class="exam-topbar">
+    <div class="tb-left"><span class="module-tag">IELTS Reading</span></div>
+    <div class="tb-mid" id="candidateLabel"></div>
+    <div class="tb-right">
+      <div class="exam-timer" id="timer">60:00</div>
+    </div>
+  </div>
+
+  <div class="exam-body">
+    <div class="exam-pane passage" id="passagePane"></div>
+    <div class="exam-pane questions" id="questionsPane"></div>
+  </div>
+
+  <div class="exam-bottombar">
+    <div class="q-nav-strip" id="navStrip"></div>
+    <div class="exam-nav-actions">
+      <button class="exam-btn" id="prevPassageBtn">Previous passage</button>
+      <button class="exam-btn" id="nextPassageBtn">Next passage</button>
+      <button class="exam-btn primary" id="submitBtn">Submit Reading</button>
+    </div>
+  </div>
+</div>
+
+<div class="exam-modal-backdrop" id="confirmModal" style="display:none;">
+  <div class="exam-modal">
+    <h2>Submit the Reading module?</h2>
+    <p>You've answered <span id="answeredCount">0</span> of <span id="totalCount">0</span> questions. Once submitted, you can't change your Reading answers.</p>
+    <div class="modal-actions">
+      <button class="exam-btn" id="cancelSubmit">Keep working</button>
+      <button class="exam-btn primary" id="confirmSubmit">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/exam-common.js"></script>
+<script>
+let profile, session;
+let passageIndex = 0;
+const answers = new Map();
+let timer;
+
+(async () => {
+  profile = await Auth.requireRole('student');
+  if (!profile) return;
+  session = ExamRuntime.getSession();
+  if (!session) return;
+  document.getElementById('candidateLabel').textContent = profile.name;
+  init();
+})();
+
+function allQuestions() {
+  return session.passages.flatMap(p => p.questions);
+}
+
+function init() {
+  document.getElementById('totalCount').textContent = allQuestions().length;
+  timer = ExamRuntime.startTimer(session.test.reading_duration_min, onTick, onExpire);
+  render();
+
+  document.getElementById('prevPassageBtn').addEventListener('click', () => { if (passageIndex > 0) { passageIndex--; render(); } });
+  document.getElementById('nextPassageBtn').addEventListener('click', () => { if (passageIndex < session.passages.length - 1) { passageIndex++; render(); } });
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    document.getElementById('answeredCount').textContent = [...answers.values()].filter(v => String(v).trim()).length;
+    document.getElementById('confirmModal').style.display = 'flex';
+  });
+  document.getElementById('cancelSubmit').addEventListener('click', () => { document.getElementById('confirmModal').style.display = 'none'; });
+  document.getElementById('confirmSubmit').addEventListener('click', submit);
+}
+
+function onTick(secondsLeft) {
+  const el = document.getElementById('timer');
+  el.textContent = ExamRuntime.formatTime(Math.max(secondsLeft, 0));
+  if (secondsLeft <= 300) el.classList.add('low');
+}
+
+function onExpire() { submit(); }
+
+function render() {
+  const passage = session.passages[passageIndex];
+  document.getElementById('passagePane').innerHTML = `
+    <div class="passage-title">Reading Passage ${passageIndex + 1}</div>
+    <div class="passage-subtitle">${ExamRuntime.escapeHtml(passage.title)}</div>
+    <div class="passage-text">${ExamRuntime.escapeHtml(passage.passage_text)}</div>
+  `;
+
+  let globalNum = session.passages.slice(0, passageIndex).reduce((sum, p) => sum + p.questions.length, 0);
+  document.getElementById('questionsPane').innerHTML = `
+    <div class="section-divider">Questions ${globalNum + 1}–${globalNum + passage.questions.length}</div>
+    ${passage.questions.map((q, i) => renderQuestion(q, globalNum + i + 1)).join('')}
+  `;
+
+  document.getElementById('questionsPane').querySelectorAll('[data-answer-for]').forEach(el => {
+    el.addEventListener(el.tagName === 'INPUT' && el.type === 'radio' ? 'change' : 'input', (e) => {
+      answers.set(el.dataset.answerFor, el.value);
+      renderNav();
+    });
+  });
+
+  document.getElementById('prevPassageBtn').disabled = passageIndex === 0;
+  document.getElementById('nextPassageBtn').disabled = passageIndex === session.passages.length - 1;
+  renderNav();
+}
+
+function renderQuestion(q, num) {
+  const opts = q.options || [];
+  let body = '';
+  if (q.question_type === 'true_false_not_given') {
+    body = `<div class="q-options">${['True', 'False', 'Not Given'].map(v => `
+      <label><input type="radio" name="q_${q.id}" value="${v.toLowerCase().replace(' ', '_')}" data-answer-for="${q.id}" ${answers.get(q.id) === v.toLowerCase().replace(' ', '_') ? 'checked' : ''}> ${v}</label>
+    `).join('')}</div>`;
+  } else if (q.question_type === 'multiple_choice') {
+    body = `<div class="q-options">${opts.map((opt, idx) => `
+      <label><input type="radio" name="q_${q.id}" value="${ExamRuntime.escapeHtml(opt)}" data-answer-for="${q.id}" ${answers.get(q.id) === opt ? 'checked' : ''}> ${String.fromCharCode(65 + idx)}. ${ExamRuntime.escapeHtml(opt)}</label>
+    `).join('')}</div>`;
+  } else {
+    body = `<input type="text" class="q-short-input" data-answer-for="${q.id}" value="${ExamRuntime.escapeHtml(answers.get(q.id) || '')}" placeholder="Your answer">`;
+  }
+  return `
+    <div class="q-item" id="q-${q.id}">
+      <div class="q-text"><span class="q-num-badge">${num}</span>${ExamRuntime.escapeHtml(q.question_text)}</div>
+      ${body}
+    </div>
+  `;
+}
+
+function renderNav() {
+  const flat = [];
+  session.passages.forEach((p, pi) => p.questions.forEach(q => flat.push({ id: q.id, passageIndex: pi })));
+  ExamRuntime.renderNavStrip(
+    document.getElementById('navStrip'),
+    flat,
+    answers,
+    flat.find(f => f.passageIndex === passageIndex)?.id,
+    (qid) => {
+      const target = flat.find(f => f.id === qid);
+      if (target.passageIndex !== passageIndex) { passageIndex = target.passageIndex; render(); }
+      document.getElementById(`q-${qid}`)?.scrollIntoView({ block: 'center' });
+    }
+  );
+}
+
+async function submit() {
+  timer.clear();
+  document.getElementById('confirmModal').style.display = 'none';
+  const payload = [...answers.entries()].map(([question_id, answer_text]) => ({ question_id, answer_text }));
+  try {
+    await supabase.rpc('submit_reading_answers', { p_submission_id: session.submissionId, p_answers: payload });
+  } catch (e) { /* fall through to next module even if a save fails, so the student isn't stuck */ }
+  const nextUrl = ExamRuntime.nextModuleUrl(session, 'reading');
+  if (nextUrl === '/exam/finish.html') {
+    try { await supabase.rpc('finish_submission', { p_submission_id: session.submissionId }); } catch (e) {}
+    sessionStorage.removeItem('le_exam_session');
+  }
+  window.location.href = nextUrl;
+}
+</script>
+</body>
+</html>

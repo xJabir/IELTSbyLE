@@ -1,0 +1,113 @@
+/* Computer-delivered exam chrome: deliberately plain and utilitarian —
+   this is exam software, not a marketing surface. Grey chrome, black text,
+   a monospace countdown, and a numbered question-navigator strip at the
+   bottom, matching the real CD IELTS test screen. */
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; font-family: 'IBM Plex Sans', Arial, sans-serif; color: #111;
+  background: #fff;
+}
+.exam-shell { display: flex; flex-direction: column; height: 100vh; }
+
+/* Top bar */
+.exam-topbar {
+  background: #E8E8E8; border-bottom: 1px solid #BEBEBE; padding: 10px 20px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.exam-topbar .tb-left { display: flex; align-items: center; gap: 14px; font-size: 14px; }
+.exam-topbar .tb-left .module-tag { font-weight: 700; }
+.exam-topbar .tb-mid { font-size: 14px; color: #333; }
+.exam-topbar .tb-right { display: flex; align-items: center; gap: 18px; }
+.exam-timer {
+  font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 500;
+  background: #fff; border: 1px solid #BEBEBE; padding: 5px 12px; border-radius: 2px;
+}
+.exam-timer.low { color: #B00000; border-color: #B00000; }
+.exam-help-btn { font-size: 13px; background: #fff; border: 1px solid #BEBEBE; padding: 6px 12px; border-radius: 2px; cursor: pointer; }
+
+/* Body: split panes for reading */
+.exam-body { flex: 1; overflow: hidden; display: flex; }
+.exam-pane {
+  overflow-y: auto; padding: 30px 34px; height: 100%;
+}
+.exam-pane.passage { width: 50%; border-right: 1px solid #CCC; background: #FCFCFA; }
+.exam-pane.questions { width: 50%; background: #fff; }
+.exam-pane.full { width: 100%; }
+
+.passage-title { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+.passage-subtitle { font-size: 13px; color: #555; margin-bottom: 18px; }
+.passage-text { font-size: 15.5px; line-height: 1.7; white-space: pre-wrap; max-width: 640px; }
+
+.q-part-head { font-size: 14px; font-weight: 700; margin: 0 0 4px; }
+.q-part-instructions { font-size: 14px; color: #333; margin-bottom: 18px; line-height: 1.5; padding: 10px 14px; background: #F5F4EF; border-left: 3px solid #999; }
+.q-item { margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid #EEE; }
+.q-item:last-child { border-bottom: none; }
+.q-num-badge {
+  display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+  background: #333; color: #fff; font-size: 12px; font-weight: 700; border-radius: 2px; margin-right: 8px; flex-shrink: 0;
+}
+.q-text { font-size: 15px; line-height: 1.55; display: flex; gap: 2px; align-items: baseline; flex-wrap: wrap; }
+.q-options { margin-top: 10px; margin-left: 32px; display: flex; flex-direction: column; gap: 8px; }
+.q-options label { display: flex; align-items: baseline; gap: 8px; font-size: 15px; cursor: pointer; }
+.q-blank-input {
+  border: none; border-bottom: 2px solid #333; font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 15px; padding: 2px 4px; width: 160px; background: #FBFBEA;
+}
+.q-blank-input:focus { outline: none; background: #FFF6C8; }
+.q-short-input {
+  margin-left: 32px; margin-top: 10px; border: 1px solid #999; padding: 8px 10px;
+  font-size: 15px; width: 260px; border-radius: 2px;
+}
+
+/* Listening specific */
+.audio-banner {
+  background: #F5F4EF; border: 1px solid #CCC; padding: 16px 20px; margin-bottom: 24px;
+  display: flex; align-items: center; gap: 16px; font-size: 14px;
+}
+.audio-banner .playing-dot { width: 9px; height: 9px; border-radius: 50%; background: #B00000; flex-shrink: 0; }
+.audio-banner .playing-dot.idle { background: #999; }
+
+/* Writing */
+.writing-prompt { max-width: 720px; font-size: 15.5px; line-height: 1.65; margin-bottom: 20px; }
+.writing-prompt img { margin-top: 14px; border: 1px solid #CCC; max-width: 480px; }
+.writing-area {
+  width: 100%; max-width: 720px; min-height: 380px; font-size: 15.5px; line-height: 1.7;
+  border: 1px solid #999; padding: 16px; font-family: 'IBM Plex Sans', sans-serif; resize: vertical;
+}
+.writing-area:focus { outline: none; border-color: #333; }
+.word-count { margin-top: 10px; font-size: 13px; color: #555; font-family: 'IBM Plex Mono', monospace; }
+.word-count.low { color: #B00000; font-weight: 600; }
+
+/* Bottom navigator */
+.exam-bottombar {
+  background: #E8E8E8; border-top: 1px solid #BEBEBE; padding: 10px 20px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+}
+.q-nav-strip { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; }
+.q-nav-btn {
+  width: 30px; height: 30px; border: 1px solid #999; background: #fff; font-size: 12.5px;
+  font-family: 'IBM Plex Mono', monospace; border-radius: 2px; cursor: pointer; color: #333;
+}
+.q-nav-btn.answered { background: #333; color: #fff; border-color: #333; }
+.q-nav-btn.current { border: 2px solid #B00000; }
+.exam-nav-actions { display: flex; gap: 10px; flex-shrink: 0; }
+.exam-btn {
+  padding: 9px 20px; font-size: 14px; border-radius: 2px; border: 1px solid #333; background: #fff; cursor: pointer;
+}
+.exam-btn.primary { background: #333; color: #fff; }
+.exam-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Section switch banner (between reading passages / listening parts) */
+.section-divider { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #555; margin: 0 0 16px; }
+
+/* Intro / confirm screens reuse main.css tokens where sensible */
+.exam-modal-backdrop {
+  position: fixed; inset: 0; background: rgba(20,20,20,0.55); display: flex; align-items: center; justify-content: center; z-index: 50;
+}
+.exam-modal {
+  background: #fff; max-width: 440px; width: 92%; padding: 30px; border-radius: 3px;
+}
+.exam-modal h2 { font-family: 'Fraunces', serif; font-size: 21px; margin: 0 0 12px; }
+.exam-modal p { font-size: 14.5px; color: #444; line-height: 1.5; margin-bottom: 20px; }
+.exam-modal .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }

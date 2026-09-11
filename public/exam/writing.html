@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing — London Educators</title>
+<link rel="stylesheet" href="/css/exam.css">
+</head>
+<body>
+<div class="exam-shell">
+  <div class="exam-topbar">
+    <div class="tb-left"><span class="module-tag">IELTS Writing</span></div>
+    <div class="tb-mid" id="candidateLabel"></div>
+    <div class="tb-right">
+      <div class="exam-timer" id="timer">60:00</div>
+    </div>
+  </div>
+
+  <div class="exam-body">
+    <div class="exam-pane full" id="taskPane"></div>
+  </div>
+
+  <div class="exam-bottombar">
+    <div class="q-nav-strip" id="taskTabs"></div>
+    <div class="exam-nav-actions">
+      <button class="exam-btn primary" id="submitBtn">Submit Writing</button>
+    </div>
+  </div>
+</div>
+
+<div class="exam-modal-backdrop" id="confirmModal" style="display:none;">
+  <div class="exam-modal">
+    <h2>Submit the Writing module?</h2>
+    <p>This finishes your mock test. Your teacher will grade your writing and your overall band will appear on your results page once grading is complete.</p>
+    <div class="modal-actions">
+      <button class="exam-btn" id="cancelSubmit">Keep working</button>
+      <button class="exam-btn primary" id="confirmSubmit">Submit &amp; finish test</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/exam-common.js"></script>
+<script>
+let profile, session;
+const drafts = new Map();
+let taskIndex = 0;
+let timer;
+
+(async () => {
+  profile = await Auth.requireRole('student');
+  if (!profile) return;
+  session = ExamRuntime.getSession();
+  if (!session) return;
+  document.getElementById('candidateLabel').textContent = profile.name;
+  init();
+})();
+
+function init() {
+  timer = ExamRuntime.startTimer(session.test.writing_duration_min, onTick, onExpire);
+  render();
+
+  document.getElementById('submitBtn').addEventListener('click', () => { document.getElementById('confirmModal').style.display = 'flex'; });
+  document.getElementById('cancelSubmit').addEventListener('click', () => { document.getElementById('confirmModal').style.display = 'none'; });
+  document.getElementById('confirmSubmit').addEventListener('click', submit);
+}
+
+function onTick(secondsLeft) {
+  const el = document.getElementById('timer');
+  el.textContent = ExamRuntime.formatTime(Math.max(secondsLeft, 0));
+  if (secondsLeft <= 300) el.classList.add('low');
+}
+
+function onExpire() { submit(); }
+
+function render() {
+  const task = session.writingTasks[taskIndex];
+  const draft = drafts.get(task.id) || '';
+  document.getElementById('taskPane').innerHTML = `
+    <div class="section-divider">Writing Task ${task.task_number}</div>
+    <div class="writing-prompt">${ExamRuntime.escapeHtml(task.prompt_text)}
+      ${task.image_url ? `<img src="${task.image_url}" alt="Task ${task.task_number} chart">` : ''}
+    </div>
+    <p style="font-size:13px;color:#555;margin-bottom:8px;">Write at least ${task.min_words} words.</p>
+    <textarea class="writing-area" id="writingArea">${ExamRuntime.escapeHtml(draft)}</textarea>
+    <div class="word-count" id="wordCount"></div>
+  `;
+  const textarea = document.getElementById('writingArea');
+  const updateCount = () => {
+    const words = textarea.value.trim().split(/\s+/).filter(Boolean).length;
+    const countEl = document.getElementById('wordCount');
+    countEl.textContent = `${words} words`;
+    countEl.classList.toggle('low', words < task.min_words);
+    drafts.set(task.id, textarea.value);
+  };
+  textarea.addEventListener('input', updateCount);
+  updateCount();
+  renderTabs();
+}
+
+function renderTabs() {
+  document.getElementById('taskTabs').innerHTML = session.writingTasks.map((t, i) => {
+    const done = (drafts.get(t.id) || '').trim().length > 0;
+    const cls = ['q-nav-btn'];
+    if (done) cls.push('answered');
+    if (i === taskIndex) cls.push('current');
+    return `<button class="${cls.join(' ')}" style="width:auto;padding:0 12px;" data-idx="${i}">Task ${t.task_number}</button>`;
+  }).join('');
+  document.getElementById('taskTabs').querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => { taskIndex = Number(btn.dataset.idx); render(); });
+  });
+}
+
+async function submit() {
+  timer.clear();
+  document.getElementById('confirmModal').style.display = 'none';
+  const payload = session.writingTasks.map(t => ({ task_id: t.id, answer_text: drafts.get(t.id) || '' }));
+  try {
+    await supabase.rpc('save_writing_answers', { p_submission_id: session.submissionId, p_answers: payload });
+    await supabase.rpc('finish_submission', { p_submission_id: session.submissionId });
+  } catch (e) { /* still send them to the finish screen */ }
+  sessionStorage.removeItem('le_exam_session');
+  window.location.href = '/exam/finish.html';
+}
+</script>
+</body>
+</html>

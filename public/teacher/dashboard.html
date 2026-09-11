@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Panel — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand">London Educators — Teacher Panel</div>
+  <div class="who">
+    <a href="/teacher/speaking-slots.html">Speaking slots</a>
+    <span id="userName"></span>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head">
+    <h1>My mock tests</h1>
+    <button class="button primary" id="newTestBtn">+ New mock test</button>
+  </div>
+  <div id="testList"></div>
+</main>
+
+<div class="exam-modal-backdrop" id="newTestModal" style="display:none;">
+  <div class="exam-modal">
+    <h2 style="font-family:var(--serif);">Name your mock test</h2>
+    <div class="field"><label>Title</label><input type="text" id="newTitle" placeholder="e.g. Academic Mock Test — Set 3"></div>
+    <div class="field"><label>Description (optional)</label><input type="text" id="newDesc" placeholder="Shown to students on the test list"></div>
+    <div class="modal-actions" style="margin-top:20px;">
+      <button class="exam-btn" id="cancelNew">Cancel</button>
+      <button class="exam-btn primary" id="createNew">Create &amp; edit</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+let profile;
+
+(async () => {
+  profile = await Auth.requireRole('teacher');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  load();
+})();
+
+async function load() {
+  const { data: tests } = await supabase.from('tests').select('*').eq('created_by', profile.id).order('created_at', { ascending: false });
+  const listEl = document.getElementById('testList');
+  if (!tests || !tests.length) {
+    listEl.innerHTML = `<div class="empty-state"><h3>No mock tests yet</h3><p>Create your first mock test to start adding passages, audio, and writing tasks.</p></div>`;
+    return;
+  }
+  listEl.innerHTML = tests.map(t => `
+    <div class="list-row">
+      <div>
+        <div class="title">${escapeHtml(t.title)}</div>
+        <div class="meta">${escapeHtml(t.description || 'No description')}</div>
+      </div>
+      ${t.published ? '<span class="badge done">Published</span>' : '<span class="badge pending">Draft</span>'}
+      <div style="display:flex;gap:8px;">
+        <a href="/teacher/submissions.html?testId=${t.id}" class="small-btn">Submissions</a>
+        <a href="/teacher/create-test.html?testId=${t.id}" class="button ghost" style="padding:9px 16px;">Edit</a>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('newTestBtn').addEventListener('click', () => { document.getElementById('newTestModal').style.display = 'flex'; });
+document.getElementById('cancelNew').addEventListener('click', () => { document.getElementById('newTestModal').style.display = 'none'; });
+document.getElementById('createNew').addEventListener('click', async () => {
+  const title = document.getElementById('newTitle').value.trim();
+  if (!title) return;
+  const { data, error } = await supabase.from('tests')
+    .insert({ title, description: document.getElementById('newDesc').value.trim(), created_by: profile.id })
+    .select('id').single();
+  if (error) { alert(error.message); return; }
+  window.location.href = `/teacher/create-test.html?testId=${data.id}`;
+});
+</script>
+</body>
+</html>

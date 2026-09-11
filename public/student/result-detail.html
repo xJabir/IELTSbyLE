@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Result Detail — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand">London Educators</div>
+  <div class="who">
+    <a href="/student/results.html">My results</a>
+    <span id="userName"></span>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div id="content"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+const subId = new URLSearchParams(location.search).get('id');
+
+(async () => {
+  const profile = await Auth.requireRole('student');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  load();
+})();
+
+async function load() {
+  const { data: s } = await supabase.from('submissions').select('*, tests(title)').eq('id', subId).single();
+  const { data: writingAnswers } = await supabase
+    .from('writing_answers')
+    .select('*, writing_tasks(task_number)')
+    .eq('submission_id', subId);
+
+  const sorted = (writingAnswers || []).slice().sort((a, b) => a.writing_tasks.task_number - b.writing_tasks.task_number);
+
+  document.getElementById('content').innerHTML = `
+    <div class="dash-head"><h1>${escapeHtml(s.tests?.title || '')}</h1></div>
+    <div class="stat-row">
+      <div class="stat-cell"><div class="label">Listening</div><div class="value seal">${fmt(s.listening_band)}</div></div>
+      <div class="stat-cell"><div class="label">Reading</div><div class="value seal">${fmt(s.reading_band)}</div></div>
+      <div class="stat-cell"><div class="label">Writing</div><div class="value seal">${fmt(s.writing_band)}</div></div>
+      <div class="stat-cell"><div class="label">Overall</div><div class="value seal">${fmt(s.overall_band)}</div></div>
+    </div>
+
+    <div class="panel">
+      <h2>Reading &amp; Listening</h2>
+      <p class="panel-sub">Raw score ${fmt(s.reading_raw_score)}/40 (Reading) · ${fmt(s.listening_raw_score)}/40 (Listening) — auto-marked on submission.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Writing</h2>
+      <p class="panel-sub">${s.writing_band != null ? 'Graded by your teacher.' : "Awaiting your teacher's grading."}</p>
+      ${sorted.map(w => `
+        <div class="builder-item">
+          <div class="builder-item-head">
+            <strong>Task ${w.writing_tasks.task_number}</strong>
+            <span class="tag">${w.band_score != null ? 'Band ' + w.band_score : 'Not yet graded'}</span>
+          </div>
+          <p style="font-size:14px;color:var(--ink-soft);margin-bottom:8px;">${w.word_count} words</p>
+          ${w.feedback ? `<p style="font-size:14px;">${escapeHtml(w.feedback)}</p>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function fmt(v) { return v == null ? '—' : v; }
+</script>
+</body>
+</html>

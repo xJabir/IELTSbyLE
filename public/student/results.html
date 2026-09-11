@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Results — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand">London Educators</div>
+  <div class="who">
+    <a href="/student/dashboard.html">Mock tests</a>
+    <a href="/student/speaking.html">Speaking test</a>
+    <span id="userName"></span>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head"><h1>My results</h1></div>
+  <div id="resultsWrap"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+(async () => {
+  const profile = await Auth.requireRole('student');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  load(profile);
+})();
+
+async function load(profile) {
+  const { data: results } = await supabase
+    .from('submissions')
+    .select('*, tests(title)')
+    .eq('student_id', profile.id)
+    .neq('status', 'in_progress')
+    .order('submitted_at', { ascending: false });
+
+  const wrap = document.getElementById('resultsWrap');
+  if (!results || !results.length) {
+    wrap.innerHTML = `<div class="empty-state"><h3>No results yet</h3><p>Once you submit a mock test, your band scores will show up here.</p></div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <table class="band-table">
+      <thead><tr>
+        <th>Test</th><th>Submitted</th><th>Listening</th><th>Reading</th><th>Writing</th><th>Overall</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${results.map(r => `
+          <tr>
+            <td>${escapeHtml(r.tests?.title || '')}</td>
+            <td>${r.submitted_at ? r.submitted_at.slice(0, 10) : '—'}</td>
+            <td class="band">${fmt(r.listening_band)}</td>
+            <td class="band">${fmt(r.reading_band)}</td>
+            <td class="band">${fmt(r.writing_band)}</td>
+            <td class="band">${fmt(r.overall_band)}</td>
+            <td><a href="/student/result-detail.html?id=${r.id}" class="small-btn">Details</a></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function fmt(v) { return v == null ? '—' : v; }
+</script>
+</body>
+</html>

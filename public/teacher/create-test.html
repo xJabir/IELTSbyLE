@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Mock Test — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand">London Educators — Teacher Panel</div>
+  <div class="who">
+    <span id="userName"></span>
+    <a href="/teacher/dashboard.html">← All tests</a>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head">
+    <h1 id="testTitleHeading">Loading…</h1>
+    <div style="display:flex;gap:10px;">
+      <span id="publishBadge"></span>
+      <button class="button ghost" id="publishBtn">Publish</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="active" data-tab="details">Details</button>
+    <button data-tab="reading">Reading</button>
+    <button data-tab="listening">Listening</button>
+    <button data-tab="writing">Writing</button>
+  </div>
+
+  <div id="tab-details" class="tab-content"></div>
+  <div id="tab-reading" class="tab-content" style="display:none;"></div>
+  <div id="tab-listening" class="tab-content" style="display:none;"></div>
+  <div id="tab-writing" class="tab-content" style="display:none;"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/teacher-create-test.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Instructions — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<div class="auth-shell">
+  <div class="auth-card" style="max-width:560px;">
+    <h1 id="testTitle">Loading…</h1>
+    <p class="sub" id="testDesc"></p>
+
+    <div style="margin-top:24px;border-top:1px solid var(--line);padding-top:20px;">
+      <div class="module-row" style="grid-template-columns: 1fr 90px; padding:14px 0;">
+        <div><strong>Listening</strong><div style="font-size:13px;color:var(--ink-soft);">Recordings play once. Answer as you listen.</div></div>
+        <div id="listenDur" style="font-family:var(--mono);text-align:right;"></div>
+      </div>
+      <div class="module-row" style="grid-template-columns: 1fr 90px; padding:14px 0;">
+        <div><strong>Reading</strong><div style="font-size:13px;color:var(--ink-soft);">Three passages, increasing in difficulty.</div></div>
+        <div id="readDur" style="font-family:var(--mono);text-align:right;"></div>
+      </div>
+      <div class="module-row" style="grid-template-columns: 1fr 90px; padding:14px 0; border-bottom:none;">
+        <div><strong>Writing</strong><div style="font-size:13px;color:var(--ink-soft);">Task 1 and Task 2.</div></div>
+        <div id="writeDur" style="font-family:var(--mono);text-align:right;"></div>
+      </div>
+    </div>
+
+    <p class="form-note" style="text-align:left;margin-top:20px;">Once you start, each module is timed and submits automatically when time runs out. You can leave and resume before finishing a module, but a module already submitted can't be redone.</p>
+
+    <div class="submit-row"><button class="button primary block" id="startBtn" disabled>Begin test</button></div>
+    <p class="form-note"><a href="/student/dashboard.html">← Back to my tests</a></p>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+const testId = new URLSearchParams(location.search).get('testId');
+
+(async () => {
+  const profile = await Auth.requireRole('student');
+  if (!profile) return;
+  load();
+})();
+
+async function load() {
+  const { data, error } = await supabase.rpc('start_or_resume_test', { p_test_id: testId });
+  if (error) {
+    document.getElementById('testTitle').textContent = 'Could not load test';
+    document.getElementById('testDesc').textContent = error.message;
+    return;
+  }
+  sessionStorage.setItem('le_exam_session', JSON.stringify(data));
+  document.getElementById('testTitle').textContent = data.test.title;
+  document.getElementById('testDesc').textContent = data.test.description || 'Full mock test: Listening, Reading and Writing.';
+  document.getElementById('listenDur').textContent = data.test.listening_duration_min + ' min';
+  document.getElementById('readDur').textContent = data.test.reading_duration_min + ' min';
+  document.getElementById('writeDur').textContent = data.test.writing_duration_min + ' min';
+  document.getElementById('startBtn').disabled = false;
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  const data = JSON.parse(sessionStorage.getItem('le_exam_session') || '{}');
+  if (data.sections && data.sections.length) {
+    window.location.href = '/exam/listening.html';
+  } else if (data.passages && data.passages.length) {
+    window.location.href = '/exam/reading.html';
+  } else if (data.writingTasks && data.writingTasks.length) {
+    window.location.href = '/exam/writing.html';
+  } else {
+    window.location.href = '/exam/finish.html';
+  }
+});
+</script>
+</body>
+</html>

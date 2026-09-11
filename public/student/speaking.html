@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Your Speaking Test — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+<style>
+  .date-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
+  .date-pill {
+    flex-shrink: 0; min-width: 76px; text-align: center; padding: 12px 10px; border: 1px solid var(--line);
+    border-radius: 3px; cursor: pointer; background: #fff;
+  }
+  .date-pill .dow { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; }
+  .date-pill .dom { font-family: var(--serif); font-size: 20px; margin-top: 2px; }
+  .date-pill.full { opacity: 0.4; cursor: not-allowed; }
+  .date-pill.selected { border-color: var(--seal); border-width: 2px; }
+  .slot-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border: 1px solid var(--line); margin-bottom: 8px; background: #fff; }
+  .slot-row .time { font-family: var(--mono); font-size: 16px; }
+  .slot-row .seats { font-size: 13px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand">London Educators</div>
+  <div class="who">
+    <a href="/student/dashboard.html">Mock tests</a>
+    <a href="/student/results.html">My results</a>
+    <span id="userName"></span>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head"><h1>Book your Speaking test</h1></div>
+  <div id="currentBooking"></div>
+  <div id="bookingArea"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+let profile;
+let availability = []; // rows from speaking_slot_availability
+let selectedDate = null;
+let myBooking = null;
+
+(async () => {
+  profile = await Auth.requireRole('student');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  load();
+})();
+
+async function load() {
+  const today = new Date().toISOString().slice(0, 10);
+  const in60 = new Date(Date.now() + 60 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+
+  const [{ data: avail }, { data: booking }] = await Promise.all([
+    supabase.from('speaking_slot_availability').select('*').gte('slot_date', today).lte('slot_date', in60).order('slot_date').order('slot_time'),
+    supabase.from('speaking_bookings').select('*, speaking_slots(slot_date, slot_time)').eq('student_id', profile.id).eq('status', 'booked').maybeSingle()
+  ]);
+
+  availability = avail || [];
+  myBooking = booking || null;
+  renderCurrentBooking();
+  renderBookingArea();
+}
+
+function renderCurrentBooking() {
+  const el = document.getElementById('currentBooking');
+  if (!myBooking) { el.innerHTML = ''; return; }
+  const slot = myBooking.speaking_slots;
+  el.innerHTML = `
+    <div class="panel" style="border-color:var(--seal);">
+      <h2>You're booked in</h2>
+      <p class="panel-sub" style="margin-bottom:0;">${formatDate(slot.slot_date)} at ${formatTime(slot.slot_time)}</p>
+      <div class="submit-row"><button class="small-btn danger" id="cancelBookingBtn">Cancel this booking</button></div>
+    </div>
+  `;
+  document.getElementById('cancelBookingBtn').addEventListener('click', async () => {
+    if (!confirm('Cancel your speaking test booking?')) return;
+    const { error } = await supabase.from('speaking_bookings').update({ status: 'cancelled' }).eq('id', myBooking.id);
+    if (error) { alert(error.message); return; }
+    await load();
+  });
+}
+
+function renderBookingArea() {
+  const el = document.getElementById('bookingArea');
+  if (myBooking) {
+    el.innerHTML = `<p style="color:var(--ink-soft);font-size:14px;">You can only hold one upcoming speaking test at a time — cancel the one above if you'd like to pick a different slot.</p>`;
+    return;
+  }
+
+  const byDate = {};
+  availability.forEach(row => {
+    byDate[row.slot_date] = byDate[row.slot_date] || [];
+    byDate[row.slot_date].push(row);
+  });
+  const dates = Object.keys(byDate).sort();
+
+  if (!dates.length) {
+    el.innerHTML = `<div class="empty-state"><h3>No speaking slots open yet</h3><p>Ask your teacher to add some — they'll appear here once available.</p></div>`;
+    return;
+  }
+
+  if (!selectedDate || !byDate[selectedDate]) selectedDate = dates.find(d => byDate[d].some(r => r.remaining > 0)) || dates[0];
+
+  el.innerHTML = `
+    <div class="date-strip" id="dateStrip"></div>
+    <div id="slotList"></div>
+  `;
+
+  const strip = document.getElementById('dateStrip');
+  strip.innerHTML = dates.map(d => {
+    const dayFull = byDate[d].every(r => r.remaining <= 0);
+    const dt = new Date(d + 'T00:00:00');
+    const cls = ['date-pill'];
+    if (dayFull) cls.push('full');
+    if (d === selectedDate) cls.push('selected');
+    return `<div class="${cls.join(' ')}" data-date="${d}">
+      <div class="dow">${dt.toLocaleDateString(undefined, { weekday: 'short' })}</div>
+      <div class="dom">${dt.getDate()}</div>
+      ${dayFull ? '<div style="font-size:10px;color:var(--seal);margin-top:2px;">Full</div>' : ''}
+    </div>`;
+  }).join('');
+  strip.querySelectorAll('.date-pill').forEach(pill => {
+    pill.addEventListener('click', () => { selectedDate = pill.dataset.date; renderBookingArea(); });
+  });
+
+  const slotListEl = document.getElementById('slotList');
+  const slotsForDate = (byDate[selectedDate] || []).slice().sort((a, b) => a.slot_time.localeCompare(b.slot_time));
+  slotListEl.innerHTML = `<h3 style="font-family:var(--serif);font-size:18px;margin:20px 0 12px;">${formatDate(selectedDate)}</h3>` +
+    slotsForDate.map(s => `
+      <div class="slot-row">
+        <div>
+          <div class="time">${formatTime(s.slot_time)}</div>
+          <div class="seats">${s.remaining > 0 ? `${s.remaining} seat${s.remaining === 1 ? '' : 's'} left` : 'Full'}</div>
+        </div>
+        <button class="button primary" style="padding:9px 18px;" data-slot="${s.id}" ${s.remaining <= 0 ? 'disabled' : ''}>Book</button>
+      </div>
+    `).join('');
+
+  slotListEl.querySelectorAll('[data-slot]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      const { error } = await supabase.rpc('book_speaking_slot', { p_slot_id: btn.dataset.slot });
+      if (error) { alert(error.message); btn.disabled = false; return; }
+      await load();
+    });
+  });
+}
+
+function formatDate(d) {
+  return new Date(d + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+}
+function formatTime(t) {
+  const [h, m] = t.split(':');
+  const hour = Number(h);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const h12 = ((hour + 11) % 12) + 1;
+  return `${h12}:${m} ${ampm}`;
+}
+</script>
+</body>
+</html>

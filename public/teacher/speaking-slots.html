@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking Slots — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand">London Educators — Teacher Panel</div>
+  <div class="who">
+    <span id="userName"></span>
+    <a href="/teacher/dashboard.html">← All tests</a>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head"><h1>Speaking slots</h1></div>
+
+  <div class="panel">
+    <h2>Add a slot</h2>
+    <p class="panel-sub">Students book directly into these — the day shows as full automatically once every slot on it is at capacity.</p>
+    <div class="inline-row">
+      <div class="field"><label>Date</label><input type="date" id="newDate"></div>
+      <div class="field"><label>Time</label><input type="time" id="newTime"></div>
+      <div class="field" style="flex:0 0 120px;"><label>Capacity</label><input type="number" id="newCapacity" min="1" value="1"></div>
+      <button class="button primary" id="addSlotBtn" style="padding:11px 20px;">Add slot</button>
+    </div>
+  </div>
+
+  <div id="slotList"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+let profile;
+
+(async () => {
+  profile = await Auth.requireRole('teacher');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  document.getElementById('addSlotBtn').addEventListener('click', addSlot);
+  load();
+})();
+
+async function load() {
+  const { data: slots } = await supabase
+    .from('speaking_slots').select('*').eq('teacher_id', profile.id)
+    .order('slot_date').order('slot_time');
+
+  const { data: bookings } = await supabase
+    .from('speaking_bookings').select('*, profiles(name, email)').eq('status', 'booked');
+
+  const el = document.getElementById('slotList');
+  if (!slots || !slots.length) {
+    el.innerHTML = `<div class="empty-state"><h3>No slots yet</h3><p>Add your first speaking slot above.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = slots.map(s => {
+    const booked = (bookings || []).filter(b => b.slot_id === s.id);
+    return `
+      <div class="list-row" style="grid-template-columns: 1fr auto auto;">
+        <div>
+          <div class="title">${formatDate(s.slot_date)} · ${formatTime(s.slot_time)}</div>
+          <div class="meta">${booked.length}/${s.capacity} booked${booked.length ? ': ' + booked.map(b => escapeHtml(b.profiles.name)).join(', ') : ''}</div>
+        </div>
+        <span class="badge ${booked.length >= s.capacity ? 'done' : 'pending'}">${booked.length >= s.capacity ? 'Full' : 'Open'}</span>
+        <button class="small-btn danger" data-del-slot="${s.id}" data-booked="${booked.length}">Delete</button>
+      </div>
+    `;
+  }).join('');
+
+  el.querySelectorAll('[data-del-slot]').forEach(btn => btn.addEventListener('click', () => deleteSlot(btn.dataset.delSlot, Number(btn.dataset.booked))));
+}
+
+async function addSlot() {
+  const slot_date = document.getElementById('newDate').value;
+  const slot_time = document.getElementById('newTime').value;
+  const capacity = Number(document.getElementById('newCapacity').value) || 1;
+  if (!slot_date || !slot_time) { alert('Pick a date and time.'); return; }
+  const { error } = await supabase.from('speaking_slots').insert({ teacher_id: profile.id, slot_date, slot_time, capacity });
+  if (error) { alert(error.message); return; }
+  document.getElementById('newDate').value = '';
+  document.getElementById('newTime').value = '';
+  document.getElementById('newCapacity').value = '1';
+  await load();
+}
+
+async function deleteSlot(id, bookedCount) {
+  const msg = bookedCount > 0
+    ? `${bookedCount} student(s) already booked this slot — deleting it removes their booking too. Continue?`
+    : 'Delete this slot?';
+  if (!confirm(msg)) return;
+  await supabase.from('speaking_slots').delete().eq('id', id);
+  await load();
+}
+
+function formatDate(d) {
+  return new Date(d + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function formatTime(t) {
+  const [h, m] = t.split(':');
+  const hour = Number(h);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const h12 = ((hour + 11) % 12) + 1;
+  return `${h12}:${m} ${ampm}`;
+}
+</script>
+</body>
+</html>
