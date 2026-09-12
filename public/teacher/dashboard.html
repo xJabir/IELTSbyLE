@@ -66,10 +66,10 @@ async function load() {
     listEl.innerHTML = `<div class="empty-state"><h3>No mock tests yet</h3><p>Create your first mock test to start adding passages, audio, and writing tasks.</p></div>`;
     return;
   }
-  listEl.innerHTML = tests.map(t => `
+    listEl.innerHTML = tests.map(t => `
     <div class="list-row">
       <div>
-        <div class="title">${escapeHtml(t.title)}</div>
+        <div class="title">${escapeHtml(t.title)} <span class="tag">${typeLabel(t.test_type)}</span></div>
         <div class="meta">${escapeHtml(t.description || 'No description')}</div>
       </div>
       ${t.published ? '<span class="badge done">Published</span>' : '<span class="badge pending">Draft</span>'}
@@ -79,6 +79,10 @@ async function load() {
       </div>
     </div>
   `).join('');
+}
+
+function typeLabel(type) {
+  return { reading: 'Reading only', listening: 'Listening only', writing: 'Writing only', full: 'Full Mock Test' }[type] || 'Full Mock Test';
 }
 
 document.getElementById('newTestBtn').addEventListener('click', () => { document.getElementById('newTestModal').style.display = 'flex'; });
