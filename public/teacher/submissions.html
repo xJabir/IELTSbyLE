@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Submissions — London Educators</title>
+<title>Submissions — IELTSbyLE</title>
 <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
 
 <nav class="dash-nav">
-  <div class="brand"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"> IELTSbyLE — Teacher Panel</div>
+  <div class="brand"><img src="/images/logo.png" alt="IELTSbyLE" class="brand-logo"> — Teacher Panel</div>
   <div class="who">
     <span id="userName"></span>
     <a href="/teacher/dashboard.html">← All tests</a>
@@ -18,7 +18,7 @@
 </nav>
 
 <main class="dash-main">
-  <div class="dash-head"><h1>Submissions</h1></div>
+  <div class="dash-head"><h1 id="pageTitle">Submissions</h1></div>
   <div id="subList"></div>
 </main>
 
@@ -36,6 +36,9 @@ const testId = new URLSearchParams(location.search).get('testId');
 })();
 
 async function load() {
+  const { data: test } = await supabase.from('tests').select('title').eq('id', testId).single();
+  if (test) document.getElementById('pageTitle').textContent = `Submissions — ${test.title}`;
+
   const { data: submissions, error } = await supabase
     .from('submissions')
     .select('*, profiles(name, email)')
@@ -49,17 +52,33 @@ async function load() {
     el.innerHTML = `<div class="empty-state"><h3>No submissions yet</h3><p>They'll appear here once a student finishes this mock test.</p></div>`;
     return;
   }
-  el.innerHTML = submissions.map(s => `
-    <div class="list-row">
-      <div>
-        <div class="title">${escapeHtml(s.profiles.name)}</div>
-        <div class="meta">${escapeHtml(s.profiles.email)} · submitted ${s.submitted_at ? s.submitted_at.slice(0, 16).replace('T', ' ') : '—'}</div>
-      </div>
-      ${s.status === 'graded' ? '<span class="badge done">Graded</span>' : '<span class="badge pending">Needs writing grade</span>'}
-      <a href="/teacher/grade.html?subId=${s.id}" class="button ghost" style="padding:9px 16px;">Open</a>
-    </div>
-  `).join('');
+
+  el.innerHTML = `
+    <table class="band-table">
+      <thead><tr>
+        <th>Student</th><th>Submitted</th><th>Listening</th><th>Reading</th><th>Writing</th><th>Overall</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${submissions.map(s => `
+          <tr>
+            <td>${escapeHtml(s.profiles.name)}<br><span style="font-size:12px;color:var(--ink-soft);">${escapeHtml(s.profiles.email)}</span></td>
+            <td>${s.submitted_at ? s.submitted_at.slice(0, 16).replace('T', ' ') : '—'}</td>
+            <td class="band">${fmt(s.listening_band)}</td>
+            <td class="band">${fmt(s.reading_band)}</td>
+            <td class="band">${fmt(s.writing_band)}</td>
+            <td class="band">${fmt(s.overall_band)}</td>
+            <td>
+              ${s.status === 'graded' ? '<span class="badge done">Graded</span>' : '<span class="badge pending">Needs grade</span>'}
+              <a href="/teacher/grade.html?subId=${s.id}" class="small-btn" style="margin-left:8px;">Open</a>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
+
+function fmt(v) { return v == null ? '—' : v; }
 </script>
 </body>
 </html>
