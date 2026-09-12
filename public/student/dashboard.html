@@ -52,37 +52,60 @@
   if (!profile) return;
   document.getElementById('userName').textContent = profile.name;
   document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  document.querySelectorAll('#typeTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#typeTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTestList(btn.dataset.filter);
+    });
+  });
   load();
 })();
+
+let allTests = [], allResults = [], allInProgress = [];
 
 async function load() {
   const profile = await Auth.getProfile();
   const [{ data: tests }, { data: results }] = await Promise.all([
-        supabase.from('tests').select('id, title, description, test_type').eq('published', true).order('created_at', { ascending: false }),
+    supabase.from('tests').select('id, title, description, test_type').eq('published', true).order('created_at', { ascending: false }),
     supabase.from('submissions').select('*').eq('student_id', profile.id).neq('status', 'in_progress')
   ]);
   const { data: inProgress } = await supabase.from('submissions').select('test_id, status').eq('student_id', profile.id).eq('status', 'in_progress');
 
-  const graded = (results || []).filter(r => r.overall_band != null);
+  allTests = tests || [];
+  allResults = results || [];
+  allInProgress = inProgress || [];
+
+  const graded = allResults.filter(r => r.overall_band != null);
   const avg = graded.length ? (graded.reduce((a, r) => a + r.overall_band, 0) / graded.length).toFixed(1) : '—';
   const best = graded.length ? Math.max(...graded.map(r => r.overall_band)) : '—';
 
   document.getElementById('statRow').innerHTML = `
-    <div class="stat-cell"><div class="label">Tests taken</div><div class="value">${(results || []).length}</div></div>
+    <div class="stat-cell"><div class="label">Tests taken</div><div class="value">${allResults.length}</div></div>
     <div class="stat-cell"><div class="label">Fully graded</div><div class="value">${graded.length}</div></div>
     <div class="stat-cell"><div class="label">Average overall band</div><div class="value seal">${avg}</div></div>
     <div class="stat-cell"><div class="label">Best overall band</div><div class="value seal">${best}</div></div>
   `;
 
+  renderTestList('all');
+}
+
+function renderTestList(filter) {
+  const tests = filter === 'all' ? allTests : allTests.filter(t => (t.test_type || 'full') === filter);
   const listEl = document.getElementById('testList');
-  if (!tests || !tests.length) {
+
+  if (!allTests.length) {
     listEl.innerHTML = `<div class="empty-state"><h3>No mock tests published yet</h3><p>Ask your teacher to publish a test — it'll appear here as soon as it's live.</p></div>`;
+    return;
+  }
+  if (!tests.length) {
+    listEl.innerHTML = `<div class="empty-state"><h3>No tests of this type yet</h3><p>Try a different tab, or check back later.</p></div>`;
     return;
   }
 
   listEl.innerHTML = tests.map(t => {
-    const finished = (results || []).find(r => r.test_id === t.id);
-    const progress = (inProgress || []).find(r => r.test_id === t.id);
+    const finished = allResults.find(r => r.test_id === t.id);
+    const progress = allInProgress.find(r => r.test_id === t.id);
     let badge = '<span class="badge pending">Not started</span>';
     let action = `<a href="/exam/intro.html?testId=${t.id}" class="button primary" style="padding:9px 18px;">Start test</a>`;
     if (progress) {
@@ -92,7 +115,7 @@ async function load() {
       badge = finished.status === 'graded' ? '<span class="badge done">Graded</span>' : '<span class="badge pending">Awaiting writing grade</span>';
       action = `<a href="/student/results.html" class="button ghost" style="padding:9px 18px;">View result</a>`;
     }
-        return `
+    return `
       <div class="list-row">
         <div>
           <div class="title">${escapeHtml(t.title)} <span class="tag">${typeLabel(t.test_type)}</span></div>
