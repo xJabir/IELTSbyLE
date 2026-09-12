@@ -29,7 +29,16 @@
   <div class="exam-modal">
     <h2 style="font-family:var(--serif);">Name your mock test</h2>
     <div class="field"><label>Title</label><input type="text" id="newTitle" placeholder="e.g. Academic Mock Test — Set 3"></div>
-    <div class="field"><label>Description (optional)</label><input type="text" id="newDesc" placeholder="Shown to students on the test list"></div>
+        <div class="field"><label>Description (optional)</label><input type="text" id="newDesc" placeholder="Shown to students on the test list"></div>
+    <div class="field">
+      <label>Test type</label>
+      <select id="newType">
+        <option value="full">Full Mock Test (Reading + Listening + Writing)</option>
+        <option value="reading">Reading only</option>
+        <option value="listening">Listening only</option>
+        <option value="writing">Writing only</option>
+      </select>
+    </div>
     <div class="modal-actions" style="margin-top:20px;">
       <button class="exam-btn" id="cancelNew">Cancel</button>
       <button class="exam-btn primary" id="createNew">Create &amp; edit</button>
