@@ -7,7 +7,7 @@
 const SUPABASE_URL = 'https://pcnpoisoldqtacmvolcd.supabase.co'; // e.g. https://abcdefgh.supabase.co
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbnBvaXNvbGRxdGFjbXZvbGNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMzkwNDEsImV4cCI6MjEwNDcxNTA0MX0.NmFf3z5MZtGTaw7cV7_bnVMKRSxcfOGITqEA-LvbjeY';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const Auth = {
   // Cache of {id, name, email, role} for the current tab — avoids
