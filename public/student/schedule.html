@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Schedule — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+<style>
+  .date-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
+  .date-pill {
+    flex-shrink: 0; min-width: 76px; text-align: center; padding: 12px 10px; border: 1px solid var(--line);
+    border-radius: 3px; cursor: pointer; background: #fff;
+  }
+  .date-pill .dow { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; }
+  .date-pill .dom { font-family: var(--serif); font-size: 20px; margin-top: 2px; }
+  .date-pill.today { border-color: var(--brass); }
+  .date-pill.selected { border-color: var(--seal); border-width: 2px; }
+  .class-card { border: 1px solid var(--line); background: #fff; padding: 26px; }
+  .class-card .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed var(--line); font-size: 15px; }
+  .class-card .row:last-child { border-bottom: none; }
+  .class-card .row .label { color: var(--ink-soft); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand"><a href="/student/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
+  <div class="who">
+    <a href="/student/dashboard.html">Mock tests</a>
+    <a href="/student/speaking.html">Speaking test</a>
+    <a href="/student/results.html">My results</a>
+    <span id="userName"></span>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head"><h1>Class schedule</h1></div>
+  <div id="scheduleArea"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+let profile;
+let classes = [];
+let selectedDate = null;
+
+(async () => {
+  profile = await Auth.requireRole('student');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  load();
+})();
+
+async function load() {
+  const el = document.getElementById('scheduleArea');
+
+  if (!profile.batch_number) {
+    el.innerHTML = `<div class="empty-state"><h3>No batch on file</h3><p>Your account isn't linked to a batch yet — ask your teacher to add your Batch number so classes can show up here.</p></div>`;
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('lecture_schedule').select('*').eq('batch_number', profile.batch_number)
+    .order('class_date');
+
+  if (error) { el.innerHTML = `<div class="empty-state"><h3>Couldn't load your schedule</h3><p>${escapeHtml(error.message)}</p></div>`; return; }
+
+  classes = data || [];
+  render();
+}
+
+function render() {
+  const el = document.getElementById('scheduleArea');
+
+  if (!classes.length) {
+    el.innerHTML = `<div class="empty-state"><h3>No classes scheduled yet</h3><p>Nothing's been added for ${escapeHtml(profile.batch_number)} yet — check back soon.</p></div>`;
+    return;
+  }
+
+  const byDate = {};
+  classes.forEach(c => { (byDate[c.class_date] = byDate[c.class_date] || []).push(c); });
+  const dates = Object.keys(byDate).sort();
+
+  const today = new Date().toISOString().slice(0, 10);
+  if (!selectedDate || !byDate[selectedDate]) {
+    selectedDate = dates.find(d => d >= today) || dates[dates.length - 1];
+  }
+
+  el.innerHTML = `
+    <p style="color:var(--ink-soft);font-size:14px;margin-bottom:18px;">Showing the schedule for <strong>${escapeHtml(profile.batch_number)}</strong>.</p>
+    <div class="date-strip" id="dateStrip"></div>
+    <div id="classDetail"></div>
+  `;
+
+  const strip = document.getElementById('dateStrip');
+  strip.innerHTML = dates.map(d => {
+    const dt = new Date(d + 'T00:00:00');
+    const cls = ['date-pill'];
+    if (d === today) cls.push('today');
+    if (d === selectedDate) cls.push('selected');
+    return `<div class="${cls.join(' ')}" data-date="${d}">
+      <div class="dow">${dt.toLocaleDateString(undefined, { weekday: 'short' })}</div>
+      <div class="dom">${dt.getDate()}</div>
+    </div>`;
+  }).join('');
+  strip.querySelectorAll('.date-pill').forEach(pill => {
+    pill.addEventListener('click', () => { selectedDate = pill.dataset.date; render(); });
+  });
+
+  const detailEl = document.getElementById('classDetail');
+  const dt = new Date(selectedDate + 'T00:00:00');
+  detailEl.innerHTML = `<h3 style="font-family:var(--serif);font-size:18px;margin:0 0 12px;">${dt.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</h3>` +
+    byDate[selectedDate].map(c => `
+      <div class="class-card" style="margin-bottom:12px;">
+        <div class="row"><div><div class="label">Class number</div>${escapeHtml(c.class_number)}</div></div>
+        <div class="row"><div><div class="label">Module</div>${escapeHtml(c.module_name)}</div></div>
+        <div class="row"><div><div class="label">Teacher</div>${escapeHtml(c.teacher_name)}</div></div>
+        <div class="row">
+          <div><div class="label">Joining link</div>${c.joining_link ? escapeHtml(c.joining_link) : '—'}</div>
+          ${c.joining_link ? `<a href="${escapeHtml(c.joining_link)}" target="_blank" rel="noopener" class="button primary" style="padding:9px 18px;align-self:center;">Join class</a>` : ''}
+        </div>
+      </div>
+    `).join('');
+}
+</script>
+</body>
+</html>
