@@ -45,6 +45,19 @@ function renderAll() {
   renderReading();
   renderListening();
   renderWriting();
+  applyTabVisibility();
+}
+
+function applyTabVisibility() {
+  const type = state.test.test_type || 'full';
+  const map = { reading: ['reading'], listening: ['listening'], writing: ['writing'], full: ['reading', 'listening', 'writing'] };
+  const visible = map[type] || map.full;
+  document.querySelectorAll('.tabs button[data-tab]').forEach(btn => {
+    if (btn.dataset.tab === 'details') return;
+    btn.style.display = visible.includes(btn.dataset.tab) ? '' : 'none';
+  });
+  const activeBtn = document.querySelector('.tabs button.active');
+  if (activeBtn && activeBtn.style.display === 'none') switchTab('details');
 }
 
 function switchTab(tab) {
@@ -64,11 +77,21 @@ async function togglePublish() {
 
 function renderDetails() {
   const t = state.test;
+  const type = t.test_type || 'full';
   document.getElementById('tab-details').innerHTML = `
     <div class="panel">
       <h2>Test details</h2>
       <div class="field"><label>Title</label><input id="d-title" type="text" value="${esc(t.title)}"></div>
       <div class="field"><label>Description</label><input id="d-desc" type="text" value="${esc(t.description)}"></div>
+      <div class="field">
+        <label>Test type</label>
+        <select id="d-type">
+          <option value="full" ${type === 'full' ? 'selected' : ''}>Full Mock Test (Reading + Listening + Writing)</option>
+          <option value="reading" ${type === 'reading' ? 'selected' : ''}>Reading only</option>
+          <option value="listening" ${type === 'listening' ? 'selected' : ''}>Listening only</option>
+          <option value="writing" ${type === 'writing' ? 'selected' : ''}>Writing only</option>
+        </select>
+      </div>
       <div class="inline-row" style="margin-top:20px;">
         <div class="field"><label>Listening (min)</label><input id="d-listen" type="number" min="1" value="${t.listening_duration_min}"></div>
         <div class="field"><label>Reading (min)</label><input id="d-read" type="number" min="1" value="${t.reading_duration_min}"></div>
