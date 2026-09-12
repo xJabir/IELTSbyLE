@@ -6,19 +6,44 @@
 <title>Class Schedule — London Educators</title>
 <link rel="stylesheet" href="/css/main.css">
 <style>
-  .date-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
-  .date-pill {
-    flex-shrink: 0; min-width: 76px; text-align: center; padding: 12px 10px; border: 1px solid var(--line);
-    border-radius: 3px; cursor: pointer; background: #fff;
+  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .cal-head h2 { font-family: var(--serif); font-size: 20px; }
+  .cal-nav-btn {
+    border: 1px solid var(--line); background: #fff; border-radius: var(--radius);
+    width: 34px; height: 34px; font-size: 16px; line-height: 1; cursor: pointer; color: var(--ink);
   }
-  .date-pill .dow { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; }
-  .date-pill .dom { font-family: var(--serif); font-size: 20px; margin-top: 2px; }
-  .date-pill.today { border-color: var(--brass); }
-  .date-pill.selected { border-color: var(--seal); border-width: 2px; }
+  .cal-nav-btn:hover { border-color: var(--ink); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cal-dow {
+    text-align: center; font-size: 11px; font-weight: 600; letter-spacing: .04em;
+    color: var(--ink-soft); text-transform: uppercase; padding-bottom: 6px;
+  }
+  .cal-cell {
+    position: relative; aspect-ratio: 1 / 0.85; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 8px; background: #fff; font-size: 14px;
+  }
+  .cal-cell.outside { background: transparent; border-color: transparent; }
+  .cal-cell.empty-day { color: var(--line); background: var(--paper-dim); border-color: var(--paper-dim); }
+  .cal-cell.has-class {
+    cursor: pointer; border-color: var(--seal); background: #fff; font-weight: 600;
+    transition: background .12s ease;
+  }
+  .cal-cell.has-class:hover { background: var(--paper-dim); }
+  .cal-cell.has-class.selected { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .cal-cell.today:not(.has-class) { border-color: var(--brass); }
+  .cal-dot {
+    position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%);
+    width: 5px; height: 5px; border-radius: 50%; background: var(--seal);
+  }
+  .cal-cell.selected .cal-dot { background: #fff; }
   .class-card { border: 1px solid var(--line); background: #fff; padding: 26px; }
   .class-card .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed var(--line); font-size: 15px; }
   .class-card .row:last-child { border-bottom: none; }
   .class-card .row .label { color: var(--ink-soft); font-size: 13px; }
+  @media (max-width: 640px) {
+    .cal-cell { font-size: 12px; padding: 5px; }
+    .cal-dow { font-size: 9px; }
+  }
 </style>
 </head>
 <body>
@@ -45,6 +70,9 @@
 let profile;
 let classes = [];
 let selectedDate = null;
+const today = new Date();
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth(); // 0-11
 
 (async () => {
   profile = await Auth.requireRole('student');
@@ -72,58 +100,100 @@ async function load() {
   render();
 }
 
+function isoDate(y, m, d) {
+  return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
 function render() {
   const el = document.getElementById('scheduleArea');
 
-  if (!classes.length) {
-    el.innerHTML = `<div class="empty-state"><h3>No classes scheduled yet</h3><p>Nothing's been added for ${escapeHtml(profile.batch_number)} yet — check back soon.</p></div>`;
-    return;
-  }
-
   const byDate = {};
   classes.forEach(c => { (byDate[c.class_date] = byDate[c.class_date] || []).push(c); });
-  const dates = Object.keys(byDate).sort();
-
-  const today = new Date().toISOString().slice(0, 10);
-  if (!selectedDate || !byDate[selectedDate]) {
-    selectedDate = dates.find(d => d >= today) || dates[dates.length - 1];
-  }
 
   el.innerHTML = `
-    <p style="color:var(--ink-soft);font-size:14px;margin-bottom:18px;">Showing the schedule for <strong>${escapeHtml(profile.batch_number)}</strong>.</p>
-    <div class="date-strip" id="dateStrip"></div>
-    <div id="classDetail"></div>
+    <p style="color:var(--ink-soft);font-size:14px;margin-bottom:18px;">Showing the schedule for <strong>${escapeHtml(profile.batch_number)}</strong>. Dates with a class are outlined — click one to see the details.</p>
+    <div class="panel">
+      <div class="cal-head">
+        <button class="cal-nav-btn" id="prevMonth" aria-label="Previous month">‹</button>
+        <h2 id="calTitle"></h2>
+        <button class="cal-nav-btn" id="nextMonth" aria-label="Next month">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div id="classDetail" style="margin-top:24px;"></div>
   `;
 
-  const strip = document.getElementById('dateStrip');
-  strip.innerHTML = dates.map(d => {
-    const dt = new Date(d + 'T00:00:00');
-    const cls = ['date-pill'];
-    if (d === today) cls.push('today');
-    if (d === selectedDate) cls.push('selected');
-    return `<div class="${cls.join(' ')}" data-date="${d}">
-      <div class="dow">${dt.toLocaleDateString(undefined, { weekday: 'short' })}</div>
-      <div class="dom">${dt.getDate()}</div>
-    </div>`;
-  }).join('');
-  strip.querySelectorAll('.date-pill').forEach(pill => {
-    pill.addEventListener('click', () => { selectedDate = pill.dataset.date; render(); });
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    viewMonth -= 1;
+    if (viewMonth < 0) { viewMonth = 11; viewYear -= 1; }
+    render();
+  });
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    viewMonth += 1;
+    if (viewMonth > 11) { viewMonth = 0; viewYear += 1; }
+    render();
   });
 
+  const monthLabel = new Date(viewYear, viewMonth, 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  document.getElementById('calTitle').textContent = monthLabel;
+
+  renderGrid(byDate);
+
   const detailEl = document.getElementById('classDetail');
-  const dt = new Date(selectedDate + 'T00:00:00');
-  detailEl.innerHTML = `<h3 style="font-family:var(--serif);font-size:18px;margin:0 0 12px;">${dt.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</h3>` +
-    byDate[selectedDate].map(c => `
-      <div class="class-card" style="margin-bottom:12px;">
-        <div class="row"><div><div class="label">Class number</div>${escapeHtml(c.class_number)}</div></div>
-        <div class="row"><div><div class="label">Module</div>${escapeHtml(c.module_name)}</div></div>
-        <div class="row"><div><div class="label">Teacher</div>${escapeHtml(c.teacher_name)}</div></div>
-        <div class="row">
-          <div><div class="label">Joining link</div>${c.joining_link ? escapeHtml(c.joining_link) : '—'}</div>
-          ${c.joining_link ? `<a href="${escapeHtml(c.joining_link)}" target="_blank" rel="noopener" class="button primary" style="padding:9px 18px;align-self:center;">Join class</a>` : ''}
+  if (selectedDate && byDate[selectedDate]) {
+    const dt = new Date(selectedDate + 'T00:00:00');
+    detailEl.innerHTML = `<h3 style="font-family:var(--serif);font-size:18px;margin:0 0 12px;">${dt.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</h3>` +
+      byDate[selectedDate].map(c => `
+        <div class="class-card" style="margin-bottom:12px;">
+          <div class="row"><div><div class="label">Class number</div>${escapeHtml(c.class_number)}</div></div>
+          <div class="row"><div><div class="label">Time</div>${c.class_time ? formatTime(c.class_time) : '—'}</div></div>
+          <div class="row"><div><div class="label">Module</div>${escapeHtml(c.module_name)}</div></div>
+          <div class="row"><div><div class="label">Teacher</div>${escapeHtml(c.teacher_name)}</div></div>
+          <div class="row">
+            <div><div class="label">Joining link</div>${c.joining_link ? escapeHtml(c.joining_link) : '—'}</div>
+            ${c.joining_link ? `<a href="${escapeHtml(c.joining_link)}" target="_blank" rel="noopener" class="button primary" style="padding:9px 18px;align-self:center;">Join class</a>` : ''}
+          </div>
         </div>
-      </div>
-    `).join('');
+      `).join('');
+  } else {
+    detailEl.innerHTML = `<p style="color:var(--ink-soft);font-size:14px;">${classes.length ? 'Click an outlined date above to see class details.' : `Nothing's been added for ${escapeHtml(profile.batch_number)} yet — check back soon.`}</p>`;
+  }
+}
+
+function renderGrid(byDate) {
+  const grid = document.getElementById('calGrid');
+  const dowNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const firstOfMonth = new Date(viewYear, viewMonth, 1);
+  const startOffset = firstOfMonth.getDay(); // 0 = Sunday
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const todayIso = isoDate(today.getFullYear(), today.getMonth(), today.getDate());
+
+  let html = dowNames.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  for (let i = 0; i < startOffset; i++) {
+    html += `<div class="cal-cell outside"></div>`;
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const iso = isoDate(viewYear, viewMonth, day);
+    const hasClass = !!byDate[iso];
+    const cls = ['cal-cell'];
+    if (hasClass) cls.push('has-class'); else cls.push('empty-day');
+    if (iso === todayIso) cls.push('today');
+    if (iso === selectedDate) cls.push('selected');
+    html += `<div class="${cls.join(' ')}" ${hasClass ? `data-date="${iso}"` : ''}>${day}${hasClass ? '<span class="cal-dot"></span>' : ''}</div>`;
+  }
+
+  grid.innerHTML = html;
+  grid.querySelectorAll('[data-date]').forEach(cell => {
+    cell.addEventListener('click', () => { selectedDate = cell.dataset.date; render(); });
+  });
+}
+
+function formatTime(t) {
+  const [h, m] = t.split(':').map(Number);
+  const dt = new Date(2000, 0, 1, h, m);
+  return dt.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }
 </script>
 </body>
