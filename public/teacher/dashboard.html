@@ -20,8 +20,17 @@
 <main class="dash-main">
   <div class="dash-head">
     <h1>My mock tests</h1>
-    <button class="button primary" id="newTestBtn">+ New mock test</button>
+        <button class="button primary" id="newTestBtn">+ New mock test</button>
   </div>
+
+  <div class="tabs" id="typeTabs">
+    <button class="active" data-filter="all">All</button>
+    <button data-filter="full">Full Mock Test</button>
+    <button data-filter="reading">Reading</button>
+    <button data-filter="listening">Listening</button>
+    <button data-filter="writing">Writing</button>
+  </div>
+
   <div id="testList"></div>
 </main>
 
@@ -56,17 +65,36 @@ let profile;
   if (!profile) return;
   document.getElementById('userName').textContent = profile.name;
   document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  document.querySelectorAll('#typeTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#typeTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTestList(btn.dataset.filter);
+    });
+  });
   load();
 })();
 
+let allTests = [];
+
 async function load() {
   const { data: tests } = await supabase.from('tests').select('*').eq('created_by', profile.id).order('created_at', { ascending: false });
+  allTests = tests || [];
+  renderTestList('all');
+}
+
+function renderTestList(filter) {
+  const tests = filter === 'all' ? allTests : allTests.filter(t => (t.test_type || 'full') === filter);
   const listEl = document.getElementById('testList');
-  if (!tests || !tests.length) {
+  if (!allTests.length) {
     listEl.innerHTML = `<div class="empty-state"><h3>No mock tests yet</h3><p>Create your first mock test to start adding passages, audio, and writing tasks.</p></div>`;
     return;
   }
-    listEl.innerHTML = tests.map(t => `
+  if (!tests.length) {
+    listEl.innerHTML = `<div class="empty-state"><h3>No tests of this type yet</h3><p>Try a different tab, or create one with "+ New mock test".</p></div>`;
+    return;
+  }
+  listEl.innerHTML = tests.map(t => `
     <div class="list-row">
       <div>
         <div class="title">${escapeHtml(t.title)} <span class="tag">${typeLabel(t.test_type)}</span></div>
