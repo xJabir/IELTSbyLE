@@ -23,7 +23,7 @@ const Auth = {
     if (this._profile) return this._profile;
     const session = await this.getSession();
     if (!session) return null;
-    const { data, error } = await supabase.from('profiles').select('id, name, email, role').eq('id', session.user.id).single();
+    const { data, error } = await supabase.from('profiles').select('id, name, email, role, batch_number, student_id_number').eq('id', session.user.id).single();
     if (error) return null;
     this._profile = data;
     return data;
