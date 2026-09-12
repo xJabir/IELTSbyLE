@@ -32,6 +32,7 @@
     <div class="inline-row">
       <div class="field"><label>Batch number</label><input type="text" id="newBatch" placeholder="e.g. Batch 12"></div>
       <div class="field"><label>Date</label><input type="date" id="newDate"></div>
+      <div class="field"><label>Time</label><input type="time" id="newTime"></div>
       <div class="field"><label>Class number</label><input type="text" id="newClassNumber" placeholder="e.g. 14"></div>
     </div>
     <div class="inline-row" style="margin-top:20px;">
@@ -59,6 +60,7 @@
 <script>
 let profile;
 let allClasses = [];
+let editingClassId = null;
 
 (async () => {
   profile = await Auth.requireRole('teacher');
@@ -108,19 +110,72 @@ function renderList() {
   el.innerHTML = batches.map(b => `
     <div class="batch-group">
       <h2>${escapeHtml(b)}</h2>
-      ${byBatch[b].map(c => `
+      ${byBatch[b].map(c => editingClassId === c.id ? editClassFormHtml(c) : `
         <div class="list-row" style="grid-template-columns: 1fr auto;">
           <div>
-            <div class="title">${formatDate(c.class_date)} <span class="tag">Class ${escapeHtml(c.class_number)}</span></div>
+            <div class="title">${formatDate(c.class_date)}${c.class_time ? ` · ${formatTime(c.class_time)}` : ''} <span class="tag">Class ${escapeHtml(c.class_number)}</span></div>
             <div class="meta">${escapeHtml(c.module_name)} · ${escapeHtml(c.teacher_name)}${c.joining_link ? ` · <a href="${escapeHtml(c.joining_link)}" target="_blank" rel="noopener" style="text-decoration:underline;">Join link</a>` : ''}</div>
           </div>
-          <button class="small-btn danger" data-del="${c.id}">Delete</button>
+          <div style="display:flex;gap:8px;">
+            <button class="small-btn" data-edit="${c.id}">Edit</button>
+            <button class="small-btn danger" data-del="${c.id}">Delete</button>
+          </div>
         </div>
       `).join('')}
     </div>
   `).join('');
 
   el.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => deleteClass(btn.dataset.del)));
+  el.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => { editingClassId = btn.dataset.edit; renderList(); }));
+  el.querySelectorAll('[data-cancel-edit]').forEach(btn => btn.addEventListener('click', () => { editingClassId = null; renderList(); }));
+  el.querySelectorAll('[data-save-edit]').forEach(btn => btn.addEventListener('click', () => saveClassEdit(btn.dataset.saveEdit)));
+}
+
+function editClassFormHtml(c) {
+  return `
+    <div class="panel" style="margin:12px 0;">
+      <div class="inline-row">
+        <div class="field"><label>Batch number</label><input type="text" id="edit-batch-${c.id}" value="${escapeHtml(c.batch_number)}"></div>
+        <div class="field"><label>Date</label><input type="date" id="edit-date-${c.id}" value="${c.class_date}"></div>
+        <div class="field"><label>Time</label><input type="time" id="edit-time-${c.id}" value="${c.class_time ? c.class_time.slice(0,5) : ''}"></div>
+        <div class="field"><label>Class number</label><input type="text" id="edit-classnum-${c.id}" value="${escapeHtml(c.class_number)}"></div>
+      </div>
+      <div class="inline-row" style="margin-top:20px;">
+        <div class="field" style="margin-top:0;"><label>Module name</label><input type="text" id="edit-module-${c.id}" value="${escapeHtml(c.module_name)}"></div>
+        <div class="field" style="margin-top:0;"><label>Teacher name</label><input type="text" id="edit-teacher-${c.id}" value="${escapeHtml(c.teacher_name)}"></div>
+      </div>
+      <div class="field">
+        <label>Joining link</label>
+        <input type="url" id="edit-link-${c.id}" value="${escapeHtml(c.joining_link || '')}">
+      </div>
+      <div class="submit-row" style="gap:8px;">
+        <button class="button primary" data-save-edit="${c.id}" style="padding:10px 20px;">Save changes</button>
+        <button class="small-btn" data-cancel-edit="${c.id}">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+async function saveClassEdit(id) {
+  const batch_number = document.getElementById(`edit-batch-${id}`).value.trim();
+  const class_date = document.getElementById(`edit-date-${id}`).value;
+  const class_time = document.getElementById(`edit-time-${id}`).value || null;
+  const class_number = document.getElementById(`edit-classnum-${id}`).value.trim();
+  const module_name = document.getElementById(`edit-module-${id}`).value.trim();
+  const teacher_name = document.getElementById(`edit-teacher-${id}`).value.trim();
+  const joining_link = document.getElementById(`edit-link-${id}`).value.trim();
+
+  if (!batch_number || !class_date || !class_number || !module_name || !teacher_name) {
+    alert('Batch number, date, class number, module name and teacher name are all required.');
+    return;
+  }
+
+  const { error } = await supabase.from('lecture_schedule')
+    .update({ batch_number, class_date, class_time, class_number, module_name, teacher_name, joining_link })
+    .eq('id', id);
+  if (error) { alert(error.message); return; }
+  editingClassId = null;
+  await load();
 }
 
 async function addClass() {
@@ -129,6 +184,7 @@ async function addClass() {
 
   const batch_number = document.getElementById('newBatch').value.trim();
   const class_date = document.getElementById('newDate').value;
+  const class_time = document.getElementById('newTime').value || null;
   const class_number = document.getElementById('newClassNumber').value.trim();
   const module_name = document.getElementById('newModule').value.trim();
   const teacher_name = document.getElementById('newTeacherName').value.trim();
@@ -144,7 +200,7 @@ async function addClass() {
   btn.disabled = true; btn.textContent = 'Adding…';
 
   const { error } = await supabase.from('lecture_schedule').insert({
-    teacher_id: profile.id, batch_number, class_date, class_number, module_name, teacher_name, joining_link
+    teacher_id: profile.id, batch_number, class_date, class_time, class_number, module_name, teacher_name, joining_link
   });
 
   btn.disabled = false; btn.textContent = 'Add class';
@@ -157,6 +213,7 @@ async function addClass() {
 
   document.getElementById('newBatch').value = '';
   document.getElementById('newDate').value = '';
+  document.getElementById('newTime').value = '';
   document.getElementById('newClassNumber').value = '';
   document.getElementById('newModule').value = '';
   document.getElementById('newLink').value = '';
@@ -171,6 +228,12 @@ async function deleteClass(id) {
 
 function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatTime(t) {
+  const [h, m] = t.split(':').map(Number);
+  const dt = new Date(2000, 0, 1, h, m);
+  return dt.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }
 </script>
 </body>
