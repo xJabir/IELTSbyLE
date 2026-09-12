@@ -70,7 +70,7 @@
 </section>
 
 <section class="block divider" id="approach">
-  <div class="section-head">
+  <div class="section-head reveal">
     <h2>Built for the exam hall, not a quiz app</h2>
     <p>Most mock test sites are multiple-choice quizzes with a shiny wrapper. This one is built the way the actual exam software works.</p>
   </div>
@@ -130,5 +130,21 @@
   </div>
 </footer>
 
+<script>
+  document.querySelectorAll('.reveal').forEach(el => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.15 });
+    observer.observe(el);
+  });
+
+  const nav = document.querySelector('.site-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 8);
+  });
+</script>
 </body>
 </html>
