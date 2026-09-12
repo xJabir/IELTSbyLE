@@ -90,8 +90,13 @@ document.getElementById('cancelNew').addEventListener('click', () => { document.
 document.getElementById('createNew').addEventListener('click', async () => {
   const title = document.getElementById('newTitle').value.trim();
   if (!title) return;
-  const { data, error } = await supabase.from('tests')
-    .insert({ title, description: document.getElementById('newDesc').value.trim(), created_by: profile.id })
+    const { data, error } = await supabase.from('tests')
+    .insert({
+      title,
+      description: document.getElementById('newDesc').value.trim(),
+      test_type: document.getElementById('newType').value,
+      created_by: profile.id
+    })
     .select('id').single();
   if (error) { alert(error.message); return; }
   window.location.href = `/teacher/create-test.html?testId=${data.id}`;
