@@ -50,7 +50,7 @@
 async function load() {
   const profile = await Auth.getProfile();
   const [{ data: tests }, { data: results }] = await Promise.all([
-    supabase.from('tests').select('id, title, description').eq('published', true).order('created_at', { ascending: false }),
+        supabase.from('tests').select('id, title, description, test_type').eq('published', true).order('created_at', { ascending: false }),
     supabase.from('submissions').select('*').eq('student_id', profile.id).neq('status', 'in_progress')
   ]);
   const { data: inProgress } = await supabase.from('submissions').select('test_id, status').eq('student_id', profile.id).eq('status', 'in_progress');
@@ -84,16 +84,20 @@ async function load() {
       badge = finished.status === 'graded' ? '<span class="badge done">Graded</span>' : '<span class="badge pending">Awaiting writing grade</span>';
       action = `<a href="/student/results.html" class="button ghost" style="padding:9px 18px;">View result</a>`;
     }
-    return `
+        return `
       <div class="list-row">
         <div>
-          <div class="title">${escapeHtml(t.title)}</div>
+          <div class="title">${escapeHtml(t.title)} <span class="tag">${typeLabel(t.test_type)}</span></div>
           <div class="meta">${escapeHtml(t.description || 'Reading · Listening · Writing')}</div>
         </div>
         ${badge}
         ${action}
       </div>`;
   }).join('');
+}
+
+function typeLabel(type) {
+  return { reading: 'Reading only', listening: 'Listening only', writing: 'Writing only', full: 'Full Mock Test' }[type] || 'Full Mock Test';
 }
 </script>
 </body>
