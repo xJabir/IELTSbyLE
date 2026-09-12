@@ -127,7 +127,9 @@ function renderReading() {
     </div>
   `;
   const list = document.getElementById('passageList');
-  list.innerHTML = state.passages.map((p, pi) => `
+  list.innerHTML = state.passages.map((p, pi) => {
+    const numOffset = state.passages.slice(0, pi).reduce((sum, pp) => sum + pp.questions.length, 0);
+    return `
     <div class="builder-item">
       <div class="builder-item-head">
         <span class="tag">Passage ${pi + 1}</span>
@@ -136,11 +138,11 @@ function renderReading() {
       <div class="field"><label>Title</label><input type="text" value="${esc(p.title)}" disabled></div>
       <div class="field"><label>Passage text</label><textarea rows="4" disabled>${esc(p.passage_text)}</textarea></div>
       <div style="margin-top:14px;">
-        <strong style="font-size:13px;">Questions (${p.questions.length})</strong>
+        <strong style="font-size:13px;">Questions (${p.questions.length})${p.questions.length ? ` — numbered ${numOffset + 1}–${numOffset + p.questions.length} on the real test` : ''}</strong>
         ${p.questions.map((q, qi) => `
           <div class="builder-item" style="background:#fff;">
             <div class="builder-item-head">
-              <span class="tag">Q${qi + 1} · ${esc(q.question_type)}</span>
+              <span class="tag">Q${numOffset + qi + 1} · ${esc(q.question_type)}</span>
               <button class="small-btn danger" data-del-question="${q.id}">Delete</button>
             </div>
             <p style="font-size:14px;">${esc(q.question_text)}</p>
@@ -153,7 +155,8 @@ function renderReading() {
         ${questionFormHtml(p.id, 'reading')}
       </details>
     </div>
-  `).join('') || '<p style="color:var(--ink-soft);font-size:14px;">No passages yet.</p>';
+  `;
+  }).join('') || '<p style="color:var(--ink-soft);font-size:14px;">No passages yet.</p>';
 
   document.getElementById('addPassageBtn').addEventListener('click', () => showPassageForm());
   list.querySelectorAll('[data-del-passage]').forEach(b => b.addEventListener('click', () => deletePassage(b.dataset.delPassage)));
@@ -209,7 +212,9 @@ function renderListening() {
     </div>
   `;
   const list = document.getElementById('sectionList');
-  list.innerHTML = state.sections.map((s, si) => `
+  list.innerHTML = state.sections.map((s, si) => {
+    const numOffset = state.sections.slice(0, si).reduce((sum, ss) => sum + ss.questions.length, 0);
+    return `
     <div class="builder-item">
       <div class="builder-item-head">
         <span class="tag">Section ${si + 1}: ${esc(s.title)}</span>
@@ -218,11 +223,11 @@ function renderListening() {
       <p style="font-size:13px;color:var(--ink-soft);">${s.audio_url ? `Audio attached ✓ <a href="${s.audio_url}" target="_blank">Preview</a>` : 'No audio uploaded yet'}</p>
       <input type="file" accept=".mp3,.wav,.m4a,.ogg,audio/*" data-upload-audio="${s.id}">
       <div style="margin-top:14px;">
-        <strong style="font-size:13px;">Questions (${s.questions.length})</strong>
+        <strong style="font-size:13px;">Questions (${s.questions.length})${s.questions.length ? ` — numbered ${numOffset + 1}–${numOffset + s.questions.length} on the real test` : ''}</strong>
         ${s.questions.map((q, qi) => `
           <div class="builder-item" style="background:#fff;">
             <div class="builder-item-head">
-              <span class="tag">Q${qi + 1} · ${esc(q.question_type)}</span>
+              <span class="tag">Q${numOffset + qi + 1} · ${esc(q.question_type)}</span>
               <button class="small-btn danger" data-del-lquestion="${q.id}">Delete</button>
             </div>
             <p style="font-size:14px;">${esc(q.question_text)}</p>
@@ -235,7 +240,8 @@ function renderListening() {
         ${questionFormHtml(s.id, 'listening')}
       </details>
     </div>
-  `).join('') || '<p style="color:var(--ink-soft);font-size:14px;">No sections yet.</p>';
+  `;
+  }).join('') || '<p style="color:var(--ink-soft);font-size:14px;">No sections yet.</p>';
 
   document.getElementById('addSectionBtn').addEventListener('click', () => showSectionForm());
   list.querySelectorAll('[data-del-section]').forEach(b => b.addEventListener('click', () => deleteSection(b.dataset.delSection)));
