@@ -1,0 +1,165 @@
+/* ===========================================================
+   Landing page only. Loaded after main.css and scoped under
+   body.landing so none of this touches dashboards, auth pages,
+   or the exam interface.
+   =========================================================== */
+
+body.landing { overflow-x: hidden; }
+
+/* ---------- Sticky nav gets a soft shadow once you scroll ---------- */
+body.landing .site-nav {
+  transition: box-shadow 200ms ease, background 200ms ease;
+}
+body.landing .site-nav.scrolled {
+  box-shadow: 0 2px 16px rgba(27, 59, 111, 0.08);
+}
+
+/* ---------- Hero: animated red/blue blobs behind the content ---------- */
+body.landing .hero { position: relative; overflow: visible; }
+
+.hero-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  z-index: -1;
+  pointer-events: none;
+}
+.hero-blob.blob-red {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, var(--seal) 0%, transparent 70%);
+  top: -120px; left: -80px;
+  animation: float-a 14s ease-in-out infinite;
+}
+.hero-blob.blob-blue {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, var(--brass) 0%, transparent 70%);
+  top: 40px; right: -140px;
+  animation: float-b 16s ease-in-out infinite;
+}
+
+@keyframes float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 40px) scale(1.08); }
+}
+@keyframes float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-40px, -20px) scale(1.05); }
+}
+
+/* ---------- Gradient headline ---------- */
+body.landing .hero h1 {
+  background: linear-gradient(100deg, var(--ink) 20%, var(--seal) 55%, var(--brass) 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-shift 8s ease infinite;
+  background-size: 200% 200%;
+}
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+body.landing .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+}
+body.landing .eyebrow::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--seal); display: inline-block;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* ---------- Buttons: gradient + lift on hover (landing only) ---------- */
+body.landing .button.primary {
+  background: linear-gradient(135deg, var(--ink) 0%, var(--brass) 100%);
+  border-color: transparent;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  box-shadow: 0 4px 14px rgba(27, 59, 111, 0.25);
+}
+body.landing .button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(27, 59, 111, 0.35);
+  background: linear-gradient(135deg, var(--seal) 0%, var(--ink) 100%);
+}
+body.landing .button.ghost {
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+body.landing .button.ghost:hover {
+  transform: translateY(-2px);
+  border-color: var(--seal);
+  background: rgba(192, 57, 43, 0.05);
+}
+
+/* ---------- The report-card "slip" gets a livelier shadow + tilt ---------- */
+body.landing .slip {
+  box-shadow: 0 20px 50px -12px rgba(27, 59, 111, 0.25);
+  transition: transform 300ms ease, box-shadow 300ms ease;
+  transform: rotate(1deg);
+}
+body.landing .slip:hover {
+  transform: rotate(0deg) translateY(-4px);
+  box-shadow: 0 26px 60px -12px rgba(192, 57, 43, 0.3);
+}
+body.landing .slip .band-badge .n {
+  background: linear-gradient(120deg, var(--seal), var(--ink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Cards lift on hover ---------- */
+body.landing .pillar {
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+  padding: 20px; border-radius: 8px;
+}
+body.landing .pillar:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px -14px rgba(27, 59, 111, 0.22);
+  border-top-color: var(--seal);
+}
+body.landing .module-row {
+  transition: background 200ms ease, transform 200ms ease;
+  border-radius: 6px;
+}
+body.landing .module-row:hover {
+  background: linear-gradient(90deg, rgba(192, 57, 43, 0.04), rgba(47, 95, 168, 0.04));
+  transform: translateX(4px);
+}
+
+/* ---------- Quote block: subtle gradient wash ---------- */
+body.landing .quote-block {
+  background: linear-gradient(135deg, var(--ink) 0%, #14264a 100%);
+  position: relative;
+  overflow: hidden;
+}
+body.landing .quote-block::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(192, 57, 43, 0.25), transparent 60%);
+  pointer-events: none;
+}
+
+/* ---------- Scroll-reveal ---------- */
+body.landing .reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 700ms ease, transform 700ms ease;
+}
+body.landing .reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-blob, body.landing .hero h1, body.landing .eyebrow::before {
+    animation: none !important;
+  }
+  body.landing .reveal {
+    opacity: 1; transform: none; transition: none;
+  }
+}
