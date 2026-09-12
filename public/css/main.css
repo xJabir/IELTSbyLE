@@ -51,6 +51,7 @@ button { font-family: var(--sans); cursor: pointer; }
   display: flex; align-items: center; justify-content: space-between;
   padding: 22px 28px; border-bottom: 1px solid var(--line);
   max-width: 1120px; margin: 0 auto;
+  position: sticky; top: 0; z-index: 100; background: var(--paper);
 }
 .brand { display: flex; align-items: baseline; gap: 10px; font-family: var(--serif); font-size: 21px; font-weight: 600; }
 .brand .brand-mark { color: var(--seal); font-size: 21px; }
