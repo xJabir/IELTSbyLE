@@ -101,9 +101,10 @@ function renderDetails() {
     </div>
   `;
   document.getElementById('saveDetailsBtn').addEventListener('click', async () => {
-    const { error } = await supabase.from('tests').update({
+        const { error } = await supabase.from('tests').update({
       title: document.getElementById('d-title').value,
       description: document.getElementById('d-desc').value,
+      test_type: document.getElementById('d-type').value,
       listening_duration_min: Number(document.getElementById('d-listen').value),
       reading_duration_min: Number(document.getElementById('d-read').value),
       writing_duration_min: Number(document.getElementById('d-write').value)
