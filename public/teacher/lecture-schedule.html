@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture Schedule — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+<style>
+  .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .filter-row select { padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; font-size: 14px; }
+  .batch-group { margin-bottom: 30px; }
+  .batch-group h2 { font-family: var(--serif); font-size: 18px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand"><a href="/teacher/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
+  <div class="who">
+    <span id="userName"></span>
+    <a href="/teacher/dashboard.html">← All tests</a>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head"><h1>Lecture schedule</h1></div>
+
+  <div class="panel">
+    <h2>Add a class</h2>
+    <p class="panel-sub">Only students whose Batch number matches will see this class on their schedule.</p>
+    <div class="inline-row">
+      <div class="field"><label>Batch number</label><input type="text" id="newBatch" placeholder="e.g. Batch 12"></div>
+      <div class="field"><label>Date</label><input type="date" id="newDate"></div>
+      <div class="field"><label>Class number</label><input type="text" id="newClassNumber" placeholder="e.g. 14"></div>
+    </div>
+    <div class="inline-row" style="margin-top:20px;">
+      <div class="field" style="margin-top:0;"><label>Module name</label><input type="text" id="newModule" placeholder="e.g. Reading — Skimming &amp; Scanning"></div>
+      <div class="field" style="margin-top:0;"><label>Teacher name</label><input type="text" id="newTeacherName" placeholder="e.g. Ms. Rahman"></div>
+    </div>
+    <div class="field">
+      <label>Joining link</label>
+      <input type="url" id="newLink" placeholder="https://meet.google.com/...">
+    </div>
+    <div class="form-error" id="formError"></div>
+    <div class="submit-row"><button class="button primary" id="addClassBtn" style="padding:11px 22px;">Add class</button></div>
+  </div>
+
+  <div class="filter-row">
+    <label for="batchFilter" style="font-size:13px;font-weight:600;color:var(--ink-soft);">Batch</label>
+    <select id="batchFilter"><option value="all">All batches</option></select>
+  </div>
+
+  <div id="scheduleList"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+let profile;
+let allClasses = [];
+
+(async () => {
+  profile = await Auth.requireRole('teacher');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('newTeacherName').value = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  document.getElementById('addClassBtn').addEventListener('click', addClass);
+  document.getElementById('batchFilter').addEventListener('change', renderList);
+  load();
+})();
+
+async function load() {
+  const { data, error } = await supabase
+    .from('lecture_schedule').select('*').eq('teacher_id', profile.id)
+    .order('batch_number').order('class_date');
+
+  if (error) { console.error(error); return; }
+  allClasses = data || [];
+  populateBatchFilter();
+  renderList();
+}
+
+function populateBatchFilter() {
+  const select = document.getElementById('batchFilter');
+  const current = select.value;
+  const batches = [...new Set(allClasses.map(c => c.batch_number))].sort();
+  select.innerHTML = '<option value="all">All batches</option>' +
+    batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+  if (batches.includes(current)) select.value = current;
+}
+
+function renderList() {
+  const filter = document.getElementById('batchFilter').value;
+  const el = document.getElementById('scheduleList');
+
+  if (!allClasses.length) {
+    el.innerHTML = `<div class="empty-state"><h3>No classes scheduled yet</h3><p>Add your first class above — it'll appear here and on the schedule of any student in that batch.</p></div>`;
+    return;
+  }
+
+  const filtered = filter === 'all' ? allClasses : allClasses.filter(c => c.batch_number === filter);
+  const byBatch = {};
+  filtered.forEach(c => { (byBatch[c.batch_number] = byBatch[c.batch_number] || []).push(c); });
+  const batches = Object.keys(byBatch).sort();
+
+  el.innerHTML = batches.map(b => `
+    <div class="batch-group">
+      <h2>${escapeHtml(b)}</h2>
+      ${byBatch[b].map(c => `
+        <div class="list-row" style="grid-template-columns: 1fr auto;">
+          <div>
+            <div class="title">${formatDate(c.class_date)} <span class="tag">Class ${escapeHtml(c.class_number)}</span></div>
+            <div class="meta">${escapeHtml(c.module_name)} · ${escapeHtml(c.teacher_name)}${c.joining_link ? ` · <a href="${escapeHtml(c.joining_link)}" target="_blank" rel="noopener" style="text-decoration:underline;">Join link</a>` : ''}</div>
+          </div>
+          <button class="small-btn danger" data-del="${c.id}">Delete</button>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  el.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => deleteClass(btn.dataset.del)));
+}
+
+async function addClass() {
+  const errorBox = document.getElementById('formError');
+  errorBox.style.display = 'none';
+
+  const batch_number = document.getElementById('newBatch').value.trim();
+  const class_date = document.getElementById('newDate').value;
+  const class_number = document.getElementById('newClassNumber').value.trim();
+  const module_name = document.getElementById('newModule').value.trim();
+  const teacher_name = document.getElementById('newTeacherName').value.trim();
+  const joining_link = document.getElementById('newLink').value.trim();
+
+  if (!batch_number || !class_date || !class_number || !module_name || !teacher_name) {
+    errorBox.textContent = 'Batch number, date, class number, module name and teacher name are all required.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('addClassBtn');
+  btn.disabled = true; btn.textContent = 'Adding…';
+
+  const { error } = await supabase.from('lecture_schedule').insert({
+    teacher_id: profile.id, batch_number, class_date, class_number, module_name, teacher_name, joining_link
+  });
+
+  btn.disabled = false; btn.textContent = 'Add class';
+
+  if (error) {
+    errorBox.textContent = error.message;
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  document.getElementById('newBatch').value = '';
+  document.getElementById('newDate').value = '';
+  document.getElementById('newClassNumber').value = '';
+  document.getElementById('newModule').value = '';
+  document.getElementById('newLink').value = '';
+  await load();
+}
+
+async function deleteClass(id) {
+  if (!confirm('Delete this class from the schedule?')) return;
+  await supabase.from('lecture_schedule').delete().eq('id', id);
+  await load();
+}
+
+function formatDate(d) {
+  return new Date(d + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+</script>
+</body>
+</html>
