@@ -21,6 +21,16 @@
         <label for="email">Email</label>
         <input type="email" id="email" required autocomplete="email">
       </div>
+      <div class="inline-row">
+        <div class="field">
+          <label for="batchNumber">Batch number</label>
+          <input type="text" id="batchNumber" required placeholder="e.g. Batch 12">
+        </div>
+        <div class="field">
+          <label for="studentIdNumber">Student ID</label>
+          <input type="text" id="studentIdNumber" required placeholder="e.g. LE-0231">
+        </div>
+      </div>
       <div class="field">
         <label for="password">Password</label>
         <input type="password" id="password" required minlength="6" autocomplete="new-password">
@@ -45,7 +55,12 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   const { data, error } = await supabase.auth.signUp({
     email: document.getElementById('email').value,
     password: document.getElementById('password').value,
-    options: { data: { name: document.getElementById('name').value, role: 'student' } }
+    options: { data: {
+      name: document.getElementById('name').value,
+      role: 'student',
+      batch_number: document.getElementById('batchNumber').value,
+      student_id_number: document.getElementById('studentIdNumber').value
+    } }
   });
 
   if (error) {
