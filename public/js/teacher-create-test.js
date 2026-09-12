@@ -2,6 +2,15 @@ let profile;
 const testId = new URLSearchParams(location.search).get('testId');
 let state = null; // { test, passages, sections, writingTasks }
 
+// Which items are currently open in an inline "edit" form. Kept outside
+// `state` so toggling edit mode doesn't require a server round-trip —
+// we just re-render the affected tab.
+const editingPassages = new Set();
+const editingReadingQuestions = new Set();
+const editingSections = new Set();
+const editingListeningQuestions = new Set();
+const editingWritingTasks = new Set();
+
 (async () => {
   profile = await Auth.requireRole('teacher');
   if (!profile) return;
@@ -129,26 +138,47 @@ function renderReading() {
   const list = document.getElementById('passageList');
   list.innerHTML = state.passages.map((p, pi) => {
     const numOffset = state.passages.slice(0, pi).reduce((sum, pp) => sum + pp.questions.length, 0);
+    const editingThisPassage = editingPassages.has(p.id);
     return `
     <div class="builder-item">
       <div class="builder-item-head">
         <span class="tag">Passage ${pi + 1}</span>
-        <button class="small-btn danger" data-del-passage="${p.id}">Delete passage</button>
+        <div style="display:flex;gap:8px;">
+          ${editingThisPassage ? '' : `<button class="small-btn" data-edit-passage="${p.id}">Edit</button>`}
+          <button class="small-btn danger" data-del-passage="${p.id}">Delete passage</button>
+        </div>
       </div>
-      <div class="field"><label>Title</label><input type="text" value="${esc(p.title)}" disabled></div>
-      <div class="field"><label>Passage text</label><textarea rows="4" disabled>${esc(p.passage_text)}</textarea></div>
+      ${editingThisPassage ? `
+        <div class="field"><label>Title</label><input type="text" id="edit-p-title-${p.id}" value="${esc(p.title)}"></div>
+        <div class="field"><label>Passage text</label><textarea rows="8" id="edit-p-text-${p.id}">${esc(p.passage_text)}</textarea></div>
+        <div class="submit-row" style="gap:8px;">
+          <button class="button primary" data-save-passage="${p.id}" style="padding:9px 18px;">Save</button>
+          <button class="small-btn" data-cancel-passage="${p.id}">Cancel</button>
+        </div>
+      ` : `
+        <div class="field"><label>Title</label><input type="text" value="${esc(p.title)}" disabled></div>
+        <div class="field"><label>Passage text</label><textarea rows="4" disabled>${esc(p.passage_text)}</textarea></div>
+      `}
       <div style="margin-top:14px;">
         <strong style="font-size:13px;">Questions (${p.questions.length})${p.questions.length ? ` — numbered ${numOffset + 1}–${numOffset + p.questions.length} on the real test` : ''}</strong>
-        ${p.questions.map((q, qi) => `
+        ${p.questions.map((q, qi) => {
+          const editingThisQuestion = editingReadingQuestions.has(q.id);
+          return editingThisQuestion
+            ? questionEditFormHtml(q, 'reading')
+            : `
           <div class="builder-item" style="background:#fff;">
             <div class="builder-item-head">
               <span class="tag">Q${numOffset + qi + 1} · ${esc(q.question_type)}</span>
-              <button class="small-btn danger" data-del-question="${q.id}">Delete</button>
+              <div style="display:flex;gap:8px;">
+                <button class="small-btn" data-edit-question="${q.id}" data-kind="reading">Edit</button>
+                <button class="small-btn danger" data-del-question="${q.id}">Delete</button>
+              </div>
             </div>
             <p style="font-size:14px;">${esc(q.question_text)}</p>
             <p style="font-size:13px;color:var(--ink-soft);">Answer: ${esc(q.correct_answer)}</p>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
       <details style="margin-top:12px;">
         <summary style="cursor:pointer;font-size:14px;color:var(--seal);">+ Add a question to this passage</summary>
@@ -160,8 +190,27 @@ function renderReading() {
 
   document.getElementById('addPassageBtn').addEventListener('click', () => showPassageForm());
   list.querySelectorAll('[data-del-passage]').forEach(b => b.addEventListener('click', () => deletePassage(b.dataset.delPassage)));
+  list.querySelectorAll('[data-edit-passage]').forEach(b => b.addEventListener('click', () => { editingPassages.add(b.dataset.editPassage); renderReading(); }));
+  list.querySelectorAll('[data-cancel-passage]').forEach(b => b.addEventListener('click', () => { editingPassages.delete(b.dataset.cancelPassage); renderReading(); }));
+  list.querySelectorAll('[data-save-passage]').forEach(b => b.addEventListener('click', () => savePassageEdit(b.dataset.savePassage)));
   list.querySelectorAll('[data-del-question]').forEach(b => b.addEventListener('click', () => deleteReadingQuestion(b.dataset.delQuestion)));
+  list.querySelectorAll('[data-edit-question]').forEach(b => b.addEventListener('click', () => {
+    (b.dataset.kind === 'reading' ? editingReadingQuestions : editingListeningQuestions).add(b.dataset.editQuestion);
+    (b.dataset.kind === 'reading' ? renderReading : renderListening)();
+  }));
   wireQuestionForms(el, 'reading');
+  wireQuestionEditForms(el, 'reading');
+}
+
+async function savePassageEdit(id) {
+  const title = document.getElementById(`edit-p-title-${id}`).value.trim();
+  const passage_text = document.getElementById(`edit-p-text-${id}`).value.trim();
+  if (!title || !passage_text) return;
+  const { error } = await supabase.from('reading_passages').update({ title, passage_text }).eq('id', id);
+  if (error) { alert(error.message); return; }
+  editingPassages.delete(id);
+  await loadAll();
+  switchTab('reading');
 }
 
 function showPassageForm() {
@@ -189,12 +238,14 @@ function showPassageForm() {
 async function deletePassage(id) {
   if (!confirm('Delete this passage and all its questions?')) return;
   await supabase.from('reading_passages').delete().eq('id', id);
+  editingPassages.delete(id);
   await loadAll();
   switchTab('reading');
 }
 
 async function deleteReadingQuestion(id) {
   await supabase.from('reading_questions').delete().eq('id', id);
+  editingReadingQuestions.delete(id);
   await loadAll();
   switchTab('reading');
 }
@@ -214,26 +265,43 @@ function renderListening() {
   const list = document.getElementById('sectionList');
   list.innerHTML = state.sections.map((s, si) => {
     const numOffset = state.sections.slice(0, si).reduce((sum, ss) => sum + ss.questions.length, 0);
+    const editingThisSection = editingSections.has(s.id);
     return `
     <div class="builder-item">
       <div class="builder-item-head">
-        <span class="tag">Section ${si + 1}: ${esc(s.title)}</span>
-        <button class="small-btn danger" data-del-section="${s.id}">Delete section</button>
+        ${editingThisSection
+          ? `<input type="text" id="edit-s-title-${s.id}" value="${esc(s.title)}" style="flex:1;margin-right:10px;">`
+          : `<span class="tag">Section ${si + 1}: ${esc(s.title)}</span>`}
+        <div style="display:flex;gap:8px;">
+          ${editingThisSection
+            ? `<button class="button primary" data-save-section="${s.id}" style="padding:6px 14px;">Save</button>
+               <button class="small-btn" data-cancel-section="${s.id}">Cancel</button>`
+            : `<button class="small-btn" data-edit-section="${s.id}">Edit</button>`}
+          <button class="small-btn danger" data-del-section="${s.id}">Delete section</button>
+        </div>
       </div>
       <p style="font-size:13px;color:var(--ink-soft);">${s.audio_url ? `Audio attached ✓ <a href="${s.audio_url}" target="_blank">Preview</a>` : 'No audio uploaded yet'}</p>
       <input type="file" accept=".mp3,.wav,.m4a,.ogg,audio/*" data-upload-audio="${s.id}">
       <div style="margin-top:14px;">
         <strong style="font-size:13px;">Questions (${s.questions.length})${s.questions.length ? ` — numbered ${numOffset + 1}–${numOffset + s.questions.length} on the real test` : ''}</strong>
-        ${s.questions.map((q, qi) => `
+        ${s.questions.map((q, qi) => {
+          const editingThisQuestion = editingListeningQuestions.has(q.id);
+          return editingThisQuestion
+            ? questionEditFormHtml(q, 'listening')
+            : `
           <div class="builder-item" style="background:#fff;">
             <div class="builder-item-head">
               <span class="tag">Q${numOffset + qi + 1} · ${esc(q.question_type)}</span>
-              <button class="small-btn danger" data-del-lquestion="${q.id}">Delete</button>
+              <div style="display:flex;gap:8px;">
+                <button class="small-btn" data-edit-question="${q.id}" data-kind="listening">Edit</button>
+                <button class="small-btn danger" data-del-lquestion="${q.id}">Delete</button>
+              </div>
             </div>
             <p style="font-size:14px;">${esc(q.question_text)}</p>
             <p style="font-size:13px;color:var(--ink-soft);">Answer: ${esc(q.correct_answer)}</p>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
       <details style="margin-top:12px;">
         <summary style="cursor:pointer;font-size:14px;color:var(--seal);">+ Add a question to this section</summary>
@@ -245,9 +313,27 @@ function renderListening() {
 
   document.getElementById('addSectionBtn').addEventListener('click', () => showSectionForm());
   list.querySelectorAll('[data-del-section]').forEach(b => b.addEventListener('click', () => deleteSection(b.dataset.delSection)));
+  list.querySelectorAll('[data-edit-section]').forEach(b => b.addEventListener('click', () => { editingSections.add(b.dataset.editSection); renderListening(); }));
+  list.querySelectorAll('[data-cancel-section]').forEach(b => b.addEventListener('click', () => { editingSections.delete(b.dataset.cancelSection); renderListening(); }));
+  list.querySelectorAll('[data-save-section]').forEach(b => b.addEventListener('click', () => saveSectionEdit(b.dataset.saveSection)));
   list.querySelectorAll('[data-del-lquestion]').forEach(b => b.addEventListener('click', () => deleteListeningQuestion(b.dataset.delLquestion)));
+  list.querySelectorAll('[data-edit-question]').forEach(b => b.addEventListener('click', () => {
+    (b.dataset.kind === 'reading' ? editingReadingQuestions : editingListeningQuestions).add(b.dataset.editQuestion);
+    (b.dataset.kind === 'reading' ? renderReading : renderListening)();
+  }));
   list.querySelectorAll('[data-upload-audio]').forEach(input => input.addEventListener('change', () => handleAudioUpload(input)));
   wireQuestionForms(el, 'listening');
+  wireQuestionEditForms(el, 'listening');
+}
+
+async function saveSectionEdit(id) {
+  const title = document.getElementById(`edit-s-title-${id}`).value.trim();
+  if (!title) return;
+  const { error } = await supabase.from('listening_sections').update({ title }).eq('id', id);
+  if (error) { alert(error.message); return; }
+  editingSections.delete(id);
+  await loadAll();
+  switchTab('listening');
 }
 
 function showSectionForm() {
@@ -273,12 +359,14 @@ function showSectionForm() {
 async function deleteSection(id) {
   if (!confirm('Delete this section and all its questions?')) return;
   await supabase.from('listening_sections').delete().eq('id', id);
+  editingSections.delete(id);
   await loadAll();
   switchTab('listening');
 }
 
 async function deleteListeningQuestion(id) {
   await supabase.from('listening_questions').delete().eq('id', id);
+  editingListeningQuestions.delete(id);
   await loadAll();
   switchTab('listening');
 }
@@ -324,20 +412,58 @@ function renderWriting() {
   `;
   if (!t1) wireWritingForm(1);
   if (!t2) wireWritingForm(2);
+  if (t1 && editingWritingTasks.has(t1.id)) wireWritingEditForm(t1);
+  if (t2 && editingWritingTasks.has(t2.id)) wireWritingEditForm(t2);
   el.querySelectorAll('[data-del-task]').forEach(b => b.addEventListener('click', () => deleteWritingTask(b.dataset.delTask)));
+  el.querySelectorAll('[data-edit-task]').forEach(b => b.addEventListener('click', () => { editingWritingTasks.add(b.dataset.editTask); renderWriting(); }));
+  el.querySelectorAll('[data-cancel-task]').forEach(b => b.addEventListener('click', () => { editingWritingTasks.delete(b.dataset.cancelTask); renderWriting(); }));
 }
 
 function renderTaskCard(t) {
+  if (editingWritingTasks.has(t.id)) {
+    return `
+      <div class="field"><label>Prompt</label><textarea id="editw-prompt-${t.id}" rows="4">${esc(t.prompt_text)}</textarea></div>
+      <div class="inline-row" style="margin-top:14px;">
+        <div class="field"><label>Image URL (optional, for charts)</label><input type="text" id="editw-image-${t.id}" value="${esc(t.image_url || '')}"></div>
+        <div class="field" style="flex:0 0 140px;"><label>Min words</label><input type="number" id="editw-min-${t.id}" value="${t.min_words}"></div>
+      </div>
+      <div class="submit-row" style="gap:8px;">
+        <button class="button primary" id="saveEditW-${t.id}" style="padding:9px 18px;">Save</button>
+        <button class="small-btn" data-cancel-task="${t.id}">Cancel</button>
+      </div>
+    `;
+  }
   return `
     <div class="builder-item">
       <div class="builder-item-head">
         <span class="tag">Min ${t.min_words} words</span>
-        <button class="small-btn danger" data-del-task="${t.id}">Delete &amp; replace</button>
+        <div style="display:flex;gap:8px;">
+          <button class="small-btn" data-edit-task="${t.id}">Edit</button>
+          <button class="small-btn danger" data-del-task="${t.id}">Delete &amp; replace</button>
+        </div>
       </div>
       <p style="font-size:14px;">${esc(t.prompt_text)}</p>
       ${t.image_url ? `<img src="${esc(t.image_url)}" style="max-width:280px;margin-top:10px;border:1px solid var(--line);">` : ''}
     </div>
   `;
+}
+
+function wireWritingEditForm(t) {
+  const btn = document.getElementById(`saveEditW-${t.id}`);
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const prompt_text = document.getElementById(`editw-prompt-${t.id}`).value.trim();
+    if (!prompt_text) return;
+    const { error } = await supabase.from('writing_tasks').update({
+      prompt_text,
+      image_url: document.getElementById(`editw-image-${t.id}`).value.trim(),
+      min_words: Number(document.getElementById(`editw-min-${t.id}`).value) || t.min_words
+    }).eq('id', t.id);
+    if (error) { alert(error.message); return; }
+    editingWritingTasks.delete(t.id);
+    await loadAll();
+    switchTab('writing');
+  });
 }
 
 function writingTaskForm(num) {
@@ -370,6 +496,7 @@ function wireWritingForm(num) {
 
 async function deleteWritingTask(id) {
   await supabase.from('writing_tasks').delete().eq('id', id);
+  editingWritingTasks.delete(id);
   await loadAll();
   switchTab('writing');
 }
@@ -402,6 +529,40 @@ function questionFormHtml(parentId, kind) {
   `;
 }
 
+// Same shape as questionFormHtml, but pre-filled with an existing question's
+// values and wired to update rather than insert. Used for both reading and
+// listening questions — the two only differ in which table wireQuestionEditForms()
+// writes to.
+function questionEditFormHtml(q, kind) {
+  const optionsVal = (q.options || []).join('\n');
+  return `
+    <div class="builder-item" style="background:#fff;">
+      <div class="field">
+        <label>Question type</label>
+        <select data-eqtype="${q.id}">
+          ${kind === 'reading' ? `<option value="true_false_not_given" ${q.question_type === 'true_false_not_given' ? 'selected' : ''}>True / False / Not Given</option>` : ''}
+          <option value="multiple_choice" ${q.question_type === 'multiple_choice' ? 'selected' : ''}>Multiple choice</option>
+          <option value="fill_blank" ${q.question_type === 'fill_blank' ? 'selected' : ''}>Fill in the blank</option>
+          <option value="short_answer" ${q.question_type === 'short_answer' ? 'selected' : ''}>Short answer</option>
+        </select>
+      </div>
+      <div class="field"><label>Question text</label><textarea rows="2" data-eqtext="${q.id}">${esc(q.question_text)}</textarea></div>
+      <div class="field">
+        <label>Options (multiple choice only — one per line)</label>
+        <textarea rows="3" data-eqoptions="${q.id}">${esc(optionsVal)}</textarea>
+      </div>
+      <div class="field">
+        <label>Correct answer</label>
+        <input type="text" data-eqanswer="${q.id}" value="${esc(q.correct_answer)}">
+      </div>
+      <div class="submit-row" style="gap:8px;">
+        <button class="button primary" data-save-edit-question="${q.id}" data-kind="${kind}" style="padding:9px 18px;">Save</button>
+        <button class="small-btn" data-cancel-edit-question="${q.id}" data-kind="${kind}">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
 function wireQuestionForms(container, kind) {
   container.querySelectorAll('[data-save-question]').forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -423,6 +584,34 @@ function wireQuestionForms(container, kind) {
       if (error) { alert(error.message); return; }
       await loadAll();
       switchTab(kind);
+    });
+  });
+}
+
+function wireQuestionEditForms(container, kind) {
+  container.querySelectorAll('[data-save-edit-question]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const qid = btn.dataset.saveEditQuestion;
+      const question_type = container.querySelector(`[data-eqtype="${qid}"]`).value;
+      const question_text = container.querySelector(`[data-eqtext="${qid}"]`).value.trim();
+      const optionsRaw = container.querySelector(`[data-eqoptions="${qid}"]`).value.trim();
+      const correct_answer = container.querySelector(`[data-eqanswer="${qid}"]`).value.trim();
+      if (!question_text || !correct_answer) return;
+      const options = question_type === 'multiple_choice' ? optionsRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
+      const table = kind === 'reading' ? 'reading_questions' : 'listening_questions';
+      const { error } = await supabase.from(table)
+        .update({ question_type, question_text, options, correct_answer }).eq('id', qid);
+      if (error) { alert(error.message); return; }
+      (kind === 'reading' ? editingReadingQuestions : editingListeningQuestions).delete(qid);
+      await loadAll();
+      switchTab(kind);
+    });
+  });
+  container.querySelectorAll('[data-cancel-edit-question]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const kindHere = btn.dataset.kind;
+      (kindHere === 'reading' ? editingReadingQuestions : editingListeningQuestions).delete(btn.dataset.cancelEditQuestion);
+      (kindHere === 'reading' ? renderReading : renderListening)();
     });
   });
 }
