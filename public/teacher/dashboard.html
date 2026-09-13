@@ -3,135 +3,1513 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teacher Panel — London Educators</title>
+<title>Mock Tests | Teacher Panel | London Educators</title>
 <link rel="stylesheet" href="/css/main.css">
+
+<style>
+/* =========================================
+   IELTSbyLE Teacher Mock Tests
+   Modern Red + Navy UI
+========================================= */
+
+:root {
+  --teacher-red: #e63946;
+  --teacher-red-dark: #c92f3b;
+  --teacher-red-light: #fff1f2;
+  --teacher-navy: #142b5f;
+  --teacher-navy-light: #edf3ff;
+  --teacher-bg: #f7f9fc;
+  --teacher-card: #ffffff;
+  --teacher-text: #172033;
+  --teacher-muted: #6b7280;
+  --teacher-border: #e6eaf0;
+  --teacher-green: #16845b;
+  --teacher-green-bg: #eaf8f2;
+  --teacher-orange: #b86b00;
+  --teacher-orange-bg: #fff6e5;
+}
+
+/* Page */
+body {
+  background:
+    radial-gradient(circle at 90% 5%, rgba(230, 57, 70, .07), transparent 25%),
+    radial-gradient(circle at 5% 30%, rgba(20, 43, 95, .05), transparent 25%),
+    var(--teacher-bg);
+}
+
+/* Navigation */
+.dash-nav {
+  background: rgba(255, 255, 255, .92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--teacher-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dash-nav .who {
+  gap: 18px;
+}
+
+.dash-nav .who a:not(.button) {
+  position: relative;
+  transition: color .2s ease;
+}
+
+.dash-nav .who a:not(.button):hover {
+  color: var(--teacher-red);
+}
+
+.dash-nav .who a:not(.button)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -7px;
+  width: 0;
+  height: 2px;
+  background: var(--teacher-red);
+  transition: width .2s ease;
+}
+
+.dash-nav .who a:not(.button):hover::after {
+  width: 100%;
+}
+
+/* Main */
+.dash-main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 42px 28px 70px;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 30px;
+  animation: fadeUp .5s ease both;
+}
+
+.page-heading {
+  max-width: 680px;
+}
+
+.page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--teacher-red);
+  margin-bottom: 10px;
+}
+
+.page-eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 2px;
+  background: var(--teacher-red);
+  border-radius: 99px;
+}
+
+.page-heading h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.1;
+  color: var(--teacher-navy);
+  letter-spacing: -.03em;
+}
+
+.page-heading p {
+  margin: 12px 0 0;
+  color: var(--teacher-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* New test button */
+.new-test-btn {
+  border: 0;
+  background: linear-gradient(135deg, var(--teacher-red), var(--teacher-red-dark));
+  color: #fff;
+  border-radius: 12px;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 10px 25px rgba(230, 57, 70, .20);
+  transition: transform .2s ease, box-shadow .2s ease;
+  white-space: nowrap;
+}
+
+.new-test-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(230, 57, 70, .28);
+}
+
+.new-test-btn .plus {
+  font-size: 21px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+/* Stats */
+.test-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+  animation: fadeUp .55s .05s ease both;
+}
+
+.test-stat {
+  background: var(--teacher-card);
+  border: 1px solid var(--teacher-border);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 18px rgba(20, 43, 95, .04);
+}
+
+.test-stat::after {
+  content: "";
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: var(--teacher-red-light);
+}
+
+.test-stat.navy::after {
+  background: var(--teacher-navy-light);
+}
+
+.stat-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--teacher-red-light);
+  color: var(--teacher-red);
+  font-size: 17px;
+  margin-bottom: 14px;
+}
+
+.test-stat.navy .stat-icon {
+  background: var(--teacher-navy-light);
+  color: var(--teacher-navy);
+}
+
+.stat-number {
+  font-size: 27px;
+  font-weight: 800;
+  color: var(--teacher-navy);
+  line-height: 1;
+}
+
+.stat-label {
+  margin-top: 7px;
+  color: var(--teacher-muted);
+  font-size: 13px;
+}
+
+/* Filter section */
+.test-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+  animation: fadeUp .6s .1s ease both;
+}
+
+.section-title {
+  color: var(--teacher-navy);
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.section-title span {
+  color: var(--teacher-muted);
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: 7px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 5px;
+  background: #eef1f6;
+  border-radius: 12px;
+}
+
+.tabs button {
+  border: 0;
+  background: transparent;
+  color: #687184;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.tabs button:hover {
+  color: var(--teacher-navy);
+}
+
+.tabs button.active {
+  background: #fff;
+  color: var(--teacher-red);
+  box-shadow: 0 3px 10px rgba(20, 43, 95, .08);
+}
+
+/* Test list */
+.test-list {
+  display: grid;
+  gap: 14px;
+}
+
+/* Test card */
+.test-card {
+  background: var(--teacher-card);
+  border: 1px solid var(--teacher-border);
+  border-radius: 17px;
+  padding: 21px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp .45s ease both;
+  box-shadow: 0 5px 18px rgba(20, 43, 95, .035);
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+}
+
+.test-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--teacher-red);
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform .2s ease;
+}
+
+.test-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(230, 57, 70, .22);
+  box-shadow: 0 15px 35px rgba(20, 43, 95, .08);
+}
+
+.test-card:hover::before {
+  transform: scaleY(1);
+}
+
+.test-info {
+  min-width: 0;
+}
+
+.test-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.test-title {
+  color: var(--teacher-navy);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.test-description {
+  color: var(--teacher-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.test-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Type tags */
+.type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--teacher-navy-light);
+  color: var(--teacher-navy);
+}
+
+.type-tag.full {
+  background: var(--teacher-red-light);
+  color: var(--teacher-red);
+}
+
+.type-tag.reading {
+  background: #f2edff;
+  color: #6842c2;
+}
+
+.type-tag.listening {
+  background: #eaf8f2;
+  color: #16845b;
+}
+
+.type-tag.writing {
+  background: #fff5e6;
+  color: #ad6800;
+}
+
+/* Status */
+.status-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-badge.published {
+  color: var(--teacher-green);
+  background: var(--teacher-green-bg);
+}
+
+.status-badge.published::before {
+  background: var(--teacher-green);
+}
+
+.status-badge.draft {
+  color: var(--teacher-orange);
+  background: var(--teacher-orange-bg);
+}
+
+.status-badge.draft::before {
+  background: var(--teacher-orange);
+}
+
+/* Actions */
+.test-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn {
+  border: 1px solid var(--teacher-border);
+  background: #fff;
+  color: var(--teacher-navy);
+  text-decoration: none;
+  border-radius: 9px;
+  padding: 9px 13px;
+  font-size: 12px;
+  font-weight: 750;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .2s ease;
+  white-space: nowrap;
+}
+
+.action-btn:hover {
+  border-color: var(--teacher-navy);
+  background: var(--teacher-navy);
+  color: #fff;
+}
+
+.action-btn.primary {
+  background: var(--teacher-red);
+  border-color: var(--teacher-red);
+  color: #fff;
+}
+
+.action-btn.primary:hover {
+  background: var(--teacher-red-dark);
+  border-color: var(--teacher-red-dark);
+  transform: translateY(-1px);
+}
+
+/* Empty state */
+.empty-state {
+  background: #fff;
+  border: 1px dashed #ccd3df;
+  border-radius: 18px;
+  padding: 65px 25px;
+  text-align: center;
+  animation: fadeUp .45s ease both;
+}
+
+.empty-icon {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 18px;
+  border-radius: 18px;
+  background: var(--teacher-red-light);
+  color: var(--teacher-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px;
+  color: var(--teacher-navy);
+  font-size: 19px;
+}
+
+.empty-state p {
+  margin: 0 auto 20px;
+  color: var(--teacher-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 450px;
+}
+
+.empty-create {
+  border: 0;
+  background: var(--teacher-red);
+  color: #fff;
+  padding: 10px 17px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Modal backdrop */
+.exam-modal-backdrop {
+  position: fixed !important;
+  inset: 0;
+  background: rgba(10, 20, 40, .56);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  animation: modalFade .2s ease both;
+}
+
+/* Modal */
+.exam-modal {
+  width: min(520px, 100%);
+  background: #fff;
+  border-radius: 22px;
+  padding: 31px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .20);
+  animation: modalUp .3s ease both;
+}
+
+.modal-header {
+  margin-bottom: 25px;
+}
+
+.modal-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--teacher-red-light);
+  color: var(--teacher-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+
+.exam-modal h2 {
+  margin: 0;
+  color: var(--teacher-navy);
+  font-size: 24px;
+}
+
+.modal-subtitle {
+  color: var(--teacher-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 7px 0 0;
+}
+
+/* Form */
+.field {
+  margin-bottom: 18px;
+}
+
+.field label {
+  display: block;
+  color: var(--teacher-navy);
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 7px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #dce1e9;
+  background: #fbfcfe;
+  color: var(--teacher-text);
+  border-radius: 10px;
+  padding: 12px 13px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.field input::placeholder {
+  color: #a4aab5;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--teacher-red);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, .10);
+  background: #fff;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 7px;
+}
+
+.modal-btn {
+  border: 1px solid var(--teacher-border);
+  background: #fff;
+  color: var(--teacher-navy);
+  padding: 10px 17px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.modal-btn:hover {
+  background: #f5f6f9;
+}
+
+.modal-btn.primary {
+  background: var(--teacher-red);
+  border-color: var(--teacher-red);
+  color: #fff;
+}
+
+.modal-btn.primary:hover {
+  background: var(--teacher-red-dark);
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .test-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .test-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tabs {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .dash-main {
+    padding: 30px 16px 50px;
+  }
+
+  .dash-nav .who {
+    gap: 9px;
+  }
+
+  .dash-nav .who > a:not(.button) {
+    display: none;
+  }
+
+  .page-heading h1 {
+    font-size: 31px;
+  }
+
+  .new-test-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .test-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .test-stat {
+    padding: 16px;
+  }
+
+  .stat-number {
+    font-size: 23px;
+  }
+
+  .tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tabs button {
+    flex: 0 0 auto;
+  }
+
+  .test-card {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 18px;
+  }
+
+  .test-actions {
+    width: 100%;
+  }
+
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .exam-modal {
+    padding: 24px 20px;
+    border-radius: 18px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
 </head>
+
 <body>
 
 <nav class="dash-nav">
-  <div class="brand"><a href="/teacher/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
+  <div class="brand">
+    <a href="/teacher/dashboard.html">
+      <img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo">
+    </a>
+  </div>
+
   <div class="who">
     <a href="/teacher/lecture-schedule.html">Lecture schedule</a>
     <a href="/teacher/resources.html">Resources</a>
     <a href="/teacher/approvals.html">Student approvals</a>
     <a href="/teacher/speaking-slots.html">Speaking slots</a>
+
     <span id="userName"></span>
-    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">
+      Log out
+    </a>
   </div>
 </nav>
 
+
 <main class="dash-main">
-  <div class="dash-head">
-    <h1>My mock tests</h1>
-        <button class="button primary" id="newTestBtn">+ New mock test</button>
-  </div>
 
-  <div class="tabs" id="typeTabs">
-    <button class="active" data-filter="all">All</button>
-    <button data-filter="full">Full Mock Test</button>
-    <button data-filter="reading">Reading</button>
-    <button data-filter="listening">Listening</button>
-    <button data-filter="writing">Writing</button>
-  </div>
+  <!-- PAGE HEADER -->
+  <section class="page-header">
 
-  <div id="testList"></div>
+    <div class="page-heading">
+      <div class="page-eyebrow">Teacher workspace</div>
+
+      <h1>Mock Tests</h1>
+
+      <p>
+        Create, manage and publish IELTS mock tests for your students.
+        Add passages, listening audio, writing tasks and review student submissions.
+      </p>
+    </div>
+
+    <button class="new-test-btn" id="newTestBtn">
+      <span class="plus">+</span>
+      New mock test
+    </button>
+
+  </section>
+
+
+  <!-- STATS -->
+  <section class="test-stats">
+
+    <div class="test-stat">
+      <div class="stat-icon">▣</div>
+      <div class="stat-number" id="totalTests">0</div>
+      <div class="stat-label">Total mock tests</div>
+    </div>
+
+    <div class="test-stat navy">
+      <div class="stat-icon">✓</div>
+      <div class="stat-number" id="publishedTests">0</div>
+      <div class="stat-label">Published tests</div>
+    </div>
+
+    <div class="test-stat">
+      <div class="stat-icon">✎</div>
+      <div class="stat-number" id="draftTests">0</div>
+      <div class="stat-label">Draft tests</div>
+    </div>
+
+    <div class="test-stat navy">
+      <div class="stat-icon">◈</div>
+      <div class="stat-number" id="fullTests">0</div>
+      <div class="stat-label">Full mock tests</div>
+    </div>
+
+  </section>
+
+
+  <!-- TOOLBAR -->
+  <section class="test-toolbar">
+
+    <div class="section-title">
+      Your tests
+      <span id="testCount"></span>
+    </div>
+
+    <div class="tabs" id="typeTabs">
+
+      <button class="active" data-filter="all">
+        All
+      </button>
+
+      <button data-filter="full">
+        Full Mock Test
+      </button>
+
+      <button data-filter="reading">
+        Reading
+      </button>
+
+      <button data-filter="listening">
+        Listening
+      </button>
+
+      <button data-filter="writing">
+        Writing
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- TEST LIST -->
+  <div id="testList" class="test-list"></div>
+
 </main>
 
+
+<!-- NEW TEST MODAL -->
 <div class="exam-modal-backdrop" id="newTestModal" style="display:none;">
+
   <div class="exam-modal">
-    <h2 style="font-family:var(--serif);">Name your mock test</h2>
-    <div class="field"><label>Title</label><input type="text" id="newTitle" placeholder="e.g. Academic Mock Test — Set 3"></div>
-        <div class="field"><label>Description (optional)</label><input type="text" id="newDesc" placeholder="Shown to students on the test list"></div>
+
+    <div class="modal-header">
+
+      <div class="modal-icon">
+        +
+      </div>
+
+      <h2>Create a mock test</h2>
+
+      <p class="modal-subtitle">
+        Start by giving your test a title and selecting the type.
+        You can add questions, passages and tasks after creation.
+      </p>
+
+    </div>
+
+
     <div class="field">
-      <label>Test type</label>
+      <label for="newTitle">
+        Test title
+      </label>
+
+      <input
+        type="text"
+        id="newTitle"
+        placeholder="Example: Academic Mock Test Set 3"
+        autocomplete="off"
+      >
+    </div>
+
+
+    <div class="field">
+      <label for="newDesc">
+        Description
+        <span style="font-weight:500;color:#9aa1ad;">
+          Optional
+        </span>
+      </label>
+
+      <input
+        type="text"
+        id="newDesc"
+        placeholder="Shown to students on the test list"
+        autocomplete="off"
+      >
+    </div>
+
+
+    <div class="field">
+      <label for="newType">
+        Test type
+      </label>
+
       <select id="newType">
-        <option value="full">Full Mock Test (Reading + Listening + Writing)</option>
-        <option value="reading">Reading only</option>
-        <option value="listening">Listening only</option>
-        <option value="writing">Writing only</option>
+
+        <option value="full">
+          Full Mock Test
+        </option>
+
+        <option value="reading">
+          Reading only
+        </option>
+
+        <option value="listening">
+          Listening only
+        </option>
+
+        <option value="writing">
+          Writing only
+        </option>
+
       </select>
     </div>
-    <div class="modal-actions" style="margin-top:20px;">
-      <button class="exam-btn" id="cancelNew">Cancel</button>
-      <button class="exam-btn primary" id="createNew">Create &amp; edit</button>
+
+
+    <div class="modal-actions">
+
+      <button class="modal-btn" id="cancelNew">
+        Cancel
+      </button>
+
+      <button class="modal-btn primary" id="createNew">
+        Create and edit
+      </button>
+
     </div>
+
   </div>
+
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
+
 <script>
+
 let profile;
-
-(async () => {
-  profile = await Auth.requireRole('teacher');
-  if (!profile) return;
-  document.getElementById('userName').textContent = profile.name;
-  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
-  document.querySelectorAll('#typeTabs button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#typeTabs button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderTestList(btn.dataset.filter);
-    });
-  });
-  load();
-})();
-
 let allTests = [];
 
+
+/* =========================================
+   AUTH
+========================================= */
+
+(async () => {
+
+  profile = await Auth.requireRole('teacher');
+
+  if (!profile) return;
+
+  document.getElementById('userName').textContent = profile.name;
+
+  document
+    .getElementById('logoutLink')
+    .addEventListener('click', (e) => {
+
+      e.preventDefault();
+
+      Auth.logout();
+
+    });
+
+
+  /* Tabs */
+
+  document
+    .querySelectorAll('#typeTabs button')
+    .forEach(btn => {
+
+      btn.addEventListener('click', () => {
+
+        document
+          .querySelectorAll('#typeTabs button')
+          .forEach(b => b.classList.remove('active'));
+
+        btn.classList.add('active');
+
+        renderTestList(btn.dataset.filter);
+
+      });
+
+    });
+
+
+  load();
+
+})();
+
+
+/* =========================================
+   LOAD TESTS
+========================================= */
+
 async function load() {
-  const { data: tests } = await supabase.from('tests').select('*').eq('created_by', profile.id).order('created_at', { ascending: false });
+
+  const { data: tests, error } = await supabase
+    .from('tests')
+    .select('*')
+    .eq('created_by', profile.id)
+    .order('created_at', {
+      ascending: false
+    });
+
+
+  if (error) {
+
+    document.getElementById('testList').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">!</div>
+        <h3>Unable to load tests</h3>
+        <p>${escapeHtml(error.message)}</p>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
   allTests = tests || [];
+
+  updateStats();
+
   renderTestList('all');
+
 }
+
+
+/* =========================================
+   STATS
+========================================= */
+
+function updateStats() {
+
+  const total = allTests.length;
+
+  const published = allTests.filter(
+    t => t.published
+  ).length;
+
+  const drafts = allTests.filter(
+    t => !t.published
+  ).length;
+
+  const full = allTests.filter(
+    t => (t.test_type || 'full') === 'full'
+  ).length;
+
+
+  document.getElementById('totalTests').textContent = total;
+
+  document.getElementById('publishedTests').textContent = published;
+
+  document.getElementById('draftTests').textContent = drafts;
+
+  document.getElementById('fullTests').textContent = full;
+
+}
+
+
+/* =========================================
+   RENDER TEST LIST
+========================================= */
 
 function renderTestList(filter) {
-  const tests = filter === 'all' ? allTests : allTests.filter(t => (t.test_type || 'full') === filter);
-  const listEl = document.getElementById('testList');
+
+  const tests =
+    filter === 'all'
+      ? allTests
+      : allTests.filter(
+          t => (t.test_type || 'full') === filter
+        );
+
+
+  const listEl =
+    document.getElementById('testList');
+
+
+  document.getElementById('testCount').textContent =
+    tests.length
+      ? `(${tests.length})`
+      : '';
+
+
+  /* No tests at all */
+
   if (!allTests.length) {
-    listEl.innerHTML = `<div class="empty-state"><h3>No mock tests yet</h3><p>Create your first mock test to start adding passages, audio, and writing tasks.</p></div>`;
+
+    listEl.innerHTML = `
+
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          +
+        </div>
+
+        <h3>No mock tests yet</h3>
+
+        <p>
+          Create your first mock test and start adding
+          passages, listening audio and writing tasks.
+        </p>
+
+        <button
+          class="empty-create"
+          onclick="openNewTestModal()"
+        >
+          Create your first test
+        </button>
+
+      </div>
+
+    `;
+
     return;
+
   }
+
+
+  /* Filter has no results */
+
   if (!tests.length) {
-    listEl.innerHTML = `<div class="empty-state"><h3>No tests of this type yet</h3><p>Try a different tab, or create one with "+ New mock test".</p></div>`;
+
+    listEl.innerHTML = `
+
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          ○
+        </div>
+
+        <h3>No tests of this type</h3>
+
+        <p>
+          There are currently no mock tests in this category.
+          Try another category or create a new test.
+        </p>
+
+        <button
+          class="empty-create"
+          onclick="openNewTestModal()"
+        >
+          New mock test
+        </button>
+
+      </div>
+
+    `;
+
     return;
+
   }
-  listEl.innerHTML = tests.map(t => `
-    <div class="list-row">
-      <div>
-        <div class="title">${escapeHtml(t.title)} <span class="tag">${typeLabel(t.test_type)}</span></div>
-        <div class="meta">${escapeHtml(t.description || 'No description')}</div>
-      </div>
-      ${t.published ? '<span class="badge done">Published</span>' : '<span class="badge pending">Draft</span>'}
-      <div style="display:flex;gap:8px;">
-        <a href="/teacher/submissions.html?testId=${t.id}" class="small-btn">Submissions</a>
-        <a href="/teacher/create-test.html?testId=${t.id}" class="button ghost" style="padding:9px 16px;">Edit</a>
-      </div>
-    </div>
-  `).join('');
+
+
+  /* Render */
+
+  listEl.innerHTML = tests.map((t, index) => {
+
+    const type =
+      t.test_type || 'full';
+
+    const typeClass =
+      ['full', 'reading', 'listening', 'writing'].includes(type)
+        ? type
+        : 'full';
+
+
+    const published =
+      !!t.published;
+
+
+    return `
+
+      <article
+        class="test-card"
+        style="animation-delay:${Math.min(index * 40, 300)}ms"
+      >
+
+        <div class="test-info">
+
+          <div class="test-title-row">
+
+            <div class="test-title">
+              ${escapeHtml(t.title)}
+            </div>
+
+            <span class="type-tag ${typeClass}">
+              ${typeLabel(type)}
+            </span>
+
+          </div>
+
+
+          <div class="test-description">
+            ${escapeHtml(
+              t.description || 'No description added'
+            )}
+          </div>
+
+
+          <div class="test-meta">
+
+            <span class="status-badge ${published ? 'published' : 'draft'}">
+              ${published ? 'Published' : 'Draft'}
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="test-actions">
+
+          <a
+            href="/teacher/submissions.html?testId=${encodeURIComponent(t.id)}"
+            class="action-btn"
+          >
+            <span>▤</span>
+            Submissions
+          </a>
+
+          <a
+            href="/teacher/create-test.html?testId=${encodeURIComponent(t.id)}"
+            class="action-btn primary"
+          >
+            <span>✎</span>
+            Edit test
+          </a>
+
+        </div>
+
+      </article>
+
+    `;
+
+  }).join('');
+
 }
+
+
+/* =========================================
+   TYPE LABEL
+========================================= */
 
 function typeLabel(type) {
-  return { reading: 'Reading only', listening: 'Listening only', writing: 'Writing only', full: 'Full Mock Test' }[type] || 'Full Mock Test';
+
+  return {
+
+    reading: 'Reading',
+
+    listening: 'Listening',
+
+    writing: 'Writing',
+
+    full: 'Full Mock Test'
+
+  }[type] || 'Full Mock Test';
+
 }
 
-document.getElementById('newTestBtn').addEventListener('click', () => { document.getElementById('newTestModal').style.display = 'flex'; });
-document.getElementById('cancelNew').addEventListener('click', () => { document.getElementById('newTestModal').style.display = 'none'; });
-document.getElementById('createNew').addEventListener('click', async () => {
-  const title = document.getElementById('newTitle').value.trim();
-  if (!title) return;
-    const { data, error } = await supabase.from('tests')
-    .insert({
-      title,
-      description: document.getElementById('newDesc').value.trim(),
-      test_type: document.getElementById('newType').value,
-      created_by: profile.id
-    })
-    .select('id').single();
-  if (error) { alert(error.message); return; }
-  window.location.href = `/teacher/create-test.html?testId=${data.id}`;
+
+/* =========================================
+   NEW TEST MODAL
+========================================= */
+
+function openNewTestModal() {
+
+  document
+    .getElementById('newTestModal')
+    .style.display = 'flex';
+
+  setTimeout(() => {
+
+    document
+      .getElementById('newTitle')
+      .focus();
+
+  }, 100);
+
+}
+
+
+function closeNewTestModal() {
+
+  document
+    .getElementById('newTestModal')
+    .style.display = 'none';
+
+}
+
+
+document
+  .getElementById('newTestBtn')
+  .addEventListener('click', openNewTestModal);
+
+
+document
+  .getElementById('cancelNew')
+  .addEventListener('click', closeNewTestModal);
+
+
+/* Close by clicking backdrop */
+
+document
+  .getElementById('newTestModal')
+  .addEventListener('click', (e) => {
+
+    if (
+      e.target ===
+      document.getElementById('newTestModal')
+    ) {
+
+      closeNewTestModal();
+
+    }
+
+  });
+
+
+/* Escape key */
+
+document.addEventListener('keydown', (e) => {
+
+  if (
+    e.key === 'Escape' &&
+    document.getElementById('newTestModal').style.display !== 'none'
+  ) {
+
+    closeNewTestModal();
+
+  }
+
 });
+
+
+/* =========================================
+   CREATE TEST
+========================================= */
+
+document
+  .getElementById('createNew')
+  .addEventListener('click', async () => {
+
+    const title =
+      document
+        .getElementById('newTitle')
+        .value
+        .trim();
+
+
+    if (!title) {
+
+      document
+        .getElementById('newTitle')
+        .focus();
+
+      return;
+
+    }
+
+
+    const button =
+      document.getElementById('createNew');
+
+
+    button.disabled = true;
+
+    button.textContent = 'Creating...';
+
+
+    const { data, error } =
+      await supabase
+        .from('tests')
+        .insert({
+
+          title,
+
+          description:
+            document
+              .getElementById('newDesc')
+              .value
+              .trim(),
+
+          test_type:
+            document
+              .getElementById('newType')
+              .value,
+
+          created_by:
+            profile.id
+
+        })
+        .select('id')
+        .single();
+
+
+    if (error) {
+
+      alert(error.message);
+
+      button.disabled = false;
+
+      button.textContent = 'Create and edit';
+
+      return;
+
+    }
+
+
+    window.location.href =
+      `/teacher/create-test.html?testId=${encodeURIComponent(data.id)}`;
+
+  });
+
+
+/* =========================================
+   HTML ESCAPE
+========================================= */
+
+function escapeHtml(value) {
+
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+}
+
 </script>
+
 </body>
 </html>
