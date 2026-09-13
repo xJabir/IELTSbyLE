@@ -161,9 +161,10 @@ footer.site-footer .wrap { display: flex; justify-content: space-between; }
   display: flex; align-items: center; justify-content: space-between; padding: 18px 28px;
   border-bottom: 1px solid var(--line);
   position: sticky; top: 0; z-index: 100; background: var(--paper);
+  flex-wrap: wrap; gap: 12px;
 }
 .dash-nav .brand { font-size: 18px; }
-.dash-nav .who { font-size: 14px; color: var(--ink-soft); display: flex; align-items: center; gap: 16px; }
+.dash-nav .who { font-size: 14px; color: var(--ink-soft); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .dash-main { max-width: 1040px; margin: 0 auto; padding: 40px 28px 80px; }
 .dash-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
 .dash-head h1 { font-size: 28px; }
