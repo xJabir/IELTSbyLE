@@ -48,7 +48,7 @@ let selectedDate = null;
 let myBooking = null;
 
 (async () => {
-  profile = await Auth.requireRole('student');
+  profile = await Auth.requireApprovedRole('student');
   if (!profile) return;
   document.getElementById('userName').textContent = profile.name;
   document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
