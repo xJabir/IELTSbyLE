@@ -75,7 +75,7 @@ let viewYear = today.getFullYear();
 let viewMonth = today.getMonth(); // 0-11
 
 (async () => {
-  profile = await Auth.requireRole('student');
+  profile = await Auth.requireApprovedRole('student');
   if (!profile) return;
   document.getElementById('userName').textContent = profile.name;
   document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
