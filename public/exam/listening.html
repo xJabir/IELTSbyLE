@@ -60,7 +60,7 @@ let sectionAudioIndex = 0;
 const audioEl = document.getElementById('audioPlayer');
 
 (async () => {
-  profile = await Auth.requireRole('student');
+  profile = await Auth.requireApprovedRole('student');
   if (!profile) return;
   session = ExamRuntime.getSession();
   if (!session) return;
