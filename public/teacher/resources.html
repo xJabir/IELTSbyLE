@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resources — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand"><a href="/teacher/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
+  <div class="who">
+    <a href="/teacher/dashboard.html">← All tests</a>
+    <a href="/teacher/lecture-schedule.html">Lecture schedule</a>
+    <a href="/teacher/speaking-slots.html">Speaking slots</a>
+    <a href="/teacher/approvals.html">Student approvals</a>
+    <span id="userName"></span>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head"><h1>Resources</h1></div>
+  <p style="color:var(--ink-soft);font-size:14px;margin-bottom:20px;">Upload PDF study material by module. Anything you upload here is visible immediately to every approved student.</p>
+
+  <div class="filter-buttons" id="moduleTabs">
+    <button class="active" data-module="listening">Listening</button>
+    <button data-module="reading">Reading</button>
+    <button data-module="writing">Writing</button>
+    <button data-module="speaking">Speaking</button>
+  </div>
+
+  <div class="panel">
+    <h2>Upload a resource</h2>
+    <div class="field"><label>Title</label><input type="text" id="newTitle" placeholder="e.g. Cambridge 18 — Listening strategies"></div>
+    <div class="field"><label>Description (optional)</label><input type="text" id="newDesc" placeholder="A short note about what this covers"></div>
+    <div class="field"><label>PDF file</label><input type="file" id="newFile" accept=".pdf,application/pdf"></div>
+    <div class="submit-row" style="align-items:center;">
+      <button class="button primary" id="uploadBtn" style="padding:10px 20px;">Upload</button>
+      <span id="uploadError" style="color:var(--seal);font-size:13px;display:none;"></span>
+    </div>
+  </div>
+
+  <div id="resourceList"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+let profile;
+let allResources = [];
+let activeModule = 'listening';
+
+(async () => {
+  profile = await Auth.requireRole('teacher');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  document.querySelectorAll('#moduleTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#moduleTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeModule = btn.dataset.module;
+      render();
+    });
+  });
+  document.getElementById('uploadBtn').addEventListener('click', uploadResource);
+  load();
+})();
+
+async function load() {
+  const { data, error } = await supabase.from('resources').select('*').order('created_at', { ascending: false });
+  if (error) {
+    document.getElementById('resourceList').innerHTML = `<div class="empty-state"><h3>Couldn't load resources</h3><p>${escapeHtml(error.message)}</p></div>`;
+    return;
+  }
+  allResources = data || [];
+  render();
+}
+
+function render() {
+  const el = document.getElementById('resourceList');
+  const items = allResources.filter(r => r.module === activeModule);
+
+  if (!items.length) {
+    el.innerHTML = `<div class="empty-state"><h3>No ${escapeHtml(activeModule)} resources yet</h3><p>Upload one above to get started.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = items.map(r => `
+    <div class="list-row">
+      <div>
+        <div class="title">${escapeHtml(r.title)}</div>
+        <div class="meta">${escapeHtml(r.description || r.file_name)}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="small-btn" data-open="${r.id}">Preview</button>
+        <button class="small-btn danger" data-del="${r.id}">Delete</button>
+      </div>
+    </div>
+  `).join('');
+
+  el.querySelectorAll('[data-open]').forEach(btn => btn.addEventListener('click', () => openResource(btn.dataset.open, btn)));
+  el.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => deleteResource(btn.dataset.del)));
+}
+
+async function openResource(id, btn) {
+  const resource = allResources.find(r => r.id === id);
+  if (!resource) return;
+  const originalLabel = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Opening…';
+  const { data, error } = await supabase.storage.from('resources').createSignedUrl(resource.file_path, 600);
+  btn.disabled = false; btn.textContent = originalLabel;
+  if (error) { alert(error.message); return; }
+  window.open(data.signedUrl, '_blank', 'noopener');
+}
+
+async function uploadResource() {
+  const errorBox = document.getElementById('uploadError');
+  errorBox.style.display = 'none';
+
+  const title = document.getElementById('newTitle').value.trim();
+  const description = document.getElementById('newDesc').value.trim();
+  const fileInput = document.getElementById('newFile');
+  const file = fileInput.files[0];
+
+  if (!title || !file) {
+    errorBox.textContent = 'A title and a PDF file are both required.';
+    errorBox.style.display = 'block';
+    return;
+  }
+  if (file.type && file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+    errorBox.textContent = 'Please choose a PDF file.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true; btn.textContent = 'Uploading…';
+
+  try {
+    const path = `${activeModule}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const { error: uploadError } = await supabase.storage.from('resources').upload(path, file, { upsert: false });
+    if (uploadError) throw uploadError;
+
+    const { error: insertError } = await supabase.from('resources').insert({
+      teacher_id: profile.id, module: activeModule, title, description, file_path: path, file_name: file.name
+    });
+    if (insertError) throw insertError;
+
+    document.getElementById('newTitle').value = '';
+    document.getElementById('newDesc').value = '';
+    fileInput.value = '';
+    await load();
+  } catch (e) {
+    errorBox.textContent = e.message;
+    errorBox.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Upload';
+  }
+}
+
+async function deleteResource(id) {
+  if (!confirm('Delete this resource? Students will no longer be able to see or open it.')) return;
+  const resource = allResources.find(r => r.id === id);
+  if (!resource) return;
+  await supabase.storage.from('resources').remove([resource.file_path]);
+  const { error } = await supabase.from('resources').delete().eq('id', id);
+  if (error) { alert(error.message); return; }
+  await load();
+}
+</script>
+</body>
+</html>
