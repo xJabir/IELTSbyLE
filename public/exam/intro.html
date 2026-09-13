@@ -39,7 +39,7 @@
 const testId = new URLSearchParams(location.search).get('testId');
 
 (async () => {
-  const profile = await Auth.requireRole('student');
+  const profile = await Auth.requireApprovedRole('student');
   if (!profile) return;
   load();
 })();
