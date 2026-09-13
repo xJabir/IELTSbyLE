@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resources — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand"><a href="/student/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
+  <div class="who">
+    <a href="/student/dashboard.html">Dashboard</a>
+    <a href="/student/mock-tests.html">Mock tests</a>
+    <a href="/student/schedule.html">Class schedule</a>
+    <a href="/student/speaking.html">Speaking test</a>
+    <a href="/student/results.html">My results</a>
+    <span id="userName"></span>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head"><h1>Resources</h1></div>
+  <p style="color:var(--ink-soft);font-size:14px;margin-bottom:20px;">Study material your teacher has uploaded, by module.</p>
+
+  <div class="filter-buttons" id="moduleTabs">
+    <button class="active" data-module="listening">Listening</button>
+    <button data-module="reading">Reading</button>
+    <button data-module="writing">Writing</button>
+    <button data-module="speaking">Speaking</button>
+  </div>
+
+  <div id="resourceList"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+let allResources = [];
+let activeModule = 'listening';
+
+(async () => {
+  const profile = await Auth.requireApprovedRole('student');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  document.querySelectorAll('#moduleTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#moduleTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeModule = btn.dataset.module;
+      render();
+    });
+  });
+  load();
+})();
+
+async function load() {
+  const { data, error } = await supabase.from('resources').select('*').order('created_at', { ascending: false });
+  if (error) {
+    document.getElementById('resourceList').innerHTML = `<div class="empty-state"><h3>Couldn't load resources</h3><p>${escapeHtml(error.message)}</p></div>`;
+    return;
+  }
+  allResources = data || [];
+  render();
+}
+
+function render() {
+  const el = document.getElementById('resourceList');
+  const items = allResources.filter(r => r.module === activeModule);
+
+  if (!items.length) {
+    el.innerHTML = `<div class="empty-state"><h3>No ${escapeHtml(activeModule)} resources yet</h3><p>Check back soon — your teacher is still building this out.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = items.map(r => `
+    <div class="list-row">
+      <div>
+        <div class="title">${escapeHtml(r.title)}</div>
+        <div class="meta">${escapeHtml(r.description || r.file_name)}</div>
+      </div>
+      <button class="button primary" data-open="${r.id}" style="padding:9px 18px;">View PDF</button>
+    </div>
+  `).join('');
+
+  el.querySelectorAll('[data-open]').forEach(btn => btn.addEventListener('click', () => openResource(btn.dataset.open, btn)));
+}
+
+async function openResource(id, btn) {
+  const resource = allResources.find(r => r.id === id);
+  if (!resource) return;
+  const originalLabel = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Opening…';
+  const { data, error } = await supabase.storage.from('resources').createSignedUrl(resource.file_path, 600);
+  btn.disabled = false; btn.textContent = originalLabel;
+  if (error) { alert(error.message); return; }
+  window.open(data.signedUrl, '_blank', 'noopener');
+}
+</script>
+</body>
+</html>
