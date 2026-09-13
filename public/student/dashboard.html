@@ -49,7 +49,7 @@
 <script src="/js/supabase-client.js"></script>
 <script>
 (async () => {
-  const profile = await Auth.requireRole('student');
+  const profile = await Auth.requireApprovedRole('student');
   if (!profile) return;
   document.getElementById('userName').textContent = profile.name;
   document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
