@@ -32,7 +32,7 @@ body.landing h1, body.landing h2, body.landing h3 { font-family: var(--ln-serif)
 }
 .ln-nav.scrolled { box-shadow: 0 1px 0 var(--line), 0 12px 24px -18px rgba(20,33,61,0.35); }
 .ln-brand { display: inline-flex; align-items: center; }
-.ln-logo { height: 34px; width: auto; }
+.ln-logo { height: 54px; width: auto; }
 .ln-nav-links { display: flex; align-items: center; gap: 26px; font-size: 15px; color: var(--ink-soft); }
 .ln-nav-links a:not(.ln-btn) { color: var(--ink-soft); transition: color 150ms ease; }
 .ln-nav-links a:not(.ln-btn):hover { color: var(--ink); }
