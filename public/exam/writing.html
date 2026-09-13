@@ -49,7 +49,7 @@ let taskIndex = 0;
 let timer;
 
 (async () => {
-  profile = await Auth.requireRole('student');
+  profile = await Auth.requireApprovedRole('student');
   if (!profile) return;
   session = ExamRuntime.getSession();
   if (!session) return;
