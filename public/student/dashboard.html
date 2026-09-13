@@ -5,12 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Dashboard — London Educators</title>
 <link rel="stylesheet" href="/css/main.css">
+<style>
+  .hub-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 8px; }
+  .hub-card {
+    border: 1px solid var(--line); background: #fff; padding: 32px; border-radius: var(--radius);
+    display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit;
+    transition: border-color .12s ease, transform .12s ease;
+  }
+  .hub-card:hover { border-color: var(--seal); transform: translateY(-2px); }
+  .hub-card h2 { font-family: var(--serif); font-size: 22px; color: var(--ink); }
+  .hub-card p { color: var(--ink-soft); font-size: 14px; line-height: 1.6; margin: 0; }
+  .hub-card .go { color: var(--seal); font-weight: 600; font-size: 14px; margin-top: 4px; }
+  @media (max-width: 640px) { .hub-grid { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
 
 <nav class="dash-nav">
   <div class="brand"><a href="/student/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
   <div class="who">
+    <a href="/student/resources.html">Resources</a>
+    <a href="/student/mock-tests.html">Mock tests</a>
     <a href="/student/schedule.html">Class schedule</a>
     <a href="/student/speaking.html">Speaking test</a>
     <a href="/student/results.html">My results</a>
@@ -20,29 +35,22 @@
 </nav>
 
 <main class="dash-main">
-  <div class="dash-head">
-    <h1>Available mock tests</h1>
+  <div class="dash-head"><h1>Welcome back<span id="welcomeName"></span></h1></div>
+
+  <div class="stat-row" id="statRow"></div>
+
+  <div class="hub-grid">
+    <a class="hub-card" href="/student/resources.html">
+      <h2>Resources</h2>
+      <p>PDF study material from your teacher, organised by module — Listening, Reading, Writing, and Speaking.</p>
+      <span class="go">Browse resources →</span>
+    </a>
+    <a class="hub-card" href="/student/mock-tests.html">
+      <h2>Mock Tests</h2>
+      <p>Full-length, computer-delivered mock exams on the real test screen — take one, resume one, or view a graded result.</p>
+      <span class="go">View mock tests →</span>
+    </a>
   </div>
-
-    <div class="stat-row" id="statRow"></div>
-
-  <div class="panel" style="border-color:var(--seal);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-    <div>
-      <h2 style="margin-bottom:4px;">Looking for the Speaking test?</h2>
-      <p class="panel-sub" style="margin-bottom:0;">Speaking is booked as a live slot with your teacher, not taken here.</p>
-    </div>
-    <a href="/student/speaking.html" class="button primary" style="padding:10px 18px;">Book Speaking test</a>
-  </div>
-
-    <div class="filter-buttons" id="typeTabs">
-    <button class="active" data-filter="all">All</button>
-    <button data-filter="full">Full Mock Test</button>
-    <button data-filter="reading">Reading</button>
-    <button data-filter="listening">Listening</button>
-    <button data-filter="writing">Writing</button>
-  </div>
-
-  <div id="testList"></div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -52,31 +60,14 @@
   const profile = await Auth.requireApprovedRole('student');
   if (!profile) return;
   document.getElementById('userName').textContent = profile.name;
+  document.getElementById('welcomeName').textContent = `, ${profile.name.split(' ')[0]}`;
   document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
-  document.querySelectorAll('#typeTabs button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#typeTabs button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderTestList(btn.dataset.filter);
-    });
-  });
-  load();
+  load(profile);
 })();
 
-let allTests = [], allResults = [], allInProgress = [];
-
-async function load() {
-  const profile = await Auth.getProfile();
-  const [{ data: tests }, { data: results }] = await Promise.all([
-    supabase.from('tests').select('id, title, description, test_type').eq('published', true).order('created_at', { ascending: false }),
-    supabase.from('submissions').select('*').eq('student_id', profile.id).neq('status', 'in_progress')
-  ]);
-  const { data: inProgress } = await supabase.from('submissions').select('test_id, status').eq('student_id', profile.id).eq('status', 'in_progress');
-
-  allTests = tests || [];
-  allResults = results || [];
-  allInProgress = inProgress || [];
-
+async function load(profile) {
+  const { data: results } = await supabase.from('submissions').select('*').eq('student_id', profile.id).neq('status', 'in_progress');
+  const allResults = results || [];
   const graded = allResults.filter(r => r.overall_band != null);
   const avg = graded.length ? (graded.reduce((a, r) => a + r.overall_band, 0) / graded.length).toFixed(1) : '—';
   const best = graded.length ? Math.max(...graded.map(r => r.overall_band)) : '—';
@@ -87,49 +78,6 @@ async function load() {
     <div class="stat-cell"><div class="label">Average overall band</div><div class="value seal">${avg}</div></div>
     <div class="stat-cell"><div class="label">Best overall band</div><div class="value seal">${best}</div></div>
   `;
-
-  renderTestList('all');
-}
-
-function renderTestList(filter) {
-  const tests = filter === 'all' ? allTests : allTests.filter(t => (t.test_type || 'full') === filter);
-  const listEl = document.getElementById('testList');
-
-  if (!allTests.length) {
-    listEl.innerHTML = `<div class="empty-state"><h3>No mock tests published yet</h3><p>Ask your teacher to publish a test — it'll appear here as soon as it's live.</p></div>`;
-    return;
-  }
-  if (!tests.length) {
-    listEl.innerHTML = `<div class="empty-state"><h3>No tests of this type yet</h3><p>Try a different tab, or check back later.</p></div>`;
-    return;
-  }
-
-  listEl.innerHTML = tests.map(t => {
-    const finished = allResults.find(r => r.test_id === t.id);
-    const progress = allInProgress.find(r => r.test_id === t.id);
-    let badge = '<span class="badge pending">Not started</span>';
-    let action = `<a href="/exam/intro.html?testId=${t.id}" class="button primary" style="padding:9px 18px;">Start test</a>`;
-    if (progress) {
-      badge = '<span class="badge progress">In progress</span>';
-      action = `<a href="/exam/intro.html?testId=${t.id}" class="button primary" style="padding:9px 18px;">Resume</a>`;
-    } else if (finished) {
-      badge = finished.status === 'graded' ? '<span class="badge done">Graded</span>' : '<span class="badge pending">Awaiting writing grade</span>';
-      action = `<a href="/student/results.html" class="button ghost" style="padding:9px 18px;">View result</a>`;
-    }
-    return `
-      <div class="list-row">
-        <div>
-          <div class="title">${escapeHtml(t.title)} <span class="tag">${typeLabel(t.test_type)}</span></div>
-          <div class="meta">${escapeHtml(t.description || 'Reading · Listening · Writing')}</div>
-        </div>
-        ${badge}
-        ${action}
-      </div>`;
-  }).join('');
-}
-
-function typeLabel(type) {
-  return { reading: 'Reading only', listening: 'Listening only', writing: 'Writing only', full: 'Full Mock Test' }[type] || 'Full Mock Test';
 }
 </script>
 </body>
