@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock Tests — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand"><a href="/student/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
+  <div class="who">
+    <a href="/student/dashboard.html">Dashboard</a>
+    <a href="/student/resources.html">Resources</a>
+    <a href="/student/schedule.html">Class schedule</a>
+    <a href="/student/speaking.html">Speaking test</a>
+    <a href="/student/results.html">My results</a>
+    <span id="userName"></span>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head">
+    <h1>Available mock tests</h1>
+  </div>
+
+    <div class="stat-row" id="statRow"></div>
+
+  <div class="panel" style="border-color:var(--seal);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="margin-bottom:4px;">Looking for the Speaking test?</h2>
+      <p class="panel-sub" style="margin-bottom:0;">Speaking is booked as a live slot with your teacher, not taken here.</p>
+    </div>
+    <a href="/student/speaking.html" class="button primary" style="padding:10px 18px;">Book Speaking test</a>
+  </div>
+
+    <div class="filter-buttons" id="typeTabs">
+    <button class="active" data-filter="all">All</button>
+    <button data-filter="full">Full Mock Test</button>
+    <button data-filter="reading">Reading</button>
+    <button data-filter="listening">Listening</button>
+    <button data-filter="writing">Writing</button>
+  </div>
+
+  <div id="testList"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+(async () => {
+  const profile = await Auth.requireApprovedRole('student');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  document.querySelectorAll('#typeTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#typeTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTestList(btn.dataset.filter);
+    });
+  });
+  load();
+})();
+
+let allTests = [], allResults = [], allInProgress = [];
+
+async function load() {
+  const profile = await Auth.getProfile();
+  const [{ data: tests }, { data: results }] = await Promise.all([
+    supabase.from('tests').select('id, title, description, test_type').eq('published', true).order('created_at', { ascending: false }),
+    supabase.from('submissions').select('*').eq('student_id', profile.id).neq('status', 'in_progress')
+  ]);
+  const { data: inProgress } = await supabase.from('submissions').select('test_id, status').eq('student_id', profile.id).eq('status', 'in_progress');
+
+  allTests = tests || [];
+  allResults = results || [];
+  allInProgress = inProgress || [];
+
+  const graded = allResults.filter(r => r.overall_band != null);
+  const avg = graded.length ? (graded.reduce((a, r) => a + r.overall_band, 0) / graded.length).toFixed(1) : '—';
+  const best = graded.length ? Math.max(...graded.map(r => r.overall_band)) : '—';
+
+  document.getElementById('statRow').innerHTML = `
+    <div class="stat-cell"><div class="label">Tests taken</div><div class="value">${allResults.length}</div></div>
+    <div class="stat-cell"><div class="label">Fully graded</div><div class="value">${graded.length}</div></div>
+    <div class="stat-cell"><div class="label">Average overall band</div><div class="value seal">${avg}</div></div>
+    <div class="stat-cell"><div class="label">Best overall band</div><div class="value seal">${best}</div></div>
+  `;
+
+  renderTestList('all');
+}
+
+function renderTestList(filter) {
+  const tests = filter === 'all' ? allTests : allTests.filter(t => (t.test_type || 'full') === filter);
+  const listEl = document.getElementById('testList');
+
+  if (!allTests.length) {
+    listEl.innerHTML = `<div class="empty-state"><h3>No mock tests published yet</h3><p>Ask your teacher to publish a test — it'll appear here as soon as it's live.</p></div>`;
+    return;
+  }
+  if (!tests.length) {
+    listEl.innerHTML = `<div class="empty-state"><h3>No tests of this type yet</h3><p>Try a different tab, or check back later.</p></div>`;
+    return;
+  }
+
+  listEl.innerHTML = tests.map(t => {
+    const finished = allResults.find(r => r.test_id === t.id);
+    const progress = allInProgress.find(r => r.test_id === t.id);
+    let badge = '<span class="badge pending">Not started</span>';
+    let action = `<a href="/exam/intro.html?testId=${t.id}" class="button primary" style="padding:9px 18px;">Start test</a>`;
+    if (progress) {
+      badge = '<span class="badge progress">In progress</span>';
+      action = `<a href="/exam/intro.html?testId=${t.id}" class="button primary" style="padding:9px 18px;">Resume</a>`;
+    } else if (finished) {
+      badge = finished.status === 'graded' ? '<span class="badge done">Graded</span>' : '<span class="badge pending">Awaiting writing grade</span>';
+      action = `<a href="/student/results.html" class="button ghost" style="padding:9px 18px;">View result</a>`;
+    }
+    return `
+      <div class="list-row">
+        <div>
+          <div class="title">${escapeHtml(t.title)} <span class="tag">${typeLabel(t.test_type)}</span></div>
+          <div class="meta">${escapeHtml(t.description || 'Reading · Listening · Writing')}</div>
+        </div>
+        ${badge}
+        ${action}
+      </div>`;
+  }).join('');
+}
+
+function typeLabel(type) {
+  return { reading: 'Reading only', listening: 'Listening only', writing: 'Writing only', full: 'Full Mock Test' }[type] || 'Full Mock Test';
+}
+</script>
+</body>
+</html>
