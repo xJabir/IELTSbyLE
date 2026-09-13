@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Approvals — London Educators</title>
+<link rel="stylesheet" href="/css/main.css">
+<style>
+  .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .filter-row button {
+    padding: 8px 16px; border: 1px solid var(--line); background: #fff; border-radius: var(--radius);
+    font-size: 13px; cursor: pointer; color: var(--ink-soft);
+  }
+  .filter-row button.active { border-color: var(--ink); color: var(--ink); font-weight: 600; }
+  .approve-row { grid-template-columns: 1fr auto; }
+</style>
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="brand"><a href="/teacher/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
+  <div class="who">
+    <a href="/teacher/dashboard.html">← All tests</a>
+    <a href="/teacher/lecture-schedule.html">Lecture schedule</a>
+    <a href="/teacher/speaking-slots.html">Speaking slots</a>
+    <span id="userName"></span>
+    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+  <div class="dash-head"><h1>Student approvals</h1></div>
+  <p style="color:var(--ink-soft);font-size:14px;margin-bottom:20px;">Anyone can create a student account, but they can't access mock tests, the class schedule, or speaking bookings until you approve them here. Check their name and batch/student ID against your real enrolment list before approving.</p>
+
+  <div class="filter-row" id="filterRow">
+    <button data-filter="pending" class="active">Pending</button>
+    <button data-filter="approved">Approved</button>
+    <button data-filter="rejected">Rejected</button>
+    <button data-filter="all">All</button>
+  </div>
+
+  <div id="list"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+let profile;
+let allStudents = [];
+let filter = 'pending';
+
+(async () => {
+  profile = await Auth.requireRole('teacher');
+  if (!profile) return;
+  document.getElementById('userName').textContent = profile.name;
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+  document.getElementById('filterRow').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-filter]');
+    if (!btn) return;
+    filter = btn.dataset.filter;
+    document.querySelectorAll('#filterRow button').forEach(b => b.classList.toggle('active', b === btn));
+    render();
+  });
+  load();
+})();
+
+async function load() {
+  const { data, error } = await supabase
+    .from('profiles').select('id, name, email, batch_number, student_id_number, approval_status, created_at')
+    .eq('role', 'student')
+    .order('created_at', { ascending: false });
+  if (error) {
+    document.getElementById('list').innerHTML = `<div class="empty-state"><h3>Couldn't load students</h3><p>${escapeHtml(error.message)}</p></div>`;
+    return;
+  }
+  allStudents = data || [];
+  render();
+}
+
+function render() {
+  const el = document.getElementById('list');
+  const shown = filter === 'all' ? allStudents : allStudents.filter(s => s.approval_status === filter);
+
+  if (!shown.length) {
+    el.innerHTML = `<div class="empty-state"><h3>Nothing here</h3><p>${filter === 'pending' ? 'No signups are waiting on you right now.' : 'No students match this filter.'}</p></div>`;
+    return;
+  }
+
+  el.innerHTML = shown.map(s => `
+    <div class="list-row approve-row">
+      <div>
+        <div class="title">${escapeHtml(s.name)} <span class="badge ${s.approval_status === 'approved' ? 'done' : s.approval_status === 'rejected' ? 'pending' : 'progress'}">${escapeHtml(s.approval_status)}</span></div>
+        <div class="meta">${escapeHtml(s.email)} · Batch: ${escapeHtml(s.batch_number || '—')} · Student ID: ${escapeHtml(s.student_id_number || '—')}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        ${s.approval_status !== 'approved' ? `<button class="button primary" data-approve="${s.id}" style="padding:8px 16px;">Approve</button>` : ''}
+        ${s.approval_status !== 'rejected' ? `<button class="small-btn danger" data-reject="${s.id}">Reject</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  el.querySelectorAll('[data-approve]').forEach(b => b.addEventListener('click', () => setStatus(b.dataset.approve, 'approved')));
+  el.querySelectorAll('[data-reject]').forEach(b => b.addEventListener('click', () => setStatus(b.dataset.reject, 'rejected')));
+}
+
+async function setStatus(id, status) {
+  const { error } = await supabase.from('profiles').update({ approval_status: status }).eq('id', id);
+  if (error) { alert(error.message); return; }
+  await load();
+}
+</script>
+</body>
+</html>
