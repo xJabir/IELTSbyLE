@@ -2,7 +2,7 @@
 const ExamRuntime = {
   getSession() {
     const raw = sessionStorage.getItem('le_exam_session');
-    if (!raw) { window.location.href = '/student/dashboard.html'; return null; }
+    if (!raw) { window.location.href = '/student/mock-tests.html'; return null; }
     return JSON.parse(raw);
   },
 
