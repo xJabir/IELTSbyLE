@@ -3,110 +3,1459 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resources — London Educators</title>
+<title>Resources | IELTSbyLE</title>
 <link rel="stylesheet" href="/css/main.css">
+
+<style>
+:root {
+  --resource-red: #e63946;
+  --resource-red-dark: #c92f3d;
+  --resource-red-light: #fff1f2;
+
+  --resource-blue: #142b5f;
+  --resource-blue-dark: #0e2048;
+  --resource-blue-light: #eef3ff;
+
+  --resource-text: #17233d;
+  --resource-text-soft: #667085;
+  --resource-muted: #98a2b3;
+
+  --resource-bg: #f6f8fc;
+  --resource-card: #ffffff;
+  --resource-border: #e7ebf2;
+
+  --resource-green: #14804a;
+  --resource-green-light: #ecfdf3;
+
+  --resource-shadow: 0 14px 40px rgba(20, 43, 95, 0.07);
+  --resource-shadow-hover: 0 20px 50px rgba(20, 43, 95, 0.11);
+
+  --resource-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(230, 57, 70, 0.045), transparent 24%),
+    radial-gradient(circle at 8% 30%, rgba(20, 43, 95, 0.035), transparent 26%),
+    var(--resource-bg);
+  color: var(--resource-text);
+  font-family: var(--resource-sans);
+}
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+.student-resource-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(231, 235, 242, 0.85);
+  transition: box-shadow 220ms ease, background 220ms ease;
+}
+
+.student-resource-nav.scrolled {
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 10px 35px rgba(20, 43, 95, 0.08);
+}
+
+.resource-nav-inner {
+  width: min(1280px, calc(100% - 48px));
+  min-height: 76px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.resource-brand {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.resource-brand img {
+  height: 48px;
+  width: auto;
+  display: block;
+  transition: transform 200ms ease;
+}
+
+.resource-brand:hover img {
+  transform: scale(1.035);
+}
+
+.resource-nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 21px;
+  min-width: 0;
+}
+
+.resource-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.resource-nav-links a {
+  color: #667085;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 550;
+  white-space: nowrap;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.resource-nav-links a:hover {
+  color: var(--resource-red);
+  transform: translateY(-1px);
+}
+
+.resource-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding-left: 17px;
+  border-left: 1px solid var(--resource-border);
+}
+
+.resource-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--resource-blue), #274985);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.resource-user-name {
+  max-width: 135px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--resource-blue);
+}
+
+.resource-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 13px;
+  border: 1px solid var(--resource-border);
+  border-radius: 8px;
+  color: #667085 !important;
+  text-decoration: none;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  transition: all 180ms ease;
+}
+
+.resource-logout:hover {
+  color: var(--resource-red) !important;
+  background: var(--resource-red-light);
+  border-color: rgba(230, 57, 70, 0.20);
+  transform: none !important;
+}
+
+/* =========================================
+   MAIN
+========================================= */
+
+.resource-main {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 48px 0 80px;
+}
+
+/* =========================================
+   PAGE HEADER
+========================================= */
+
+.resource-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 32px;
+}
+
+.resource-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--resource-red);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.resource-eyebrow::before {
+  content: "";
+  width: 23px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--resource-red);
+}
+
+.resource-header h1 {
+  margin: 0 0 9px;
+  color: var(--resource-blue);
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+}
+
+.resource-header p {
+  margin: 0;
+  max-width: 650px;
+  color: var(--resource-text-soft);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.resource-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border: 1px solid var(--resource-border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--resource-blue);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.resource-header-badge .badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #18a566;
+  box-shadow: 0 0 0 4px rgba(24, 165, 102, 0.10);
+}
+
+/* =========================================
+   MODULE TABS
+========================================= */
+
+.module-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.module-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 72px;
+  padding: 13px 16px;
+  border: 1px solid var(--resource-border);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--resource-text-soft);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+}
+
+.module-tab:hover {
+  transform: translateY(-2px);
+  border-color: rgba(20, 43, 95, 0.16);
+  box-shadow: 0 10px 26px rgba(20, 43, 95, 0.06);
+}
+
+.module-tab.active {
+  color: white;
+  background: var(--resource-blue);
+  border-color: var(--resource-blue);
+  box-shadow: 0 12px 28px rgba(20, 43, 95, 0.16);
+}
+
+.module-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--resource-blue-light);
+  color: var(--resource-blue);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.module-tab.active .module-icon {
+  background: rgba(255, 255, 255, 0.13);
+  color: white;
+}
+
+.module-tab-content {
+  min-width: 0;
+}
+
+.module-tab-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 750;
+  margin-bottom: 3px;
+}
+
+.module-tab-count {
+  display: block;
+  font-size: 11px;
+  opacity: 0.68;
+}
+
+.module-tab.active .module-tab-count {
+  opacity: 0.76;
+}
+
+/* =========================================
+   RESOURCE AREA
+========================================= */
+
+.resource-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 17px;
+}
+
+.resource-section-title {
+  margin: 0;
+  color: var(--resource-blue);
+  font-size: 18px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.resource-section-meta {
+  color: var(--resource-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================================
+   RESOURCE CARDS
+========================================= */
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.resource-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 210px;
+  padding: 22px;
+  border: 1px solid var(--resource-border);
+  border-radius: 15px;
+  background: var(--resource-card);
+  box-shadow: var(--resource-shadow);
+  overflow: hidden;
+  animation: resource-card-in 420ms ease both;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.resource-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--resource-red), #f56b75);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 250ms ease;
+}
+
+.resource-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--resource-shadow-hover);
+  border-color: rgba(230, 57, 70, 0.13);
+}
+
+.resource-card:hover::before {
+  transform: scaleX(1);
+}
+
+.resource-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.resource-file-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--resource-red-light);
+  color: var(--resource-red);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.03em;
+}
+
+.resource-access-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 9px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.resource-access-badge.free {
+  color: var(--resource-green);
+  background: var(--resource-green-light);
+}
+
+.resource-access-badge.locked {
+  color: #a15c00;
+  background: #fff7e8;
+}
+
+.resource-card-body {
+  margin-top: 18px;
+  flex: 1;
+}
+
+.resource-card-title {
+  margin: 0 0 8px;
+  color: var(--resource-blue);
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 750;
+}
+
+.resource-card-description {
+  margin: 0;
+  color: var(--resource-text-soft);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.resource-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 22px;
+  padding-top: 15px;
+  border-top: 1px solid #eef1f5;
+}
+
+.resource-file-name {
+  min-width: 0;
+  color: var(--resource-muted);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resource-view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 9px 15px;
+  border: 1px solid var(--resource-red);
+  border-radius: 8px;
+  background: var(--resource-red);
+  color: white;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.resource-view-btn:hover {
+  background: var(--resource-red-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(230, 57, 70, 0.20);
+}
+
+.resource-view-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =========================================
+   LOCKED CARD
+========================================= */
+
+.resource-card.locked-card {
+  background: linear-gradient(145deg, #ffffff, #fafbfc);
+}
+
+.locked-card .resource-file-icon {
+  background: #f3f4f6;
+  color: #7a8495;
+}
+
+.locked-message {
+  margin-top: 13px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: #f8f9fb;
+  color: #7b8493;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.resource-locked-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border: 1px solid #e3e6eb;
+  border-radius: 8px;
+  background: #f6f7f9;
+  color: #8a93a2;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   EMPTY / ERROR STATES
+========================================= */
+
+.resource-empty {
+  padding: 65px 25px;
+  text-align: center;
+  border: 1px dashed #dce2eb;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.resource-empty-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 15px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--resource-blue-light);
+  color: var(--resource-blue);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.resource-empty h3 {
+  margin: 0 0 7px;
+  color: var(--resource-blue);
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.resource-empty p {
+  max-width: 430px;
+  margin: 0 auto;
+  color: var(--resource-text-soft);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.resource-error {
+  border-color: rgba(230, 57, 70, 0.20);
+  background: #fff8f8;
+}
+
+.resource-error .resource-empty-icon {
+  background: var(--resource-red-light);
+  color: var(--resource-red);
+}
+
+/* =========================================
+   LOADING
+========================================= */
+
+.resource-loading-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.resource-skeleton {
+  height: 210px;
+  border-radius: 15px;
+  background:
+    linear-gradient(
+      90deg,
+      #f0f2f5 25%,
+      #f8f9fb 50%,
+      #f0f2f5 75%
+    );
+  background-size: 200% 100%;
+  animation: resource-loading 1.3s infinite;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes resource-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes resource-loading {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1050px) {
+  .resource-nav-links {
+    gap: 13px;
+  }
+
+  .resource-nav-links a:nth-child(4),
+  .resource-nav-links a:nth-child(5) {
+    display: none;
+  }
+
+  .resource-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 850px) {
+  .resource-nav-inner {
+    width: min(100% - 28px, 1180px);
+    min-height: 68px;
+  }
+
+  .resource-brand img {
+    height: 43px;
+  }
+
+  .resource-nav-links {
+    display: none;
+  }
+
+  .resource-user {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .module-tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .resource-grid,
+  .resource-loading-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-main {
+    width: min(100% - 30px, 720px);
+    padding-top: 35px;
+  }
+}
+
+@media (max-width: 520px) {
+  .resource-user-name {
+    display: none;
+  }
+
+  .resource-header h1 {
+    font-size: 30px;
+  }
+
+  .resource-header p {
+    font-size: 13px;
+  }
+
+  .resource-header-badge {
+    display: none;
+  }
+
+  .module-tabs {
+    gap: 8px;
+  }
+
+  .module-tab {
+    min-height: 66px;
+    padding: 10px;
+  }
+
+  .module-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 9px;
+  }
+
+  .resource-card {
+    padding: 18px;
+  }
+
+  .resource-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .resource-view-btn,
+  .resource-locked-btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
 </head>
+
 <body>
 
-<nav class="dash-nav">
-  <div class="brand"><a href="/student/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
-  <div class="who">
-    <a href="/student/dashboard.html">Dashboard</a>
-    <a href="/student/mock-tests.html">Mock tests</a>
-    <a href="/student/schedule.html">Class schedule</a>
-    <a href="/student/speaking.html">Speaking test</a>
-    <a href="/student/results.html">My results</a>
-    <span id="userName"></span>
-    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+<!-- =========================================
+     NAVIGATION
+========================================= -->
+
+<nav class="student-resource-nav" id="resourceNav">
+  <div class="resource-nav-inner">
+
+    <a href="/student/dashboard.html" class="resource-brand">
+      <img src="/images/logos.png" alt="IELTSbyLE">
+    </a>
+
+    <div class="resource-nav-right">
+
+      <div class="resource-nav-links">
+        <a href="/student/dashboard.html">Dashboard</a>
+        <a href="/student/mock-tests.html">Mock tests</a>
+        <a href="/student/schedule.html">Class schedule</a>
+        <a href="/student/speaking.html">Speaking test</a>
+        <a href="/student/results.html">My results</a>
+      </div>
+
+      <div class="resource-user">
+        <div class="resource-avatar" id="userAvatar">S</div>
+        <span class="resource-user-name" id="userName">Student</span>
+
+        <a href="#" id="logoutLink" class="resource-logout">
+          Log out
+        </a>
+      </div>
+
+    </div>
+
   </div>
 </nav>
 
-<main class="dash-main">
-  <div class="dash-head"><h1>Resources</h1></div>
-  <p style="color:var(--ink-soft);font-size:14px;margin-bottom:20px;">Study material your teacher has uploaded, by module.</p>
 
-  <div class="filter-buttons" id="moduleTabs">
-    <button class="active" data-module="listening">Listening</button>
-    <button data-module="reading">Reading</button>
-    <button data-module="writing">Writing</button>
-    <button data-module="speaking">Speaking</button>
+<!-- =========================================
+     MAIN CONTENT
+========================================= -->
+
+<main class="resource-main">
+
+  <header class="resource-header">
+
+    <div>
+      <div class="resource-eyebrow">IELTS Study Centre</div>
+
+      <h1>Resources</h1>
+
+      <p>
+        Access your IELTS study materials, organised by module.
+        Learn from teacher uploaded resources and prepare at your own pace.
+      </p>
+    </div>
+
+    <div class="resource-header-badge">
+      <span class="badge-dot"></span>
+      Updated by your teachers
+    </div>
+
+  </header>
+
+
+  <!-- =========================================
+       MODULE TABS
+  ========================================= -->
+
+  <div class="module-tabs" id="moduleTabs">
+
+    <button class="module-tab active" data-module="listening">
+
+      <span class="module-icon">L</span>
+
+      <span class="module-tab-content">
+        <span class="module-tab-title">Listening</span>
+        <span class="module-tab-count" data-count="listening">
+          0 resources
+        </span>
+      </span>
+
+    </button>
+
+
+    <button class="module-tab" data-module="reading">
+
+      <span class="module-icon">R</span>
+
+      <span class="module-tab-content">
+        <span class="module-tab-title">Reading</span>
+        <span class="module-tab-count" data-count="reading">
+          0 resources
+        </span>
+      </span>
+
+    </button>
+
+
+    <button class="module-tab" data-module="writing">
+
+      <span class="module-icon">W</span>
+
+      <span class="module-tab-content">
+        <span class="module-tab-title">Writing</span>
+        <span class="module-tab-count" data-count="writing">
+          0 resources
+        </span>
+      </span>
+
+    </button>
+
+
+    <button class="module-tab" data-module="speaking">
+
+      <span class="module-icon">S</span>
+
+      <span class="module-tab-content">
+        <span class="module-tab-title">Speaking</span>
+        <span class="module-tab-count" data-count="speaking">
+          0 resources
+        </span>
+      </span>
+
+    </button>
+
   </div>
 
-  <div id="resourceList"></div>
+
+  <!-- =========================================
+       RESOURCE LIST
+  ========================================= -->
+
+  <section>
+
+    <div class="resource-section-head">
+
+      <h2 class="resource-section-title" id="resourceSectionTitle">
+        Listening resources
+      </h2>
+
+      <span class="resource-section-meta" id="resourceSectionMeta">
+        0 resources
+      </span>
+
+    </div>
+
+    <div id="resourceList">
+      <div class="resource-loading-grid">
+        <div class="resource-skeleton"></div>
+        <div class="resource-skeleton"></div>
+      </div>
+    </div>
+
+  </section>
+
 </main>
+
+
+<!-- =========================================
+     SCRIPTS
+========================================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
+
 <script>
+
 let allResources = [];
 let activeModule = 'listening';
 let currentProfile = null;
 
+
+/* =========================================
+   INITIALISE
+========================================= */
+
 (async () => {
+
   const profile = await Auth.requireApprovedRole('student');
+
   if (!profile) return;
+
   currentProfile = profile;
-  document.getElementById('userName').textContent = profile.name;
-  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
-  document.querySelectorAll('#moduleTabs button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#moduleTabs button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeModule = btn.dataset.module;
-      render();
+
+  const userName = document.getElementById('userName');
+  const userAvatar = document.getElementById('userAvatar');
+
+  userName.textContent = profile.name || 'Student';
+
+  const initials = getInitials(profile.name || 'Student');
+  userAvatar.textContent = initials;
+
+
+  document
+    .getElementById('logoutLink')
+    .addEventListener('click', (e) => {
+
+      e.preventDefault();
+
+      Auth.logout();
+
     });
-  });
+
+
+  document
+    .querySelectorAll('#moduleTabs .module-tab')
+    .forEach(btn => {
+
+      btn.addEventListener('click', () => {
+
+        document
+          .querySelectorAll('#moduleTabs .module-tab')
+          .forEach(b => b.classList.remove('active'));
+
+        btn.classList.add('active');
+
+        activeModule = btn.dataset.module;
+
+        updateSectionHeading();
+
+        render();
+
+      });
+
+    });
+
+
   load();
+
 })();
 
+
+/* =========================================
+   LOAD RESOURCES
+========================================= */
+
 async function load() {
-  const { data, error } = await supabase.from('resources').select('*').order('created_at', { ascending: false });
-  if (error) {
-    document.getElementById('resourceList').innerHTML = `<div class="empty-state"><h3>Couldn't load resources</h3><p>${escapeHtml(error.message)}</p></div>`;
-    return;
-  }
-  allResources = data || [];
-  render();
-}
 
-function render() {
-  const el = document.getElementById('resourceList');
-  const items = allResources.filter(r => r.module === activeModule);
+  const resourceList = document.getElementById('resourceList');
 
-  if (!items.length) {
-    el.innerHTML = `<div class="empty-state"><h3>No ${escapeHtml(activeModule)} resources yet</h3><p>Check back soon — your teacher is still building this out.</p></div>`;
-    return;
-  }
-
-  el.innerHTML = items.map(r => {
-    const isEnrolled = currentProfile && currentProfile.account_type === 'enrolled';
-    const locked = r.is_locked && !isEnrolled;
-    return `
-    <div class="list-row"${locked ? ' style="opacity:0.65;"' : ''}>
-      <div>
-        <div class="title">${escapeHtml(r.title)}${locked ? ' <span class="tag">🔒 Requires enrollment</span>' : ''}</div>
-        <div class="meta">${escapeHtml(r.description || r.file_name)}${locked ? ' — Ask your teacher about enrolling for full access.' : ''}</div>
-      </div>
-      ${locked
-        ? `<button class="button ghost" disabled style="padding:9px 18px;opacity:0.5;cursor:not-allowed;" title="Ask your teacher to enrol you for access">Locked</button>`
-        : `<button class="button primary" data-open="${r.id}" style="padding:9px 18px;">View PDF</button>`}
+  resourceList.innerHTML = `
+    <div class="resource-loading-grid">
+      <div class="resource-skeleton"></div>
+      <div class="resource-skeleton"></div>
     </div>
   `;
-  }).join('');
 
-  el.querySelectorAll('[data-open]').forEach(btn => btn.addEventListener('click', () => openResource(btn.dataset.open, btn)));
+
+  const { data, error } = await supabase
+    .from('resources')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+
+  if (error) {
+
+    console.error(error);
+
+    resourceList.innerHTML = `
+      <div class="resource-empty resource-error">
+
+        <div class="resource-empty-icon">!</div>
+
+        <h3>Couldn't load resources</h3>
+
+        <p>
+          ${escapeHtml(error.message)}
+        </p>
+
+      </div>
+    `;
+
+    return;
+  }
+
+
+  allResources = data || [];
+
+  updateModuleCounts();
+  updateSectionHeading();
+  render();
+
 }
+
+
+/* =========================================
+   UPDATE MODULE COUNTS
+========================================= */
+
+function updateModuleCounts() {
+
+  const modules = [
+    'listening',
+    'reading',
+    'writing',
+    'speaking'
+  ];
+
+
+  modules.forEach(module => {
+
+    const count = allResources.filter(
+      resource => resource.module === module
+    ).length;
+
+
+    const element = document.querySelector(
+      `[data-count="${module}"]`
+    );
+
+
+    if (!element) return;
+
+
+    element.textContent =
+      `${count} ${count === 1 ? 'resource' : 'resources'}`;
+
+  });
+
+}
+
+
+/* =========================================
+   UPDATE SECTION HEADING
+========================================= */
+
+function updateSectionHeading() {
+
+  const title =
+    document.getElementById('resourceSectionTitle');
+
+  const meta =
+    document.getElementById('resourceSectionMeta');
+
+
+  const count = allResources.filter(
+    resource => resource.module === activeModule
+  ).length;
+
+
+  const moduleName =
+    activeModule.charAt(0).toUpperCase() +
+    activeModule.slice(1);
+
+
+  title.textContent =
+    `${moduleName} resources`;
+
+
+  meta.textContent =
+    `${count} ${count === 1 ? 'resource' : 'resources'}`;
+
+}
+
+
+/* =========================================
+   RENDER
+========================================= */
+
+function render() {
+
+  const el =
+    document.getElementById('resourceList');
+
+
+  const items =
+    allResources.filter(
+      resource => resource.module === activeModule
+    );
+
+
+  if (!items.length) {
+
+    const moduleName =
+      activeModule.charAt(0).toUpperCase() +
+      activeModule.slice(1);
+
+
+    el.innerHTML = `
+      <div class="resource-empty">
+
+        <div class="resource-empty-icon">
+          ${getModuleLetter(activeModule)}
+        </div>
+
+        <h3>
+          No ${escapeHtml(moduleName.toLowerCase())} resources yet
+        </h3>
+
+        <p>
+          Your teacher hasn't uploaded any ${escapeHtml(moduleName.toLowerCase())}
+          study materials yet. Check back soon for new resources.
+        </p>
+
+      </div>
+    `;
+
+    return;
+  }
+
+
+  el.innerHTML = `
+    <div class="resource-grid">
+
+      ${items.map((resource, index) => {
+
+        const isEnrolled =
+          currentProfile &&
+          currentProfile.account_type === 'enrolled';
+
+
+        const locked =
+          resource.is_locked &&
+          !isEnrolled;
+
+
+        return `
+          <article
+            class="resource-card ${locked ? 'locked-card' : ''}"
+            style="animation-delay:${Math.min(index * 45, 300)}ms;"
+          >
+
+            <div class="resource-card-top">
+
+              <div class="resource-file-icon">
+                PDF
+              </div>
+
+
+              <span class="resource-access-badge ${locked ? 'locked' : 'free'}">
+
+                ${locked
+                  ? '🔒 Enrolled only'
+                  : '✓ Available to you'}
+
+              </span>
+
+            </div>
+
+
+            <div class="resource-card-body">
+
+              <h3 class="resource-card-title">
+                ${escapeHtml(resource.title)}
+              </h3>
+
+
+              <p class="resource-card-description">
+                ${escapeHtml(
+                  resource.description ||
+                  'Study material uploaded by your teacher.'
+                )}
+              </p>
+
+
+              ${
+                locked
+                  ? `
+                    <div class="locked-message">
+                      This resource is available to enrolled students.
+                      Ask your teacher about enrolling for full access.
+                    </div>
+                  `
+                  : ''
+              }
+
+            </div>
+
+
+            <div class="resource-card-footer">
+
+              <span
+                class="resource-file-name"
+                title="${escapeHtml(resource.file_name || '')}"
+              >
+                ${escapeHtml(resource.file_name || 'PDF resource')}
+              </span>
+
+
+              ${
+                locked
+
+                  ? `
+                    <button
+                      class="resource-locked-btn"
+                      disabled
+                      title="Ask your teacher about enrollment"
+                    >
+                      🔒 Locked
+                    </button>
+                  `
+
+                  : `
+                    <button
+                      class="resource-view-btn"
+                      data-open="${resource.id}"
+                    >
+                      View PDF
+                      <span>↗</span>
+                    </button>
+                  `
+              }
+
+            </div>
+
+          </article>
+        `;
+
+      }).join('')}
+
+    </div>
+  `;
+
+
+  el
+    .querySelectorAll('[data-open]')
+    .forEach(btn => {
+
+      btn.addEventListener(
+        'click',
+        () => openResource(btn.dataset.open, btn)
+      );
+
+    });
+
+}
+
+
+/* =========================================
+   OPEN RESOURCE
+========================================= */
 
 async function openResource(id, btn) {
-  const resource = allResources.find(r => r.id === id);
+
+  const resource =
+    allResources.find(r => r.id === id);
+
+
   if (!resource) return;
-  const originalLabel = btn.textContent;
-  btn.disabled = true; btn.textContent = 'Opening…';
-  const { data, error } = await supabase.storage.from('resources').createSignedUrl(resource.file_path, 600);
-  btn.disabled = false; btn.textContent = originalLabel;
-  if (error) { alert(error.message); return; }
-  window.open(data.signedUrl, '_blank', 'noopener');
+
+
+  const originalLabel =
+    btn.innerHTML;
+
+
+  btn.disabled = true;
+
+  btn.innerHTML = `
+    Opening...
+  `;
+
+
+  try {
+
+    const { data, error } =
+      await supabase.storage
+        .from('resources')
+        .createSignedUrl(
+          resource.file_path,
+          600
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    if (!data || !data.signedUrl) {
+      throw new Error('Unable to generate the PDF link.');
+    }
+
+
+    window.open(
+      data.signedUrl,
+      '_blank',
+      'noopener'
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(error.message || 'Unable to open this resource.');
+
+
+  } finally {
+
+    btn.disabled = false;
+
+    btn.innerHTML = originalLabel;
+
+  }
+
 }
+
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function getInitials(name) {
+
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(part => part.charAt(0).toUpperCase())
+    .join('');
+
+}
+
+
+function getModuleLetter(module) {
+
+  const letters = {
+    listening: 'L',
+    reading: 'R',
+    writing: 'W',
+    speaking: 'S'
+  };
+
+  return letters[module] || 'R';
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+}
+
+
+/* =========================================
+   NAV SCROLL EFFECT
+========================================= */
+
+window.addEventListener('scroll', () => {
+
+  const nav =
+    document.getElementById('resourceNav');
+
+  if (!nav) return;
+
+  nav.classList.toggle(
+    'scrolled',
+    window.scrollY > 8
+  );
+
+});
+
 </script>
+
 </body>
 </html>
