@@ -3,200 +3,2174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Class Schedule — London Educators</title>
+
+<title>Class Schedule | IELTSbyLE</title>
+
 <link rel="stylesheet" href="/css/main.css">
+
 <style>
-  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-  .cal-head h2 { font-family: var(--serif); font-size: 20px; }
-  .cal-nav-btn {
-    border: 1px solid var(--line); background: #fff; border-radius: var(--radius);
-    width: 34px; height: 34px; font-size: 16px; line-height: 1; cursor: pointer; color: var(--ink);
+:root {
+  --schedule-red: #e63946;
+  --schedule-red-dark: #c92f3d;
+  --schedule-red-light: #fff1f2;
+
+  --schedule-blue: #142b5f;
+  --schedule-blue-dark: #0e2048;
+  --schedule-blue-light: #eef3ff;
+
+  --schedule-text: #17233d;
+  --schedule-text-soft: #667085;
+  --schedule-muted: #98a2b3;
+
+  --schedule-bg: #f6f8fc;
+  --schedule-card: #ffffff;
+  --schedule-border: #e7ebf2;
+
+  --schedule-green: #14804a;
+  --schedule-green-light: #ecfdf3;
+
+  --schedule-shadow: 0 14px 40px rgba(20, 43, 95, 0.07);
+  --schedule-shadow-hover: 0 20px 48px rgba(20, 43, 95, 0.11);
+
+  --schedule-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(
+      circle at 92% 8%,
+      rgba(230, 57, 70, 0.045),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 8% 30%,
+      rgba(20, 43, 95, 0.035),
+      transparent 26%
+    ),
+    var(--schedule-bg);
+  color: var(--schedule-text);
+  font-family: var(--schedule-sans);
+}
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+.schedule-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(231, 235, 242, 0.85);
+  transition: box-shadow 220ms ease, background 220ms ease;
+}
+
+.schedule-nav.scrolled {
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 10px 35px rgba(20, 43, 95, 0.08);
+}
+
+.schedule-nav-inner {
+  width: min(1280px, calc(100% - 48px));
+  min-height: 76px;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 28px;
+}
+
+.schedule-brand {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.schedule-brand img {
+  height: 48px;
+  width: auto;
+  display: block;
+  transition: transform 200ms ease;
+}
+
+.schedule-brand:hover img {
+  transform: scale(1.035);
+}
+
+.schedule-nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 21px;
+  min-width: 0;
+}
+
+.schedule-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.schedule-nav-links a {
+  color: #667085;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 550;
+  white-space: nowrap;
+
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.schedule-nav-links a:hover {
+  color: var(--schedule-red);
+  transform: translateY(-1px);
+}
+
+.schedule-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  min-width: 0;
+  padding-left: 17px;
+
+  border-left: 1px solid var(--schedule-border);
+}
+
+.schedule-avatar {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--schedule-blue),
+      #274985
+    );
+
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  flex-shrink: 0;
+}
+
+.schedule-user-name {
+  max-width: 135px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 13px;
+  font-weight: 650;
+
+  color: var(--schedule-blue);
+}
+
+.schedule-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 13px;
+
+  border: 1px solid var(--schedule-border);
+  border-radius: 8px;
+
+  color: #667085 !important;
+  text-decoration: none;
+
+  font-size: 12px !important;
+  font-weight: 600 !important;
+
+  transition: all 180ms ease;
+}
+
+.schedule-logout:hover {
+  color: var(--schedule-red) !important;
+  background: var(--schedule-red-light);
+  border-color: rgba(230, 57, 70, 0.20);
+
+  transform: none !important;
+}
+
+/* =========================================
+   MAIN
+========================================= */
+
+.schedule-main {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+
+  padding: 48px 0 80px;
+}
+
+/* =========================================
+   PAGE HEADER
+========================================= */
+
+.schedule-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.schedule-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 10px;
+
+  color: var(--schedule-red);
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.schedule-eyebrow::before {
+  content: "";
+
+  width: 23px;
+  height: 2px;
+
+  border-radius: 999px;
+
+  background: var(--schedule-red);
+}
+
+.schedule-header h1 {
+  margin: 0 0 9px;
+
+  color: var(--schedule-blue);
+
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.08;
+
+  letter-spacing: -0.035em;
+
+  font-weight: 800;
+}
+
+.schedule-header p {
+  margin: 0;
+
+  max-width: 680px;
+
+  color: var(--schedule-text-soft);
+
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.batch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 10px 14px;
+
+  border: 1px solid var(--schedule-border);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.78);
+
+  color: var(--schedule-blue);
+
+  font-size: 12px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.batch-badge-icon {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: var(--schedule-red);
+
+  box-shadow:
+    0 0 0 4px rgba(230, 57, 70, 0.10);
+}
+
+/* =========================================
+   CALENDAR PANEL
+========================================= */
+
+.calendar-panel {
+  border: 1px solid var(--schedule-border);
+  border-radius: 16px;
+
+  background: var(--schedule-card);
+
+  box-shadow: var(--schedule-shadow);
+
+  padding: 25px;
+
+  animation: schedule-panel-in 420ms ease both;
+}
+
+.calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 22px;
+}
+
+.calendar-title-area {
+  min-width: 0;
+}
+
+.calendar-title {
+  margin: 0;
+
+  color: var(--schedule-blue);
+
+  font-size: 20px;
+  line-height: 1.25;
+
+  font-weight: 800;
+
+  letter-spacing: -0.025em;
+}
+
+.calendar-subtitle {
+  margin: 5px 0 0;
+
+  color: var(--schedule-muted);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-nav-btn {
+  width: 38px;
+  height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--schedule-border);
+  border-radius: 9px;
+
+  background: #fff;
+
+  color: var(--schedule-blue);
+
+  font-family: inherit;
+
+  font-size: 21px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.calendar-nav-btn:hover {
+  transform: translateY(-2px);
+
+  color: var(--schedule-red);
+
+  background: var(--schedule-red-light);
+
+  border-color: rgba(230, 57, 70, 0.20);
+}
+
+/* =========================================
+   CALENDAR GRID
+========================================= */
+
+.calendar-grid {
+  display: grid;
+
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+
+  gap: 7px;
+}
+
+.calendar-dow {
+  padding: 0 5px 8px;
+
+  text-align: center;
+
+  color: var(--schedule-muted);
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.calendar-cell {
+  position: relative;
+
+  min-height: 86px;
+
+  padding: 10px;
+
+  border: 1px solid var(--schedule-border);
+  border-radius: 11px;
+
+  background: #fff;
+
+  color: var(--schedule-text);
+
+  font-size: 13px;
+  font-weight: 650;
+
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    background 170ms ease,
+    box-shadow 170ms ease;
+}
+
+.calendar-cell.outside {
+  background: transparent;
+  border-color: transparent;
+}
+
+.calendar-cell.empty-day {
+  background: #fafbfc;
+  color: #c8ced8;
+}
+
+.calendar-cell.today:not(.has-class) {
+  border-color: rgba(230, 57, 70, 0.48);
+
+  background: #fffafa;
+}
+
+.calendar-cell.today:not(.has-class)::after {
+  content: "TODAY";
+
+  position: absolute;
+  right: 7px;
+  top: 7px;
+
+  color: var(--schedule-red);
+
+  font-size: 7px;
+  font-weight: 850;
+
+  letter-spacing: 0.08em;
+}
+
+.calendar-cell.has-class {
+  cursor: pointer;
+
+  border-color: rgba(230, 57, 70, 0.42);
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #fff8f9
+    );
+
+  font-weight: 750;
+}
+
+.calendar-cell.has-class:hover {
+  transform: translateY(-2px);
+
+  border-color: var(--schedule-red);
+
+  box-shadow:
+    0 8px 20px rgba(230, 57, 70, 0.10);
+}
+
+.calendar-cell.has-class.selected {
+  color: #fff;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--schedule-blue),
+      #203e7a
+    );
+
+  border-color: var(--schedule-blue);
+
+  box-shadow:
+    0 10px 24px rgba(20, 43, 95, 0.18);
+
+  transform: translateY(-2px);
+}
+
+.calendar-cell-number {
+  display: block;
+}
+
+.calendar-dot {
+  position: absolute;
+
+  bottom: 10px;
+  left: 10px;
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: var(--schedule-red);
+
+  box-shadow:
+    0 0 0 4px rgba(230, 57, 70, 0.09);
+}
+
+.calendar-cell.selected .calendar-dot {
+  background: #fff;
+
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.10);
+}
+
+.calendar-class-count {
+  position: absolute;
+
+  right: 9px;
+  bottom: 8px;
+
+  color: var(--schedule-red);
+
+  font-size: 8px;
+  font-weight: 800;
+
+  letter-spacing: 0.03em;
+}
+
+.calendar-cell.selected .calendar-class-count {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* =========================================
+   LEGEND
+========================================= */
+
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+
+  margin-top: 18px;
+  padding-top: 15px;
+
+  border-top: 1px solid #eef1f5;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--schedule-muted);
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.legend-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: var(--schedule-red);
+}
+
+.legend-today {
+  width: 9px;
+  height: 9px;
+
+  border: 2px solid rgba(230, 57, 70, 0.50);
+
+  border-radius: 3px;
+
+  background: white;
+}
+
+/* =========================================
+   CLASS DETAILS
+========================================= */
+
+.class-details {
+  margin-top: 28px;
+
+  animation: details-in 350ms ease both;
+}
+
+.details-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 14px;
+}
+
+.details-heading h2 {
+  margin: 0;
+
+  color: var(--schedule-blue);
+
+  font-size: 18px;
+  font-weight: 800;
+
+  letter-spacing: -0.02em;
+}
+
+.details-date {
+  color: var(--schedule-red);
+
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.class-card {
+  position: relative;
+
+  margin-bottom: 13px;
+
+  padding: 22px;
+
+  border: 1px solid var(--schedule-border);
+  border-radius: 14px;
+
+  background: #fff;
+
+  box-shadow: var(--schedule-shadow);
+
+  overflow: hidden;
+
+  transition:
+    transform 190ms ease,
+    box-shadow 190ms ease,
+    border-color 190ms ease;
+}
+
+.class-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 4px;
+  height: 100%;
+
+  background: var(--schedule-red);
+}
+
+.class-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow: var(--schedule-shadow-hover);
+
+  border-color: rgba(20, 43, 95, 0.10);
+}
+
+.class-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding-bottom: 17px;
+  margin-bottom: 3px;
+
+  border-bottom: 1px solid #eef1f5;
+}
+
+.class-number {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--schedule-blue);
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.class-number-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 30px;
+  height: 27px;
+
+  padding: 0 8px;
+
+  border-radius: 7px;
+
+  background: var(--schedule-blue-light);
+
+  color: var(--schedule-blue);
+
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.class-module-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 7px 10px;
+
+  border-radius: 7px;
+
+  background: var(--schedule-red-light);
+
+  color: var(--schedule-red);
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.class-info-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 0;
+
+  margin-top: 5px;
+}
+
+.class-info {
+  padding: 15px 18px 10px 0;
+}
+
+.class-info + .class-info {
+  padding-left: 18px;
+
+  border-left: 1px solid #eef1f5;
+}
+
+.class-info-label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: var(--schedule-muted);
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 0.07em;
+
+  text-transform: uppercase;
+}
+
+.class-info-value {
+  color: var(--schedule-text);
+
+  font-size: 13px;
+  font-weight: 650;
+
+  line-height: 1.5;
+}
+
+.class-join-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  margin-top: 12px;
+  padding-top: 15px;
+
+  border-top: 1px dashed #e5e9ef;
+}
+
+.class-link-text {
+  min-width: 0;
+
+  color: var(--schedule-muted);
+
+  font-size: 10px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.class-link-text a {
+  color: var(--schedule-blue);
+  text-decoration: none;
+}
+
+.class-link-text a:hover {
+  color: var(--schedule-red);
+}
+
+.join-class-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  flex-shrink: 0;
+
+  padding: 10px 17px;
+
+  border: 1px solid var(--schedule-red);
+  border-radius: 8px;
+
+  background: var(--schedule-red);
+
+  color: #fff;
+
+  text-decoration: none;
+
+  font-size: 11px;
+  font-weight: 750;
+
+  box-shadow:
+    0 7px 17px rgba(230, 57, 70, 0.16);
+
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.join-class-btn:hover {
+  background: var(--schedule-red-dark);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 11px 23px rgba(230, 57, 70, 0.22);
+}
+
+.no-link {
+  color: var(--schedule-muted);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================================
+   EMPTY STATES
+========================================= */
+
+.schedule-empty {
+  padding: 65px 25px;
+
+  text-align: center;
+
+  border: 1px dashed #dce2eb;
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.schedule-empty.error {
+  border-color: rgba(230, 57, 70, 0.20);
+  background: #fff8f8;
+}
+
+.schedule-empty-icon {
+  width: 54px;
+  height: 54px;
+
+  margin: 0 auto 16px;
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--schedule-blue-light);
+
+  color: var(--schedule-blue);
+
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.schedule-empty.error .schedule-empty-icon {
+  background: var(--schedule-red-light);
+  color: var(--schedule-red);
+}
+
+.schedule-empty h3 {
+  margin: 0 0 8px;
+
+  color: var(--schedule-blue);
+
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.schedule-empty p {
+  max-width: 540px;
+
+  margin: 0 auto;
+
+  color: var(--schedule-text-soft);
+
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes schedule-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-  .cal-nav-btn:hover { border-color: var(--ink); }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .cal-dow {
-    text-align: center; font-size: 11px; font-weight: 600; letter-spacing: .04em;
-    color: var(--ink-soft); text-transform: uppercase; padding-bottom: 6px;
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  .cal-cell {
-    position: relative; aspect-ratio: 1 / 0.85; border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 8px; background: #fff; font-size: 14px;
+}
+
+@keyframes details-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
-  .cal-cell.outside { background: transparent; border-color: transparent; }
-  .cal-cell.empty-day { color: var(--line); background: var(--paper-dim); border-color: var(--paper-dim); }
-  .cal-cell.has-class {
-    cursor: pointer; border-color: var(--seal); background: #fff; font-weight: 600;
-    transition: background .12s ease;
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  .cal-cell.has-class:hover { background: var(--paper-dim); }
-  .cal-cell.has-class.selected { background: var(--ink); color: #fff; border-color: var(--ink); }
-  .cal-cell.today:not(.has-class) { border-color: var(--brass); }
-  .cal-dot {
-    position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%);
-    width: 5px; height: 5px; border-radius: 50%; background: var(--seal);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1050px) {
+
+  .schedule-nav-links {
+    gap: 13px;
   }
-  .cal-cell.selected .cal-dot { background: #fff; }
-  .class-card { border: 1px solid var(--line); background: #fff; padding: 26px; }
-  .class-card .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed var(--line); font-size: 15px; }
-  .class-card .row:last-child { border-bottom: none; }
-  .class-card .row .label { color: var(--ink-soft); font-size: 13px; }
-  @media (max-width: 640px) {
-    .cal-cell { font-size: 12px; padding: 5px; }
-    .cal-dow { font-size: 9px; }
+
+  .schedule-nav-links a:nth-child(4),
+  .schedule-nav-links a:nth-child(5) {
+    display: none;
   }
+
+  .schedule-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .class-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .class-info {
+    padding: 12px 0 !important;
+  }
+
+  .class-info + .class-info {
+    border-left: none;
+    border-top: 1px solid #eef1f5;
+  }
+}
+
+@media (max-width: 850px) {
+
+  .schedule-nav-inner {
+    width: min(100% - 28px, 1180px);
+    min-height: 68px;
+  }
+
+  .schedule-brand img {
+    height: 43px;
+  }
+
+  .schedule-nav-links {
+    display: none;
+  }
+
+  .schedule-user {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .schedule-main {
+    width: min(100% - 30px, 720px);
+    padding-top: 35px;
+  }
+
+  .calendar-panel {
+    padding: 18px;
+  }
+
+  .calendar-cell {
+    min-height: 70px;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .schedule-user-name {
+    display: none;
+  }
+
+  .schedule-header h1 {
+    font-size: 30px;
+  }
+
+  .schedule-header p {
+    font-size: 13px;
+  }
+
+  .batch-badge {
+    display: none;
+  }
+
+  .calendar-head {
+    align-items: flex-start;
+  }
+
+  .calendar-title {
+    font-size: 18px;
+  }
+
+  .calendar-cell {
+    min-height: 57px;
+    padding: 7px;
+
+    font-size: 11px;
+  }
+
+  .calendar-dow {
+    font-size: 8px;
+  }
+
+  .calendar-dot {
+    width: 5px;
+    height: 5px;
+
+    bottom: 7px;
+    left: 7px;
+  }
+
+  .calendar-class-count {
+    display: none;
+  }
+
+  .calendar-cell.today:not(.has-class)::after {
+    display: none;
+  }
+
+  .calendar-legend {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .class-card {
+    padding: 18px;
+  }
+
+  .class-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .class-join-area {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .join-class-btn {
+    width: 100%;
+  }
+
+  .class-link-text {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+
+  .calendar-grid {
+    gap: 4px;
+  }
+
+  .calendar-cell {
+    min-height: 49px;
+    border-radius: 7px;
+  }
+
+  .calendar-panel {
+    padding: 13px;
+  }
+
+  .calendar-controls {
+    gap: 5px;
+  }
+
+  .calendar-nav-btn {
+    width: 33px;
+    height: 33px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<nav class="dash-nav">
-  <div class="brand"><a href="/student/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
-  <div class="who">
-    <a href="/student/dashboard.html">Dashboard</a>
-    <a href="/student/resources.html">Resources</a>
-    <a href="/student/mock-tests.html">Mock tests</a>
-    <a href="/student/speaking.html">Speaking test</a>
-    <a href="/student/results.html">My results</a>
-    <span id="userName"></span>
-    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+<!-- =========================================
+     NAVIGATION
+========================================= -->
+
+<nav class="schedule-nav" id="scheduleNav">
+
+  <div class="schedule-nav-inner">
+
+    <a href="/student/dashboard.html" class="schedule-brand">
+      <img
+        src="/images/logos.png"
+        alt="IELTSbyLE"
+      >
+    </a>
+
+    <div class="schedule-nav-right">
+
+      <div class="schedule-nav-links">
+
+        <a href="/student/dashboard.html">
+          Dashboard
+        </a>
+
+        <a href="/student/resources.html">
+          Resources
+        </a>
+
+        <a href="/student/mock-tests.html">
+          Mock tests
+        </a>
+
+        <a href="/student/speaking.html">
+          Speaking test
+        </a>
+
+        <a href="/student/results.html">
+          My results
+        </a>
+
+      </div>
+
+
+      <div class="schedule-user">
+
+        <div class="schedule-avatar" id="userAvatar">
+          S
+        </div>
+
+        <span
+          class="schedule-user-name"
+          id="userName"
+        >
+          Student
+        </span>
+
+        <a
+          href="#"
+          id="logoutLink"
+          class="schedule-logout"
+        >
+          Log out
+        </a>
+
+      </div>
+
+    </div>
+
   </div>
+
 </nav>
 
-<main class="dash-main">
-  <div class="dash-head"><h1>Class schedule</h1></div>
+
+<!-- =========================================
+     MAIN CONTENT
+========================================= -->
+
+<main class="schedule-main">
+
+  <header class="schedule-header">
+
+    <div>
+
+      <div class="schedule-eyebrow">
+        IELTSbyLE
+      </div>
+
+      <h1>
+        Class schedule
+      </h1>
+
+      <p>
+        Keep track of your upcoming IELTS classes, teachers,
+        modules and joining information in one place.
+      </p>
+
+    </div>
+
+
+    <div
+      class="batch-badge"
+      id="batchBadge"
+      style="display:none;"
+    >
+
+      <span class="batch-badge-icon"></span>
+
+      <span id="batchBadgeText">
+        Batch
+      </span>
+
+    </div>
+
+  </header>
+
+
   <div id="scheduleArea"></div>
+
 </main>
+
+
+<!-- =========================================
+     SCRIPTS
+========================================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
+
 <script>
+
 let profile;
 let classes = [];
 let selectedDate = null;
+
 const today = new Date();
+
 let viewYear = today.getFullYear();
-let viewMonth = today.getMonth(); // 0-11
+let viewMonth = today.getMonth();
+
+
+/* =========================================
+   INITIALISE
+========================================= */
 
 (async () => {
-  profile = await Auth.requireApprovedRole('student');
+
+  profile =
+    await Auth.requireApprovedRole('student');
+
   if (!profile) return;
-  document.getElementById('userName').textContent = profile.name;
-  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+
+
+  const userName =
+    document.getElementById('userName');
+
+  const userAvatar =
+    document.getElementById('userAvatar');
+
+
+  userName.textContent =
+    profile.name || 'Student';
+
+
+  userAvatar.textContent =
+    getInitials(profile.name || 'Student');
+
+
+  document
+    .getElementById('logoutLink')
+    .addEventListener('click', (e) => {
+
+      e.preventDefault();
+
+      Auth.logout();
+
+    });
+
+
   load();
+
 })();
 
+
+/* =========================================
+   LOAD SCHEDULE
+========================================= */
+
 async function load() {
-  const el = document.getElementById('scheduleArea');
+
+  const el =
+    document.getElementById('scheduleArea');
+
 
   if (!profile.batch_number) {
-    el.innerHTML = `<div class="empty-state"><h3>No batch on file</h3><p>Your account isn't linked to a batch yet — ask your teacher to add your Batch number so classes can show up here.</p></div>`;
+
+    el.innerHTML = `
+
+      <div class="schedule-empty">
+
+        <div class="schedule-empty-icon">
+          !
+        </div>
+
+        <h3>
+          No batch assigned
+        </h3>
+
+        <p>
+          Your account isn't linked to a batch yet.
+          Please ask your teacher to add your Batch number
+          so your classes can appear here.
+        </p>
+
+      </div>
+
+    `;
+
     return;
   }
 
-  const { data, error } = await supabase
-    .from('lecture_schedule').select('*').eq('batch_number', profile.batch_number)
-    .order('class_date');
 
-  if (error) { el.innerHTML = `<div class="empty-state"><h3>Couldn't load your schedule</h3><p>${escapeHtml(error.message)}</p></div>`; return; }
+  updateBatchBadge();
+
+
+  const { data, error } =
+    await supabase
+      .from('lecture_schedule')
+      .select('*')
+      .eq('batch_number', profile.batch_number)
+      .order('class_date');
+
+
+  if (error) {
+
+    console.error(error);
+
+    el.innerHTML = `
+
+      <div class="schedule-empty error">
+
+        <div class="schedule-empty-icon">
+          !
+        </div>
+
+        <h3>
+          Couldn't load your schedule
+        </h3>
+
+        <p>
+          ${escapeHtml(error.message)}
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+  }
+
 
   classes = data || [];
+
   render();
+
 }
+
+
+/* =========================================
+   BATCH BADGE
+========================================= */
+
+function updateBatchBadge() {
+
+  const badge =
+    document.getElementById('batchBadge');
+
+  const text =
+    document.getElementById('batchBadgeText');
+
+
+  text.textContent =
+    `Batch ${profile.batch_number}`;
+
+  badge.style.display =
+    'inline-flex';
+
+}
+
+
+/* =========================================
+   DATE HELPER
+========================================= */
 
 function isoDate(y, m, d) {
+
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
 }
 
+
+/* =========================================
+   MAIN RENDER
+========================================= */
+
 function render() {
-  const el = document.getElementById('scheduleArea');
+
+  const el =
+    document.getElementById('scheduleArea');
+
 
   const byDate = {};
-  classes.forEach(c => { (byDate[c.class_date] = byDate[c.class_date] || []).push(c); });
+
+
+  classes.forEach(c => {
+
+    if (!byDate[c.class_date]) {
+      byDate[c.class_date] = [];
+    }
+
+    byDate[c.class_date].push(c);
+
+  });
+
+
+  const monthLabel =
+    new Date(
+      viewYear,
+      viewMonth,
+      1
+    ).toLocaleDateString(
+      undefined,
+      {
+        month: 'long',
+        year: 'numeric'
+      }
+    );
+
+
+  const currentMonthClassCount =
+    classes.filter(c => {
+
+      if (!c.class_date) return false;
+
+      const date =
+        new Date(
+          c.class_date + 'T00:00:00'
+        );
+
+      return (
+        date.getFullYear() === viewYear &&
+        date.getMonth() === viewMonth
+      );
+
+    }).length;
+
 
   el.innerHTML = `
-    <p style="color:var(--ink-soft);font-size:14px;margin-bottom:18px;">Showing the schedule for <strong>${escapeHtml(profile.batch_number)}</strong>. Dates with a class are outlined — click one to see the details.</p>
-    <div class="panel">
-      <div class="cal-head">
-        <button class="cal-nav-btn" id="prevMonth" aria-label="Previous month">‹</button>
-        <h2 id="calTitle"></h2>
-        <button class="cal-nav-btn" id="nextMonth" aria-label="Next month">›</button>
+
+    <div class="calendar-panel">
+
+      <div class="calendar-head">
+
+        <div class="calendar-title-area">
+
+          <h2
+            class="calendar-title"
+            id="calTitle"
+          >
+            ${monthLabel}
+          </h2>
+
+          <p class="calendar-subtitle">
+            ${currentMonthClassCount}
+            ${currentMonthClassCount === 1 ? 'class' : 'classes'}
+            scheduled this month
+          </p>
+
+        </div>
+
+
+        <div class="calendar-controls">
+
+          <button
+            class="calendar-nav-btn"
+            id="prevMonth"
+            aria-label="Previous month"
+            title="Previous month"
+          >
+            ‹
+          </button>
+
+          <button
+            class="calendar-nav-btn"
+            id="nextMonth"
+            aria-label="Next month"
+            title="Next month"
+          >
+            ›
+          </button>
+
+        </div>
+
       </div>
-      <div class="cal-grid" id="calGrid"></div>
+
+
+      <div
+        class="calendar-grid"
+        id="calGrid"
+      ></div>
+
+
+      <div class="calendar-legend">
+
+        <span class="legend-item">
+          <span class="legend-dot"></span>
+          Class scheduled
+        </span>
+
+        <span class="legend-item">
+          <span class="legend-today"></span>
+          Today
+        </span>
+
+      </div>
+
     </div>
-    <div id="classDetail" style="margin-top:24px;"></div>
+
+
+    <div
+      id="classDetail"
+      class="class-details"
+    ></div>
+
   `;
 
-  document.getElementById('prevMonth').addEventListener('click', () => {
-    viewMonth -= 1;
-    if (viewMonth < 0) { viewMonth = 11; viewYear -= 1; }
-    render();
-  });
-  document.getElementById('nextMonth').addEventListener('click', () => {
-    viewMonth += 1;
-    if (viewMonth > 11) { viewMonth = 0; viewYear += 1; }
-    render();
-  });
 
-  const monthLabel = new Date(viewYear, viewMonth, 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-  document.getElementById('calTitle').textContent = monthLabel;
+  document
+    .getElementById('prevMonth')
+    .addEventListener('click', () => {
+
+      viewMonth--;
+
+      if (viewMonth < 0) {
+
+        viewMonth = 11;
+        viewYear--;
+
+      }
+
+      render();
+
+    });
+
+
+  document
+    .getElementById('nextMonth')
+    .addEventListener('click', () => {
+
+      viewMonth++;
+
+      if (viewMonth > 11) {
+
+        viewMonth = 0;
+        viewYear++;
+
+      }
+
+      render();
+
+    });
+
 
   renderGrid(byDate);
 
-  const detailEl = document.getElementById('classDetail');
-  if (selectedDate && byDate[selectedDate]) {
-    const dt = new Date(selectedDate + 'T00:00:00');
-    detailEl.innerHTML = `<h3 style="font-family:var(--serif);font-size:18px;margin:0 0 12px;">${dt.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</h3>` +
-      byDate[selectedDate].map(c => `
-        <div class="class-card" style="margin-bottom:12px;">
-          <div class="row"><div><div class="label">Class number</div>${escapeHtml(c.class_number)}</div></div>
-          <div class="row"><div><div class="label">Time</div>${c.class_time ? formatTime(c.class_time) : '—'}</div></div>
-          <div class="row"><div><div class="label">Module</div>${escapeHtml(c.module_name)}</div></div>
-          <div class="row"><div><div class="label">Teacher</div>${escapeHtml(c.teacher_name)}</div></div>
-          <div class="row">
-            <div><div class="label">Joining link</div>${c.joining_link ? escapeHtml(c.joining_link) : '—'}</div>
-            ${c.joining_link ? `<a href="${escapeHtml(c.joining_link)}" target="_blank" rel="noopener" class="button primary" style="padding:9px 18px;align-self:center;">Join class</a>` : ''}
-          </div>
-        </div>
-      `).join('');
-  } else {
-    detailEl.innerHTML = `<p style="color:var(--ink-soft);font-size:14px;">${classes.length ? 'Click an outlined date above to see class details.' : `Nothing's been added for ${escapeHtml(profile.batch_number)} yet — check back soon.`}</p>`;
-  }
+
+  renderDetails(byDate);
+
 }
+
+
+/* =========================================
+   CALENDAR GRID
+========================================= */
 
 function renderGrid(byDate) {
-  const grid = document.getElementById('calGrid');
-  const dowNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const firstOfMonth = new Date(viewYear, viewMonth, 1);
-  const startOffset = firstOfMonth.getDay(); // 0 = Sunday
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-  const todayIso = isoDate(today.getFullYear(), today.getMonth(), today.getDate());
 
-  let html = dowNames.map(d => `<div class="cal-dow">${d}</div>`).join('');
+  const grid =
+    document.getElementById('calGrid');
 
-  for (let i = 0; i < startOffset; i++) {
-    html += `<div class="cal-cell outside"></div>`;
+
+  const dowNames = [
+    'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat'
+  ];
+
+
+  const firstOfMonth =
+    new Date(
+      viewYear,
+      viewMonth,
+      1
+    );
+
+
+  const startOffset =
+    firstOfMonth.getDay();
+
+
+  const daysInMonth =
+    new Date(
+      viewYear,
+      viewMonth + 1,
+      0
+    ).getDate();
+
+
+  const todayIso =
+    isoDate(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+
+
+  let html =
+    dowNames
+      .map(day => `
+        <div class="calendar-dow">
+          ${day}
+        </div>
+      `)
+      .join('');
+
+
+  for (
+    let i = 0;
+    i < startOffset;
+    i++
+  ) {
+
+    html += `
+      <div class="calendar-cell outside"></div>
+    `;
+
   }
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const iso = isoDate(viewYear, viewMonth, day);
-    const hasClass = !!byDate[iso];
-    const cls = ['cal-cell'];
-    if (hasClass) cls.push('has-class'); else cls.push('empty-day');
-    if (iso === todayIso) cls.push('today');
-    if (iso === selectedDate) cls.push('selected');
-    html += `<div class="${cls.join(' ')}" ${hasClass ? `data-date="${iso}"` : ''}>${day}${hasClass ? '<span class="cal-dot"></span>' : ''}</div>`;
+
+  for (
+    let day = 1;
+    day <= daysInMonth;
+    day++
+  ) {
+
+    const iso =
+      isoDate(
+        viewYear,
+        viewMonth,
+        day
+      );
+
+
+    const dayClasses =
+      byDate[iso] || [];
+
+
+    const hasClass =
+      dayClasses.length > 0;
+
+
+    const cls = [
+      'calendar-cell'
+    ];
+
+
+    if (hasClass) {
+
+      cls.push('has-class');
+
+    } else {
+
+      cls.push('empty-day');
+
+    }
+
+
+    if (iso === todayIso) {
+      cls.push('today');
+    }
+
+
+    if (iso === selectedDate) {
+      cls.push('selected');
+    }
+
+
+    const classCount =
+      dayClasses.length;
+
+
+    html += `
+
+      <div
+        class="${cls.join(' ')}"
+        ${hasClass ? `data-date="${iso}"` : ''}
+      >
+
+        <span class="calendar-cell-number">
+          ${day}
+        </span>
+
+
+        ${
+          hasClass
+            ? `
+              <span class="calendar-dot"></span>
+
+              ${
+                classCount > 1
+                  ? `
+                    <span class="calendar-class-count">
+                      ${classCount} classes
+                    </span>
+                  `
+                  : ''
+              }
+            `
+            : ''
+        }
+
+      </div>
+
+    `;
+
   }
 
-  grid.innerHTML = html;
-  grid.querySelectorAll('[data-date]').forEach(cell => {
-    cell.addEventListener('click', () => { selectedDate = cell.dataset.date; render(); });
-  });
+
+  grid.innerHTML =
+    html;
+
+
+  grid
+    .querySelectorAll('[data-date]')
+    .forEach(cell => {
+
+      cell.addEventListener(
+        'click',
+        () => {
+
+          selectedDate =
+            cell.dataset.date;
+
+          render();
+
+        }
+      );
+
+    });
+
 }
+
+
+/* =========================================
+   CLASS DETAILS
+========================================= */
+
+function renderDetails(byDate) {
+
+  const detailEl =
+    document.getElementById('classDetail');
+
+
+  if (
+    selectedDate &&
+    byDate[selectedDate]
+  ) {
+
+    const dt =
+      new Date(
+        selectedDate + 'T00:00:00'
+      );
+
+
+    const formattedDate =
+      dt.toLocaleDateString(
+        undefined,
+        {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        }
+      );
+
+
+    const selectedClasses =
+      byDate[selectedDate];
+
+
+    detailEl.innerHTML = `
+
+      <div class="details-heading">
+
+        <h2>
+          Class details
+        </h2>
+
+        <span class="details-date">
+          ${formattedDate}
+        </span>
+
+      </div>
+
+
+      ${selectedClasses
+        .map((c, index) => {
+
+          const classNumber =
+            escapeHtml(
+              c.class_number || `Class ${index + 1}`
+            );
+
+
+          const moduleName =
+            escapeHtml(
+              c.module_name || 'IELTS'
+            );
+
+
+          const teacherName =
+            escapeHtml(
+              c.teacher_name || 'Not specified'
+            );
+
+
+          const classTime =
+            c.class_time
+              ? formatTime(c.class_time)
+              : 'Time not specified';
+
+
+          return `
+
+            <article class="class-card">
+
+              <div class="class-card-top">
+
+                <div class="class-number">
+
+                  <span class="class-number-badge">
+                    ${classNumber}
+                  </span>
+
+                  Class session
+
+                </div>
+
+
+                <span class="class-module-badge">
+                  ${moduleName}
+                </span>
+
+              </div>
+
+
+              <div class="class-info-grid">
+
+                <div class="class-info">
+
+                  <span class="class-info-label">
+                    Time
+                  </span>
+
+                  <span class="class-info-value">
+                    ${escapeHtml(classTime)}
+                  </span>
+
+                </div>
+
+
+                <div class="class-info">
+
+                  <span class="class-info-label">
+                    Module
+                  </span>
+
+                  <span class="class-info-value">
+                    ${moduleName}
+                  </span>
+
+                </div>
+
+
+                <div class="class-info">
+
+                  <span class="class-info-label">
+                    Teacher
+                  </span>
+
+                  <span class="class-info-value">
+                    ${teacherName}
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div class="class-join-area">
+
+                ${
+                  c.joining_link
+                    ? `
+                      <div
+                        class="class-link-text"
+                        title="${escapeHtml(c.joining_link)}"
+                      >
+                        Online class link available
+                      </div>
+
+                      <a
+                        href="${escapeHtml(c.joining_link)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="join-class-btn"
+                      >
+                        Join class
+                        <span>↗</span>
+                      </a>
+                    `
+                    : `
+                      <span class="no-link">
+                        No joining link has been added for this class yet.
+                      </span>
+                    `
+                }
+
+              </div>
+
+            </article>
+
+          `;
+
+        })
+        .join('')}
+
+    `;
+
+    return;
+  }
+
+
+  detailEl.innerHTML = `
+
+    <div class="schedule-empty">
+
+      <div class="schedule-empty-icon">
+        ${classes.length ? '→' : '—'}
+      </div>
+
+      <h3>
+        ${
+          classes.length
+            ? 'Select a class date'
+            : 'No classes scheduled yet'
+        }
+      </h3>
+
+      <p>
+        ${
+          classes.length
+            ? 'Choose an outlined date in the calendar to view the class time, module, teacher and joining information.'
+            : `Nothing has been added for Batch ${escapeHtml(profile.batch_number)} yet. Check back soon for your upcoming classes.`
+        }
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================
+   TIME FORMATTER
+========================================= */
 
 function formatTime(t) {
-  const [h, m] = t.split(':').map(Number);
-  const dt = new Date(2000, 0, 1, h, m);
-  return dt.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+
+  if (!t) return '—';
+
+
+  const parts =
+    t.split(':').map(Number);
+
+
+  const h = parts[0];
+  const m = parts[1];
+
+
+  const dt =
+    new Date(
+      2000,
+      0,
+      1,
+      h,
+      m
+    );
+
+
+  return dt.toLocaleTimeString(
+    undefined,
+    {
+      hour: 'numeric',
+      minute: '2-digit'
+    }
+  );
+
 }
+
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function getInitials(name) {
+
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(
+      part =>
+        part
+          .charAt(0)
+          .toUpperCase()
+    )
+    .join('');
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+}
+
+
+/* =========================================
+   NAV SCROLL EFFECT
+========================================= */
+
+window.addEventListener('scroll', () => {
+
+  const nav =
+    document.getElementById('scheduleNav');
+
+  if (!nav) return;
+
+
+  nav.classList.toggle(
+    'scrolled',
+    window.scrollY > 8
+  );
+
+});
+
 </script>
+
 </body>
 </html>
