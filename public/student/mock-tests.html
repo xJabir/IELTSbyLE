@@ -66,11 +66,13 @@
 })();
 
 let allTests = [], allResults = [], allInProgress = [];
+let currentProfile = null;
 
 async function load() {
   const profile = await Auth.getProfile();
+  currentProfile = profile;
   const [{ data: tests }, { data: results }] = await Promise.all([
-    supabase.from('tests').select('id, title, description, test_type').eq('published', true).order('created_at', { ascending: false }),
+    supabase.from('tests').select('id, title, description, test_type, is_locked').eq('published', true).order('created_at', { ascending: false }),
     supabase.from('submissions').select('*').eq('student_id', profile.id).neq('status', 'in_progress')
   ]);
   const { data: inProgress } = await supabase.from('submissions').select('test_id, status').eq('student_id', profile.id).eq('status', 'in_progress');
@@ -109,6 +111,8 @@ function renderTestList(filter) {
   listEl.innerHTML = tests.map(t => {
     const finished = allResults.find(r => r.test_id === t.id);
     const progress = allInProgress.find(r => r.test_id === t.id);
+    const isEnrolled = currentProfile && currentProfile.account_type === 'enrolled';
+    const locked = t.is_locked && !isEnrolled;
     let badge = '<span class="badge pending">Not started</span>';
     let action = `<a href="/exam/intro.html?testId=${t.id}" class="button primary" style="padding:9px 18px;">Start test</a>`;
     if (progress) {
@@ -117,12 +121,15 @@ function renderTestList(filter) {
     } else if (finished) {
       badge = finished.status === 'graded' ? '<span class="badge done">Graded</span>' : '<span class="badge pending">Awaiting writing grade</span>';
       action = `<a href="/student/results.html" class="button ghost" style="padding:9px 18px;">View result</a>`;
+    } else if (locked) {
+      badge = '<span class="badge pending">🔒 Requires enrollment</span>';
+      action = `<button class="button ghost" disabled style="padding:9px 18px;opacity:0.5;cursor:not-allowed;" title="Ask your teacher to enrol you for access">Locked</button>`;
     }
     return `
-      <div class="list-row">
+      <div class="list-row"${locked ? ' style="opacity:0.65;"' : ''}>
         <div>
           <div class="title">${escapeHtml(t.title)} <span class="tag">${typeLabel(t.test_type)}</span></div>
-          <div class="meta">${escapeHtml(t.description || 'Reading · Listening · Writing')}</div>
+          <div class="meta">${escapeHtml(t.description || 'Reading · Listening · Writing')}${locked ? ' — Ask your teacher about enrolling for full access.' : ''}</div>
         </div>
         ${badge}
         ${action}
