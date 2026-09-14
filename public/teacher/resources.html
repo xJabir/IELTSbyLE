@@ -36,6 +36,13 @@
     <div class="field"><label>Title</label><input type="text" id="newTitle" placeholder="e.g. Cambridge 18 — Listening strategies"></div>
     <div class="field"><label>Description (optional)</label><input type="text" id="newDesc" placeholder="A short note about what this covers"></div>
     <div class="field"><label>PDF file</label><input type="file" id="newFile" accept=".pdf,application/pdf"></div>
+    <div class="field">
+      <label>Access</label>
+      <select id="newLocked">
+        <option value="true" selected>🔒 Enrolled students only (locked)</option>
+        <option value="false">🔓 Free for everyone, including free accounts</option>
+      </select>
+    </div>
     <div class="submit-row" style="align-items:center;">
       <button class="button primary" id="uploadBtn" style="padding:10px 20px;">Upload</button>
       <span id="uploadError" style="color:var(--seal);font-size:13px;display:none;"></span>
@@ -95,6 +102,7 @@ function render() {
         <div class="meta">${escapeHtml(r.description || r.file_name)}</div>
       </div>
       <div style="display:flex;gap:8px;">
+        <button class="small-btn" data-toggle-lock="${r.id}" data-locked="${r.is_locked}">${r.is_locked ? '🔒 Locked' : '🔓 Free'}</button>
         <button class="small-btn" data-open="${r.id}">Preview</button>
         <button class="small-btn danger" data-del="${r.id}">Delete</button>
       </div>
@@ -103,6 +111,13 @@ function render() {
 
   el.querySelectorAll('[data-open]').forEach(btn => btn.addEventListener('click', () => openResource(btn.dataset.open, btn)));
   el.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => deleteResource(btn.dataset.del)));
+  el.querySelectorAll('[data-toggle-lock]').forEach(btn => btn.addEventListener('click', () => toggleLock(btn.dataset.toggleLock, btn.dataset.locked === 'true')));
+}
+
+async function toggleLock(id, currentlyLocked) {
+  const { error } = await supabase.from('resources').update({ is_locked: !currentlyLocked }).eq('id', id);
+  if (error) { alert(error.message); return; }
+  await load();
 }
 
 async function openResource(id, btn) {
@@ -145,12 +160,14 @@ async function uploadResource() {
     if (uploadError) throw uploadError;
 
     const { error: insertError } = await supabase.from('resources').insert({
-      teacher_id: profile.id, module: activeModule, title, description, file_path: path, file_name: file.name
+      teacher_id: profile.id, module: activeModule, title, description, file_path: path, file_name: file.name,
+      is_locked: document.getElementById('newLocked').value === 'true'
     });
     if (insertError) throw insertError;
 
     document.getElementById('newTitle').value = '';
     document.getElementById('newDesc').value = '';
+    document.getElementById('newLocked').value = 'true';
     fileInput.value = '';
     await load();
   } catch (e) {
