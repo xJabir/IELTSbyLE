@@ -40,10 +40,12 @@
 <script>
 let allResources = [];
 let activeModule = 'listening';
+let currentProfile = null;
 
 (async () => {
   const profile = await Auth.requireApprovedRole('student');
   if (!profile) return;
+  currentProfile = profile;
   document.getElementById('userName').textContent = profile.name;
   document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
   document.querySelectorAll('#moduleTabs button').forEach(btn => {
@@ -76,15 +78,21 @@ function render() {
     return;
   }
 
-  el.innerHTML = items.map(r => `
-    <div class="list-row">
+  el.innerHTML = items.map(r => {
+    const isEnrolled = currentProfile && currentProfile.account_type === 'enrolled';
+    const locked = r.is_locked && !isEnrolled;
+    return `
+    <div class="list-row"${locked ? ' style="opacity:0.65;"' : ''}>
       <div>
-        <div class="title">${escapeHtml(r.title)}</div>
-        <div class="meta">${escapeHtml(r.description || r.file_name)}</div>
+        <div class="title">${escapeHtml(r.title)}${locked ? ' <span class="tag">🔒 Requires enrollment</span>' : ''}</div>
+        <div class="meta">${escapeHtml(r.description || r.file_name)}${locked ? ' — Ask your teacher about enrolling for full access.' : ''}</div>
       </div>
-      <button class="button primary" data-open="${r.id}" style="padding:9px 18px;">View PDF</button>
+      ${locked
+        ? `<button class="button ghost" disabled style="padding:9px 18px;opacity:0.5;cursor:not-allowed;" title="Ask your teacher to enrol you for access">Locked</button>`
+        : `<button class="button primary" data-open="${r.id}" style="padding:9px 18px;">View PDF</button>`}
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   el.querySelectorAll('[data-open]').forEach(btn => btn.addEventListener('click', () => openResource(btn.dataset.open, btn)));
 }
