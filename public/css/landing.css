@@ -148,6 +148,10 @@ body.landing h3 {
    NAVIGATION
    =========================================================== */
 
+/* ===========================================================
+   NAVBAR
+   =========================================================== */
+
 .ln-nav {
 
   position: sticky;
@@ -189,10 +193,16 @@ body.landing h3 {
 }
 
 
+/* ===========================================================
+   BRAND
+   =========================================================== */
+
 .ln-brand {
 
   display: inline-flex;
   align-items: center;
+
+  flex-shrink: 0;
 
 }
 
@@ -215,12 +225,19 @@ body.landing h3 {
 }
 
 
+/* ===========================================================
+   NAVIGATION LINKS
+   Only Teacher Login and Pricing appear as text links
+   =========================================================== */
+
 .ln-nav-links {
 
   display: flex;
   align-items: center;
 
-  gap: 24px;
+  gap: 22px;
+
+  margin-left: auto;
 
   font-size: 14px;
   font-weight: 500;
@@ -228,9 +245,15 @@ body.landing h3 {
 }
 
 
-.ln-nav-links a:not(.ln-btn) {
+/* Normal text links */
+
+.ln-nav-links .ln-nav-text {
 
   color: var(--ln-text-soft);
+
+  text-decoration: none;
+
+  padding: 8px 4px;
 
   transition:
     color 180ms ease,
@@ -239,7 +262,7 @@ body.landing h3 {
 }
 
 
-.ln-nav-links a:not(.ln-btn):hover {
+.ln-nav-links .ln-nav-text:hover {
 
   color: var(--ln-red);
 
@@ -264,10 +287,10 @@ body.landing h3 {
 
   font-family: var(--ln-sans);
 
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
 
-  padding: 11px 21px;
+  padding: 10px 17px;
 
   border-radius: 8px;
 
@@ -275,16 +298,21 @@ body.landing h3 {
 
   white-space: nowrap;
 
+  text-decoration: none;
+
   cursor: pointer;
 
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
     background 180ms ease,
-    color 180ms ease;
+    color 180ms ease,
+    border-color 180ms ease;
 
 }
 
+
+/* Shine animation */
 
 .ln-btn::after {
 
@@ -318,16 +346,67 @@ body.landing h3 {
 }
 
 
-.ln-btn-lg {
+/* ===========================================================
+   NAVBAR BUTTONS
+   =========================================================== */
 
-  padding: 15px 27px;
 
-  font-size: 15px;
+/* Create Free Account */
 
-  border-radius: 9px;
+.ln-btn-free {
+
+  color: var(--ln-blue);
+
+  background: #fff;
+
+  border-color: rgba(20,43,95,0.20);
 
 }
 
+
+.ln-btn-free:hover {
+
+  color: var(--ln-red);
+
+  background: var(--ln-red-light);
+
+  border-color: rgba(230,57,70,0.25);
+
+  transform: translateY(-2px);
+
+}
+
+
+/* Student Login */
+
+.ln-btn-login {
+
+  color: var(--ln-red);
+
+  background: #fff;
+
+  border-color: rgba(230,57,70,0.25);
+
+}
+
+
+.ln-btn-login:hover {
+
+  color: #fff;
+
+  background: var(--ln-red);
+
+  border-color: var(--ln-red);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 20px rgba(230,57,70,0.18);
+
+}
+
+
+/* Start Preparation */
 
 .ln-btn-primary {
 
@@ -358,6 +437,26 @@ body.landing h3 {
 }
 
 
+/* ===========================================================
+   LARGE BUTTON
+   Used for hero and major CTA buttons
+   =========================================================== */
+
+.ln-btn-lg {
+
+  padding: 15px 27px;
+
+  font-size: 15px;
+
+  border-radius: 9px;
+
+}
+
+
+/* ===========================================================
+   GHOST BUTTON
+   =========================================================== */
+
 .ln-btn-ghost {
 
   color: var(--ln-blue);
@@ -378,6 +477,77 @@ body.landing h3 {
   background: var(--ln-red-light);
 
   transform: translateY(-2px);
+
+}
+
+
+/* ===========================================================
+   NAVBAR RESPONSIVE
+   =========================================================== */
+
+@media (max-width: 1100px) {
+
+  .ln-nav {
+
+    padding-left: 22px;
+    padding-right: 22px;
+
+  }
+
+  .ln-nav-links {
+
+    gap: 14px;
+
+  }
+
+  .ln-btn {
+
+    padding-left: 13px;
+    padding-right: 13px;
+
+  }
+
+}
+
+
+@media (max-width: 900px) {
+
+  .ln-nav-links {
+
+    gap: 10px;
+
+  }
+
+  .ln-nav-links .ln-nav-text {
+
+    font-size: 13px;
+
+  }
+
+  .ln-btn {
+
+    font-size: 12px;
+
+    padding: 9px 12px;
+
+  }
+
+}
+
+
+@media (max-width: 760px) {
+
+  .ln-nav {
+
+    padding: 12px 18px;
+
+  }
+
+  .ln-nav-links {
+
+    display: none;
+
+  }
 
 }
 
