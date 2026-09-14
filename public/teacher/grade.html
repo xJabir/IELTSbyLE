@@ -3,130 +3,2448 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grade Submission — London Educators</title>
+<title>Grade Submission — IELTSbyLE</title>
 <link rel="stylesheet" href="/css/main.css">
+
+<style>
+  :root {
+    --grade-red: #e63946;
+    --grade-red-dark: #c92f3c;
+    --grade-red-light: #fff1f2;
+
+    --grade-blue: #142b5f;
+    --grade-blue-dark: #0d1f46;
+    --grade-blue-light: #eef3ff;
+
+    --grade-text: #17233d;
+    --grade-text-soft: #667085;
+    --grade-muted: #8a94a6;
+    --grade-border: #e5e9f0;
+    --grade-bg: #f7f9fc;
+
+    --grade-green: #17824b;
+    --grade-green-light: #eaf8f0;
+
+    --grade-orange: #b96a00;
+    --grade-orange-light: #fff6e6;
+
+    --grade-shadow: 0 18px 45px rgba(20, 43, 95, 0.08);
+    --grade-shadow-soft: 0 8px 25px rgba(20, 43, 95, 0.06);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(
+        circle at 90% 0%,
+        rgba(230, 57, 70, 0.045),
+        transparent 25%
+      ),
+      radial-gradient(
+        circle at 5% 15%,
+        rgba(20, 43, 95, 0.04),
+        transparent 24%
+      ),
+      var(--grade-bg);
+
+    color: var(--grade-text);
+  }
+
+  /* =====================================
+     NAVIGATION
+  ===================================== */
+
+  .grade-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    min-height: 76px;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 32px;
+
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border-bottom: 1px solid rgba(226, 231, 239, 0.9);
+
+    box-shadow: 0 4px 20px rgba(20, 43, 95, 0.035);
+  }
+
+  .grade-brand {
+    display: flex;
+    align-items: center;
+  }
+
+  .grade-logo {
+    height: 48px;
+    width: auto;
+    display: block;
+
+    transition: transform 180ms ease;
+  }
+
+  .grade-logo:hover {
+    transform: scale(1.03);
+  }
+
+  .grade-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .grade-user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: var(--grade-blue);
+
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .grade-user-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: var(--grade-red);
+
+    box-shadow:
+      0 0 0 4px rgba(230, 57, 70, 0.10);
+  }
+
+  .grade-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+  }
+
+  .grade-nav-links a {
+    color: #596579;
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition:
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .grade-nav-links a:hover {
+    color: var(--grade-red);
+    transform: translateY(-1px);
+  }
+
+  .grade-back {
+    color: var(--grade-blue) !important;
+  }
+
+  .grade-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 9px 15px;
+
+    border: 1px solid var(--grade-border);
+    border-radius: 8px;
+
+    background: #fff;
+
+    color: var(--grade-blue) !important;
+
+    box-shadow: 0 3px 10px rgba(20, 43, 95, 0.04);
+  }
+
+  .grade-logout:hover {
+    color: var(--grade-red) !important;
+    border-color: rgba(230, 57, 70, 0.25);
+    background: var(--grade-red-light);
+  }
+
+  /* =====================================
+     MAIN
+  ===================================== */
+
+  .grade-main {
+    width: min(1240px, calc(100% - 40px));
+
+    margin: 0 auto;
+
+    padding: 40px 0 75px;
+  }
+
+  /* =====================================
+     PAGE HEADER
+  ===================================== */
+
+  .grade-header {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    padding: 34px 36px;
+    margin-bottom: 22px;
+
+    border-radius: 20px;
+
+    background:
+      radial-gradient(
+        circle at 88% 12%,
+        rgba(230, 57, 70, 0.20),
+        transparent 30%
+      ),
+      linear-gradient(
+        135deg,
+        var(--grade-blue-dark),
+        var(--grade-blue)
+      );
+
+    color: #fff;
+
+    box-shadow: var(--grade-shadow);
+  }
+
+  .grade-header::before {
+    content: "";
+
+    position: absolute;
+
+    width: 250px;
+    height: 250px;
+
+    right: -100px;
+    bottom: -140px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .grade-header::after {
+    content: "";
+
+    position: absolute;
+
+    width: 130px;
+    height: 130px;
+
+    right: 110px;
+    top: -75px;
+
+    border-radius: 50%;
+
+    background: rgba(230, 57, 70, 0.07);
+  }
+
+  .grade-header-content {
+    position: relative;
+    z-index: 2;
+
+    min-width: 0;
+  }
+
+  .grade-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 10px;
+
+    color: #ffb3ba;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .grade-eyebrow::before {
+    content: "";
+
+    width: 22px;
+    height: 2px;
+
+    border-radius: 2px;
+
+    background: var(--grade-red);
+  }
+
+  .grade-header h1 {
+    margin: 0;
+
+    max-width: 780px;
+
+    color: #fff;
+
+    font-family: var(--serif);
+
+    font-size: clamp(27px, 4vw, 38px);
+
+    line-height: 1.15;
+
+    letter-spacing: -0.02em;
+
+    word-break: break-word;
+  }
+
+  .grade-header p {
+    max-width: 700px;
+
+    margin: 11px 0 0;
+
+    color: rgba(255, 255, 255, 0.72);
+
+    font-size: 14px;
+
+    line-height: 1.65;
+  }
+
+  .grade-header-action {
+    position: relative;
+    z-index: 2;
+
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 11px 17px;
+
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 9px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    backdrop-filter: blur(10px);
+
+    transition:
+      background 180ms ease,
+      transform 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .grade-header-action:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.25);
+
+    transform: translateY(-2px);
+  }
+
+  /* =====================================
+     STUDENT INFORMATION
+  ===================================== */
+
+  .student-profile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+
+    padding: 19px 22px;
+
+    background: #fff;
+
+    border: 1px solid var(--grade-border);
+    border-radius: 15px;
+
+    box-shadow: var(--grade-shadow-soft);
+  }
+
+  .student-profile-main {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+  }
+
+  .student-avatar {
+    width: 46px;
+    height: 46px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: var(--grade-blue-light);
+    color: var(--grade-blue);
+
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .student-name {
+    color: var(--grade-blue);
+
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .student-email {
+    margin-top: 4px;
+
+    color: var(--grade-muted);
+
+    font-size: 12px;
+  }
+
+  .student-test-label {
+    color: var(--grade-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    text-align: right;
+  }
+
+  .student-test-title {
+    margin-top: 4px;
+
+    color: var(--grade-text);
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-align: right;
+  }
+
+  /* =====================================
+     SCORE SUMMARY
+  ===================================== */
+
+  .score-grid {
+    display: grid;
+
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    gap: 15px;
+
+    margin-bottom: 24px;
+  }
+
+  .score-card {
+    position: relative;
+    overflow: hidden;
+
+    padding: 21px;
+
+    background: #fff;
+
+    border: 1px solid var(--grade-border);
+    border-radius: 15px;
+
+    box-shadow: var(--grade-shadow-soft);
+
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .score-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow: var(--grade-shadow);
+
+    border-color: rgba(20, 43, 95, 0.12);
+  }
+
+  .score-card.overall {
+    background:
+      radial-gradient(
+        circle at 90% 0%,
+        rgba(230, 57, 70, 0.12),
+        transparent 42%
+      ),
+      #fff;
+
+    border-color: rgba(230, 57, 70, 0.18);
+  }
+
+  .score-label {
+    margin-bottom: 9px;
+
+    color: var(--grade-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .score-value {
+    color: var(--grade-blue);
+
+    font-size: 30px;
+    font-weight: 850;
+
+    line-height: 1;
+  }
+
+  .score-card.overall .score-value {
+    color: var(--grade-red);
+
+    font-size: 34px;
+  }
+
+  .score-note {
+    margin-top: 8px;
+
+    color: var(--grade-muted);
+
+    font-size: 11px;
+  }
+
+  /* =====================================
+     PANELS
+  ===================================== */
+
+  .grade-panel {
+    margin-bottom: 22px;
+
+    overflow: hidden;
+
+    background: #fff;
+
+    border: 1px solid var(--grade-border);
+    border-radius: 18px;
+
+    box-shadow: var(--grade-shadow-soft);
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 21px 24px;
+
+    border-bottom: 1px solid var(--grade-border);
+  }
+
+  .panel-title h2 {
+    margin: 0;
+
+    color: var(--grade-blue);
+
+    font-family: var(--serif);
+
+    font-size: 21px;
+  }
+
+  .panel-title p {
+    margin: 5px 0 0;
+
+    color: var(--grade-text-soft);
+
+    font-size: 12px;
+
+    line-height: 1.55;
+  }
+
+  .panel-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 7px 10px;
+
+    border-radius: 7px;
+
+    background: var(--grade-blue-light);
+    color: var(--grade-blue);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    white-space: nowrap;
+  }
+
+  .panel-tag.auto {
+    background: var(--grade-green-light);
+    color: var(--grade-green);
+  }
+
+  .panel-body {
+    padding: 24px;
+  }
+
+  /* =====================================
+     WRITING TASK
+  ===================================== */
+
+  .writing-task {
+    margin-bottom: 18px;
+
+    padding: 21px;
+
+    border: 1px solid var(--grade-border);
+
+    border-radius: 14px;
+
+    background:
+      linear-gradient(
+        180deg,
+        #ffffff,
+        #fcfdff
+      );
+
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .writing-task:last-child {
+    margin-bottom: 0;
+  }
+
+  .writing-task:focus-within {
+    border-color: rgba(230, 57, 70, 0.35);
+
+    box-shadow:
+      0 0 0 4px rgba(230, 57, 70, 0.055);
+  }
+
+  .writing-task-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 14px;
+  }
+
+  .writing-task-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .task-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 31px;
+    height: 31px;
+
+    border-radius: 8px;
+
+    background: var(--grade-blue);
+    color: #fff;
+
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .task-name {
+    color: var(--grade-blue);
+
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .word-count {
+    padding: 6px 9px;
+
+    border-radius: 7px;
+
+    background: #f4f6f9;
+    color: var(--grade-text-soft);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    white-space: nowrap;
+  }
+
+  .answer-label {
+    margin-bottom: 7px;
+
+    color: var(--grade-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .answer-box {
+    max-height: 300px;
+
+    overflow-y: auto;
+
+    padding: 17px;
+
+    border: 1px solid var(--grade-border);
+    border-radius: 11px;
+
+    background: #fafbfc;
+
+    color: #344054;
+
+    font-size: 14px;
+
+    line-height: 1.75;
+
+    white-space: pre-wrap;
+
+    scrollbar-width: thin;
+  }
+
+  .answer-box::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .answer-box::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .answer-box::-webkit-scrollbar-thumb {
+    background: #d8dee8;
+    border-radius: 10px;
+  }
+
+  .grading-row {
+    display: grid;
+
+    grid-template-columns:
+      140px minmax(0, 1fr);
+
+    gap: 14px;
+
+    margin-top: 17px;
+  }
+
+  .grading-field label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--grade-text);
+
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .grading-field input {
+    width: 100%;
+
+    min-height: 43px;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--grade-border);
+    border-radius: 9px;
+
+    outline: none;
+
+    background: #fff;
+
+    color: var(--grade-text);
+
+    font-family: inherit;
+    font-size: 13px;
+
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .grading-field input:focus {
+    border-color: var(--grade-red);
+
+    box-shadow:
+      0 0 0 4px rgba(230, 57, 70, 0.08);
+  }
+
+  .band-input-wrap {
+    position: relative;
+  }
+
+  .band-input-wrap input {
+    padding-right: 43px;
+
+    font-size: 15px;
+    font-weight: 750;
+  }
+
+  .band-input-suffix {
+    position: absolute;
+
+    right: 12px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: var(--grade-muted);
+
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .feedback-input {
+    min-width: 0;
+  }
+
+  .save-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-top: 20px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--grade-border);
+  }
+
+  .save-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--grade-muted);
+
+    font-size: 11px;
+  }
+
+  .save-note::before {
+    content: "✓";
+
+    width: 19px;
+    height: 19px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: var(--grade-green-light);
+    color: var(--grade-green);
+
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .save-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px 20px;
+
+    border: 0;
+    border-radius: 9px;
+
+    background:
+      linear-gradient(
+        135deg,
+        var(--grade-red),
+        #f04b57
+      );
+
+    color: #fff;
+
+    font-family: inherit;
+
+    font-size: 13px;
+    font-weight: 750;
+
+    cursor: pointer;
+
+    box-shadow:
+      0 8px 20px rgba(230, 57, 70, 0.20);
+
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      opacity 180ms ease;
+  }
+
+  .save-button:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+      0 12px 26px rgba(230, 57, 70, 0.27);
+  }
+
+  .save-button:disabled {
+    opacity: 0.65;
+    cursor: wait;
+    transform: none;
+  }
+
+  /* =====================================
+     AUTO MARKED TABLE
+  ===================================== */
+
+  .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .answers-table {
+    width: 100%;
+
+    min-width: 800px;
+
+    border-collapse: collapse;
+  }
+
+  .answers-table th {
+    padding: 13px 16px;
+
+    background: #fafbfc;
+
+    border-bottom: 1px solid var(--grade-border);
+
+    color: #7b8495;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .answers-table td {
+    padding: 15px 16px;
+
+    border-bottom: 1px solid #edf0f4;
+
+    color: #344054;
+
+    font-size: 12px;
+
+    vertical-align: top;
+
+    line-height: 1.5;
+  }
+
+  .answers-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .answers-table tbody tr:hover {
+    background: #fbfcff;
+  }
+
+  .question-number {
+    width: 45px;
+
+    color: var(--grade-blue) !important;
+
+    font-weight: 800;
+  }
+
+  .answer-correct {
+    color: var(--grade-green) !important;
+    font-weight: 700;
+  }
+
+  .answer-wrong {
+    color: var(--grade-red) !important;
+    font-weight: 700;
+  }
+
+  .correct-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    height: 24px;
+
+    border-radius: 7px;
+
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .correct-icon.yes {
+    background: var(--grade-green-light);
+    color: var(--grade-green);
+  }
+
+  .correct-icon.no {
+    background: var(--grade-red-light);
+    color: var(--grade-red);
+  }
+
+  /* =====================================
+     EMPTY / ERROR / LOADING
+  ===================================== */
+
+  .state-card {
+    padding: 70px 25px;
+
+    text-align: center;
+
+    background: #fff;
+
+    border: 1px solid var(--grade-border);
+    border-radius: 18px;
+
+    box-shadow: var(--grade-shadow-soft);
+  }
+
+  .state-icon {
+    width: 58px;
+    height: 58px;
+
+    margin: 0 auto 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: var(--grade-blue-light);
+    color: var(--grade-blue);
+
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .state-card.error .state-icon {
+    background: var(--grade-red-light);
+    color: var(--grade-red);
+  }
+
+  .state-card h2 {
+    margin: 0 0 7px;
+
+    color: var(--grade-blue);
+
+    font-family: var(--serif);
+
+    font-size: 21px;
+  }
+
+  .state-card p {
+    max-width: 470px;
+
+    margin: 0 auto;
+
+    color: var(--grade-text-soft);
+
+    font-size: 13px;
+
+    line-height: 1.65;
+  }
+
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+
+    margin: 0 auto 15px;
+
+    border: 3px solid #e8edf5;
+    border-top-color: var(--grade-red);
+
+    border-radius: 50%;
+
+    animation: grade-spin 800ms linear infinite;
+  }
+
+  @keyframes grade-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* =====================================
+     ANIMATIONS
+  ===================================== */
+
+  .grade-header,
+  .student-profile,
+  .score-card,
+  .grade-panel {
+    animation: grade-fade-up 450ms ease both;
+  }
+
+  .student-profile {
+    animation-delay: 70ms;
+  }
+
+  .score-card:nth-child(2) {
+    animation-delay: 100ms;
+  }
+
+  .score-card:nth-child(3) {
+    animation-delay: 150ms;
+  }
+
+  .score-card:nth-child(4) {
+    animation-delay: 200ms;
+  }
+
+  .grade-panel {
+    animation-delay: 240ms;
+  }
+
+  @keyframes grade-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* =====================================
+     RESPONSIVE
+  ===================================== */
+
+  @media (max-width: 1050px) {
+
+    .grade-nav {
+      padding: 12px 22px;
+    }
+
+    .grade-nav-links {
+      gap: 12px;
+    }
+
+    .score-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+  }
+
+  @media (max-width: 850px) {
+
+    .grade-nav {
+      min-height: 68px;
+    }
+
+    .grade-logo {
+      height: 43px;
+    }
+
+    .grade-user {
+      display: none;
+    }
+
+    .grade-nav-right {
+      gap: 10px;
+    }
+
+    .grade-nav-links a:nth-child(1),
+    .grade-nav-links a:nth-child(2),
+    .grade-nav-links a:nth-child(3) {
+      display: none;
+    }
+
+    .grade-main {
+      width: min(100% - 28px, 1240px);
+      padding-top: 28px;
+    }
+
+    .grade-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .grade-header-action {
+      width: 100%;
+    }
+
+    .student-profile {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .student-test-label,
+    .student-test-title {
+      text-align: left;
+    }
+
+  }
+
+  @media (max-width: 650px) {
+
+    .grade-main {
+      width: calc(100% - 20px);
+      padding-top: 20px;
+      padding-bottom: 45px;
+    }
+
+    .grade-header {
+      padding: 25px 20px;
+      border-radius: 15px;
+    }
+
+    .grade-header h1 {
+      font-size: 26px;
+    }
+
+    .grade-header p {
+      font-size: 12.5px;
+    }
+
+    .score-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .score-card {
+      padding: 17px;
+    }
+
+    .score-value {
+      font-size: 25px;
+    }
+
+    .score-card.overall .score-value {
+      font-size: 29px;
+    }
+
+    .score-note {
+      font-size: 10px;
+    }
+
+    .grade-panel {
+      border-radius: 14px;
+    }
+
+    .panel-header {
+      align-items: flex-start;
+      flex-direction: column;
+      padding: 18px;
+    }
+
+    .panel-body {
+      padding: 17px;
+    }
+
+    .writing-task {
+      padding: 16px;
+    }
+
+    .writing-task-head {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .grading-row {
+      grid-template-columns: 1fr;
+    }
+
+    .save-area {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .save-button {
+      width: 100%;
+    }
+
+    .student-profile {
+      padding: 17px;
+    }
+
+  }
+
+  @media (max-width: 430px) {
+
+    .score-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .score-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 15px;
+    }
+
+    .score-card .score-label,
+    .score-card .score-note {
+      margin: 0;
+    }
+
+    .score-card .score-value {
+      flex-shrink: 0;
+    }
+
+    .student-avatar {
+      width: 40px;
+      height: 40px;
+    }
+
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+  }
+</style>
 </head>
+
 <body>
 
-<nav class="dash-nav">
-  <div class="brand"><a href="/teacher/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
-  <div class="who">
-    <span id="userName"></span>
-    <a href="/teacher/lecture-schedule.html">Lecture schedule</a>
-    <a href="/teacher/resources.html">Resources</a>
-    <a href="/teacher/approvals.html">Student approvals</a>
-    <a href="#" id="backLink">← Submissions</a>
-    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+<!-- =====================================
+     NAVIGATION
+===================================== -->
+
+<nav class="grade-nav">
+
+  <div class="grade-brand">
+    <a href="/teacher/dashboard.html">
+      <img
+        src="/images/logos.png"
+        alt="IELTSbyLE"
+        class="grade-logo"
+      >
+    </a>
   </div>
+
+  <div class="grade-nav-right">
+
+    <div class="grade-user">
+      <span class="grade-user-dot"></span>
+      <span id="userName"></span>
+    </div>
+
+    <div class="grade-nav-links">
+
+      <a href="/teacher/lecture-schedule.html">
+        Lecture schedule
+      </a>
+
+      <a href="/teacher/resources.html">
+        Resources
+      </a>
+
+      <a href="/teacher/approvals.html">
+        Student approvals
+      </a>
+
+      <a href="#" id="backLink" class="grade-back">
+        ← Submissions
+      </a>
+
+      <a href="#" id="logoutLink" class="grade-logout">
+        Log out
+      </a>
+
+    </div>
+
+  </div>
+
 </nav>
 
-<main class="dash-main">
-  <div id="content"></div>
+
+<!-- =====================================
+     MAIN
+===================================== -->
+
+<main class="grade-main">
+
+  <div id="content">
+
+    <div class="state-card">
+
+      <div class="loading-spinner"></div>
+
+      <p>
+        Loading submission...
+      </p>
+
+    </div>
+
+  </div>
+
 </main>
+
+
+<!-- =====================================
+     SCRIPTS
+===================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
+
 <script>
-const subId = new URLSearchParams(location.search).get('subId');
+
+const subId =
+  new URLSearchParams(location.search).get('subId');
+
 let data;
 
+
+/* ==========================================
+   INITIALISE
+========================================== */
+
 (async () => {
-  const profile = await Auth.requireRole('teacher');
+
+  const profile =
+    await Auth.requireRole('teacher');
+
   if (!profile) return;
-  document.getElementById('userName').textContent = profile.name;
-  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+
+
+  document.getElementById('userName').textContent =
+    profile.name;
+
+
+  document
+    .getElementById('logoutLink')
+    .addEventListener('click', (e) => {
+
+      e.preventDefault();
+
+      Auth.logout();
+
+    });
+
+
+  if (!subId) {
+
+    renderError(
+      'No submission was selected.'
+    );
+
+    return;
+
+  }
+
+
   load();
+
 })();
 
+
+/* ==========================================
+   LOAD SUBMISSION
+========================================== */
+
 async function load() {
-  const { data: submission } = await supabase.from('submissions').select('*, profiles(name, email), tests(title)').eq('id', subId).single();
-  const { data: writingAnswers } = await supabase.from('writing_answers').select('*, writing_tasks(task_number, prompt_text, min_words)').eq('submission_id', subId);
-  const { data: readingAnswers } = await supabase.from('reading_answers').select('*, reading_questions(question_text, correct_answer)').eq('submission_id', subId);
-  const { data: listeningAnswers } = await supabase.from('listening_answers').select('*, listening_questions(question_text, correct_answer)').eq('submission_id', subId);
 
-  data = {
-    submission,
-    writingAnswers: (writingAnswers || []).slice().sort((a, b) => a.writing_tasks.task_number - b.writing_tasks.task_number),
-    readingAnswers: readingAnswers || [],
-    listeningAnswers: listeningAnswers || []
-  };
+  try {
 
-  document.getElementById('backLink').href = `/teacher/submissions.html?testId=${submission.test_id}`;
-  render();
+    const [
+      submissionResponse,
+      writingResponse,
+      readingResponse,
+      listeningResponse
+    ] = await Promise.all([
+
+      supabase
+        .from('submissions')
+        .select(
+          '*, profiles(name, email), tests(title)'
+        )
+        .eq('id', subId)
+        .single(),
+
+      supabase
+        .from('writing_answers')
+        .select(
+          '*, writing_tasks(task_number, prompt_text, min_words)'
+        )
+        .eq('submission_id', subId),
+
+      supabase
+        .from('reading_answers')
+        .select(
+          '*, reading_questions(question_text, correct_answer)'
+        )
+        .eq('submission_id', subId),
+
+      supabase
+        .from('listening_answers')
+        .select(
+          '*, listening_questions(question_text, correct_answer)'
+        )
+        .eq('submission_id', subId)
+
+    ]);
+
+
+    const submission =
+      submissionResponse.data;
+
+
+    if (
+      submissionResponse.error ||
+      !submission
+    ) {
+
+      console.error(
+        submissionResponse.error
+      );
+
+      renderError(
+        'We could not find this submission.'
+      );
+
+      return;
+
+    }
+
+
+    data = {
+
+      submission,
+
+      writingAnswers:
+        (writingResponse.data || [])
+          .slice()
+          .sort(
+            (a, b) =>
+              (a.writing_tasks?.task_number || 0) -
+              (b.writing_tasks?.task_number || 0)
+          ),
+
+      readingAnswers:
+        readingResponse.data || [],
+
+      listeningAnswers:
+        listeningResponse.data || []
+
+    };
+
+
+    document.getElementById('backLink').href =
+      `/teacher/submissions.html?testId=${encodeURIComponent(submission.test_id)}`;
+
+
+    document.title =
+      `Grade ${submission.profiles?.name || 'Submission'} — IELTSbyLE`;
+
+
+    render();
+
+  } catch (error) {
+
+    console.error(error);
+
+    renderError(
+      'Something went wrong while loading this submission.'
+    );
+
+  }
+
 }
+
+
+/* ==========================================
+   RENDER
+========================================== */
 
 function render() {
-  const s = data.submission;
+
+  const s =
+    data.submission;
+
+
+  const profile =
+    s.profiles || {};
+
+
+  const test =
+    s.tests || {};
+
+
+  const studentName =
+    profile.name || 'Student';
+
+
+  const studentEmail =
+    profile.email || '';
+
+
+  const initials =
+    getInitials(studentName);
+
+
   document.getElementById('content').innerHTML = `
-    <div class="dash-head"><h1>${escapeHtml(s.profiles.name)} — ${escapeHtml(s.tests.title)}</h1></div>
 
-    <div class="stat-row">
-      <div class="stat-cell"><div class="label">Listening (auto)</div><div class="value seal">${fmt(s.listening_band)}</div><div style="font-size:12px;color:var(--ink-soft);">${fmt(s.listening_raw_score)}/40 correct</div></div>
-      <div class="stat-cell"><div class="label">Reading (auto)</div><div class="value seal">${fmt(s.reading_band)}</div><div style="font-size:12px;color:var(--ink-soft);">${fmt(s.reading_raw_score)}/40 correct</div></div>
-      <div class="stat-cell"><div class="label">Writing</div><div class="value seal">${fmt(s.writing_band)}</div></div>
-      <div class="stat-cell"><div class="label">Overall</div><div class="value seal">${fmt(s.overall_band)}</div></div>
-    </div>
+    <!-- PAGE HEADER -->
 
-    <div class="panel">
-      <h2>Writing — grade against the band descriptors</h2>
-      <p class="panel-sub">Task 2 counts twice as much as Task 1 toward the writing band, matching official IELTS weighting.</p>
-      ${data.writingAnswers.map(w => `
-        <div class="builder-item" style="background:#fff;">
-          <div class="builder-item-head"><span class="tag">Task ${w.writing_tasks.task_number} · ${w.word_count} words</span></div>
-          <p style="font-size:14.5px;line-height:1.6;white-space:pre-wrap;max-height:280px;overflow-y:auto;border:1px solid var(--line);padding:12px;background:var(--paper);">${escapeHtml(w.answer_text) || '<em>No response submitted.</em>'}</p>
-          <div class="inline-row" style="margin-top:14px;">
-            <div class="field" style="flex:0 0 120px;"><label>Band score</label><input type="number" step="0.5" min="0" max="9" id="band-${w.id}" value="${w.band_score ?? ''}"></div>
-            <div class="field"><label>Feedback</label><input type="text" id="feedback-${w.id}" value="${escapeHtml(w.feedback || '')}" placeholder="Notes for the student"></div>
-          </div>
+    <section class="grade-header">
+
+      <div class="grade-header-content">
+
+        <div class="grade-eyebrow">
+          Teacher grading workspace
         </div>
-      `).join('')}
-      <div class="submit-row"><button class="button primary" id="saveGrades" style="padding:10px 20px;">Save grades</button></div>
-    </div>
 
-    <div class="panel">
-      <h2>Reading — auto-marked</h2>
-      <table class="band-table">
-        <thead><tr><th>#</th><th>Question</th><th>Student answer</th><th>Correct answer</th><th></th></tr></thead>
-        <tbody>
-          ${data.readingAnswers.map((a, i) => `
-            <tr>
-              <td>${i + 1}</td><td>${escapeHtml(a.reading_questions.question_text)}</td><td>${escapeHtml(a.answer_text) || '—'}</td><td>${escapeHtml(a.reading_questions.correct_answer)}</td>
-              <td>${a.is_correct ? '✓' : '✗'}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
+        <h1>
+          ${escapeHtml(studentName)}
+        </h1>
 
-    <div class="panel">
-      <h2>Listening — auto-marked</h2>
-      <table class="band-table">
-        <thead><tr><th>#</th><th>Question</th><th>Student answer</th><th>Correct answer</th><th></th></tr></thead>
-        <tbody>
-          ${data.listeningAnswers.map((a, i) => `
+        <p>
+          Review this student's IELTS submission,
+          grade the writing tasks, and check the
+          automatically marked answers.
+        </p>
+
+      </div>
+
+      <a
+        href="/teacher/submissions.html?testId=${encodeURIComponent(s.test_id)}"
+        class="grade-header-action"
+      >
+        ← Back to submissions
+      </a>
+
+    </section>
+
+
+    <!-- STUDENT PROFILE -->
+
+    <section class="student-profile">
+
+      <div class="student-profile-main">
+
+        <div class="student-avatar">
+          ${escapeHtml(initials)}
+        </div>
+
+        <div>
+
+          <div class="student-name">
+            ${escapeHtml(studentName)}
+          </div>
+
+          <div class="student-email">
+            ${escapeHtml(studentEmail)}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <div class="student-test-label">
+          Mock test
+        </div>
+
+        <div class="student-test-title">
+          ${escapeHtml(test.title || 'Untitled test')}
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SCORE SUMMARY -->
+
+    <section class="score-grid">
+
+      <div class="score-card">
+
+        <div>
+
+          <div class="score-label">
+            Listening
+          </div>
+
+          <div class="score-value">
+            ${fmt(s.listening_band)}
+          </div>
+
+          <div class="score-note">
+            Auto marked · ${fmt(s.listening_raw_score)}/40
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="score-card">
+
+        <div>
+
+          <div class="score-label">
+            Reading
+          </div>
+
+          <div class="score-value">
+            ${fmt(s.reading_band)}
+          </div>
+
+          <div class="score-note">
+            Auto marked · ${fmt(s.reading_raw_score)}/40
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="score-card">
+
+        <div>
+
+          <div class="score-label">
+            Writing
+          </div>
+
+          <div class="score-value">
+            ${fmt(s.writing_band)}
+          </div>
+
+          <div class="score-note">
+            ${s.writing_band != null
+              ? 'Teacher graded'
+              : 'Awaiting grading'}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="score-card overall">
+
+        <div>
+
+          <div class="score-label">
+            Overall band
+          </div>
+
+          <div class="score-value">
+            ${fmt(s.overall_band)}
+          </div>
+
+          <div class="score-note">
+            ${s.overall_band != null
+              ? 'Final result'
+              : 'Pending writing grade'}
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- WRITING -->
+
+    <section class="grade-panel">
+
+      <div class="panel-header">
+
+        <div class="panel-title">
+
+          <h2>
+            Writing assessment
+          </h2>
+
+          <p>
+            Grade each task using the IELTS band descriptors.
+            Task 2 carries twice the weighting of Task 1.
+          </p>
+
+        </div>
+
+        <span class="panel-tag">
+          Teacher graded
+        </span>
+
+      </div>
+
+
+      <div class="panel-body">
+
+        ${
+          data.writingAnswers.length
+            ? data.writingAnswers
+                .map(renderWritingTask)
+                .join('')
+            : `
+              <div class="state-card">
+                <div class="state-icon">
+                  W
+                </div>
+
+                <h2>
+                  No writing responses
+                </h2>
+
+                <p>
+                  No writing tasks were submitted for this attempt.
+                </p>
+              </div>
+            `
+        }
+
+
+        ${
+          data.writingAnswers.length
+            ? `
+              <div class="save-area">
+
+                <div class="save-note">
+                  Your grades and feedback will be saved to this submission.
+                </div>
+
+                <button
+                  class="save-button"
+                  id="saveGrades"
+                >
+                  Save grades
+                </button>
+
+              </div>
+            `
+            : ''
+        }
+
+      </div>
+
+    </section>
+
+
+    <!-- READING -->
+
+    <section class="grade-panel">
+
+      <div class="panel-header">
+
+        <div class="panel-title">
+
+          <h2>
+            Reading
+          </h2>
+
+          <p>
+            Answers are automatically marked against the
+            correct answers configured for this test.
+          </p>
+
+        </div>
+
+        <span class="panel-tag auto">
+          Auto marked
+        </span>
+
+      </div>
+
+
+      <div class="table-wrap">
+
+        <table class="answers-table">
+
+          <thead>
+
             <tr>
-              <td>${i + 1}</td><td>${escapeHtml(a.listening_questions.question_text)}</td><td>${escapeHtml(a.answer_text) || '—'}</td><td>${escapeHtml(a.listening_questions.correct_answer)}</td>
-              <td>${a.is_correct ? '✓' : '✗'}</td>
+
+              <th>#</th>
+
+              <th>Question</th>
+
+              <th>Student answer</th>
+
+              <th>Correct answer</th>
+
+              <th>Result</th>
+
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
+
+          </thead>
+
+          <tbody>
+
+            ${
+              data.readingAnswers.length
+                ? data.readingAnswers
+                    .map((a, i) => `
+                      <tr>
+
+                        <td class="question-number">
+                          ${i + 1}
+                        </td>
+
+                        <td>
+                          ${escapeHtml(
+                            a.reading_questions?.question_text || ''
+                          )}
+                        </td>
+
+                        <td class="${
+                          a.is_correct
+                            ? 'answer-correct'
+                            : 'answer-wrong'
+                        }">
+                          ${
+                            escapeHtml(a.answer_text) || '—'
+                          }
+                        </td>
+
+                        <td>
+                          ${escapeHtml(
+                            a.reading_questions?.correct_answer || ''
+                          )}
+                        </td>
+
+                        <td>
+                          <span class="correct-icon ${
+                            a.is_correct ? 'yes' : 'no'
+                          }">
+                            ${a.is_correct ? '✓' : '✗'}
+                          </span>
+                        </td>
+
+                      </tr>
+                    `)
+                    .join('')
+                : `
+                  <tr>
+
+                    <td colspan="5">
+                      No reading answers were submitted.
+                    </td>
+
+                  </tr>
+                `
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- LISTENING -->
+
+    <section class="grade-panel">
+
+      <div class="panel-header">
+
+        <div class="panel-title">
+
+          <h2>
+            Listening
+          </h2>
+
+          <p>
+            Answers are automatically marked against the
+            correct answers configured for this test.
+          </p>
+
+        </div>
+
+        <span class="panel-tag auto">
+          Auto marked
+        </span>
+
+      </div>
+
+
+      <div class="table-wrap">
+
+        <table class="answers-table">
+
+          <thead>
+
+            <tr>
+
+              <th>#</th>
+
+              <th>Question</th>
+
+              <th>Student answer</th>
+
+              <th>Correct answer</th>
+
+              <th>Result</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${
+              data.listeningAnswers.length
+                ? data.listeningAnswers
+                    .map((a, i) => `
+                      <tr>
+
+                        <td class="question-number">
+                          ${i + 1}
+                        </td>
+
+                        <td>
+                          ${escapeHtml(
+                            a.listening_questions?.question_text || ''
+                          )}
+                        </td>
+
+                        <td class="${
+                          a.is_correct
+                            ? 'answer-correct'
+                            : 'answer-wrong'
+                        }">
+                          ${
+                            escapeHtml(a.answer_text) || '—'
+                          }
+                        </td>
+
+                        <td>
+                          ${escapeHtml(
+                            a.listening_questions?.correct_answer || ''
+                          )}
+                        </td>
+
+                        <td>
+                          <span class="correct-icon ${
+                            a.is_correct ? 'yes' : 'no'
+                          }">
+                            ${a.is_correct ? '✓' : '✗'}
+                          </span>
+                        </td>
+
+                      </tr>
+                    `)
+                    .join('')
+                : `
+                  <tr>
+
+                    <td colspan="5">
+                      No listening answers were submitted.
+                    </td>
+
+                  </tr>
+                `
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
   `;
 
-  document.getElementById('saveGrades').addEventListener('click', async () => {
-    const scores = data.writingAnswers.map(w => ({
-      writing_answer_id: w.id,
-      band_score: Number(document.getElementById(`band-${w.id}`).value) || null,
-      feedback: document.getElementById(`feedback-${w.id}`).value
-    }));
-    const { error } = await supabase.rpc('grade_writing', { p_submission_id: subId, p_scores: scores });
-    if (error) { alert(error.message); return; }
-    await load();
-  });
+
+  const saveButton =
+    document.getElementById('saveGrades');
+
+
+  if (saveButton) {
+
+    saveButton.addEventListener(
+      'click',
+      saveGrades
+    );
+
+  }
+
 }
 
-function fmt(v) { return v == null ? '—' : v; }
+
+/* ==========================================
+   WRITING TASK
+========================================== */
+
+function renderWritingTask(w) {
+
+  const taskNumber =
+    w.writing_tasks?.task_number || '?';
+
+
+  const words =
+    w.word_count == null
+      ? 'Word count unavailable'
+      : `${w.word_count} words`;
+
+
+  return `
+
+    <div class="writing-task">
+
+      <div class="writing-task-head">
+
+        <div class="writing-task-title">
+
+          <span class="task-number">
+            ${escapeHtml(taskNumber)}
+          </span>
+
+          <span class="task-name">
+            Writing Task ${escapeHtml(taskNumber)}
+          </span>
+
+        </div>
+
+        <span class="word-count">
+          ${escapeHtml(words)}
+        </span>
+
+      </div>
+
+
+      <div class="answer-label">
+        Student response
+      </div>
+
+
+      <div class="answer-box">
+
+        ${
+          w.answer_text
+            ? escapeHtml(w.answer_text)
+            : '<em>No response submitted.</em>'
+        }
+
+      </div>
+
+
+      <div class="grading-row">
+
+        <div class="grading-field">
+
+          <label for="band-${w.id}">
+            Band score
+          </label>
+
+          <div class="band-input-wrap">
+
+            <input
+              type="number"
+              step="0.5"
+              min="0"
+              max="9"
+              id="band-${w.id}"
+              value="${w.band_score ?? ''}"
+              placeholder="0.0"
+            >
+
+            <span class="band-input-suffix">
+              / 9
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="grading-field feedback-input">
+
+          <label for="feedback-${w.id}">
+            Feedback for student
+          </label>
+
+          <input
+            type="text"
+            id="feedback-${w.id}"
+            value="${escapeAttribute(w.feedback || '')}"
+            placeholder="Add clear feedback about the student's performance..."
+          >
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   SAVE GRADES
+========================================== */
+
+async function saveGrades() {
+
+  const button =
+    document.getElementById('saveGrades');
+
+
+  if (!button) return;
+
+
+  button.disabled = true;
+
+  button.textContent =
+    'Saving grades...';
+
+
+  try {
+
+    const scores =
+      data.writingAnswers.map(w => {
+
+        const input =
+          document.getElementById(`band-${w.id}`);
+
+
+        const feedback =
+          document.getElementById(
+            `feedback-${w.id}`
+          );
+
+
+        const rawScore =
+          input?.value.trim();
+
+
+        return {
+
+          writing_answer_id: w.id,
+
+          band_score:
+            rawScore === ''
+              ? null
+              : Number(rawScore),
+
+          feedback:
+            feedback?.value || ''
+
+        };
+
+      });
+
+
+    /* Validate scores */
+
+    const invalidScore =
+      scores.some(score =>
+        score.band_score !== null &&
+        (
+          Number.isNaN(score.band_score) ||
+          score.band_score < 0 ||
+          score.band_score > 9
+        )
+      );
+
+
+    if (invalidScore) {
+
+      alert(
+        'Please enter valid writing band scores between 0 and 9.'
+      );
+
+      button.disabled = false;
+      button.textContent = 'Save grades';
+
+      return;
+
+    }
+
+
+    const { error } =
+      await supabase.rpc(
+        'grade_writing',
+        {
+          p_submission_id: subId,
+          p_scores: scores
+        }
+      );
+
+
+    if (error) {
+
+      console.error(error);
+
+      alert(error.message);
+
+      button.disabled = false;
+      button.textContent = 'Save grades';
+
+      return;
+
+    }
+
+
+    await load();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      'Something went wrong while saving the grades.'
+    );
+
+    button.disabled = false;
+    button.textContent = 'Save grades';
+
+  }
+
+}
+
+
+/* ==========================================
+   ERROR
+========================================== */
+
+function renderError(message) {
+
+  document.getElementById('content').innerHTML = `
+
+    <div class="state-card error">
+
+      <div class="state-icon">
+        !
+      </div>
+
+      <h2>
+        Unable to load submission
+      </h2>
+
+      <p>
+        ${escapeHtml(message)}
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   HELPERS
+========================================== */
+
+function fmt(value) {
+
+  return value == null
+    ? '—'
+    : value;
+
+}
+
+
+function getInitials(name) {
+
+  const parts =
+    String(name)
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+
+  if (!parts.length) {
+    return '?';
+  }
+
+
+  if (parts.length === 1) {
+
+    return parts[0]
+      .slice(0, 2)
+      .toUpperCase();
+
+  }
+
+
+  return (
+    parts[0][0] +
+    parts[parts.length - 1][0]
+  ).toUpperCase();
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+}
+
+
+function escapeAttribute(value) {
+
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+}
+
 </script>
+
 </body>
 </html>
