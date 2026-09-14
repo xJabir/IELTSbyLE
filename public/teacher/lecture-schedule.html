@@ -3,215 +3,2582 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lecture Schedule — London Educators</title>
+
+<title>Lecture Schedule | IELTSbyLE</title>
+
 <link rel="stylesheet" href="/css/main.css">
+
 <style>
-  .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
-  .filter-row select { padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; font-size: 14px; }
-  .batch-group { margin-bottom: 30px; }
-  .batch-group h2 { font-family: var(--serif); font-size: 18px; margin-bottom: 10px; }
+:root {
+  --schedule-red: #e63946;
+  --schedule-red-dark: #c92f3d;
+  --schedule-red-light: #fff1f2;
+
+  --schedule-blue: #142b5f;
+  --schedule-blue-dark: #0e2048;
+  --schedule-blue-light: #eef3ff;
+
+  --schedule-text: #17233d;
+  --schedule-text-soft: #667085;
+  --schedule-muted: #98a2b3;
+
+  --schedule-bg: #f6f8fc;
+  --schedule-card: #ffffff;
+  --schedule-border: #e7ebf2;
+
+  --schedule-green: #14804a;
+  --schedule-green-light: #ecfdf3;
+
+  --schedule-shadow: 0 14px 40px rgba(20, 43, 95, 0.07);
+  --schedule-shadow-hover: 0 20px 48px rgba(20, 43, 95, 0.11);
+
+  --schedule-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(
+      circle at 92% 8%,
+      rgba(230, 57, 70, 0.045),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 8% 30%,
+      rgba(20, 43, 95, 0.035),
+      transparent 26%
+    ),
+    var(--schedule-bg);
+  color: var(--schedule-text);
+  font-family: var(--schedule-sans);
+}
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+.teacher-schedule-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  width: 100%;
+
+  background: rgba(255, 255, 255, 0.90);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-bottom: 1px solid rgba(231, 235, 242, 0.85);
+
+  transition:
+    box-shadow 220ms ease,
+    background 220ms ease;
+}
+
+.teacher-schedule-nav.scrolled {
+  background: rgba(255, 255, 255, 0.97);
+
+  box-shadow:
+    0 10px 35px rgba(20, 43, 95, 0.08);
+}
+
+.teacher-nav-inner {
+  width: min(1280px, calc(100% - 48px));
+
+  min-height: 76px;
+
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 28px;
+}
+
+.teacher-brand {
+  display: inline-flex;
+  align-items: center;
+
+  flex-shrink: 0;
+}
+
+.teacher-brand img {
+  height: 48px;
+  width: auto;
+
+  display: block;
+
+  transition: transform 200ms ease;
+}
+
+.teacher-brand:hover img {
+  transform: scale(1.035);
+}
+
+.teacher-nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 20px;
+
+  min-width: 0;
+}
+
+.teacher-nav-links {
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+}
+
+.teacher-nav-links a {
+  color: var(--schedule-text-soft);
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 550;
+
+  white-space: nowrap;
+
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.teacher-nav-links a:hover {
+  color: var(--schedule-red);
+
+  transform: translateY(-1px);
+}
+
+.teacher-user {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding-left: 17px;
+
+  border-left: 1px solid var(--schedule-border);
+
+  min-width: 0;
+}
+
+.teacher-avatar {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--schedule-blue),
+      #274985
+    );
+
+  color: white;
+
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.teacher-user-name {
+  max-width: 140px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--schedule-blue);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.teacher-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 13px;
+
+  border: 1px solid var(--schedule-border);
+  border-radius: 8px;
+
+  color: var(--schedule-text-soft) !important;
+
+  text-decoration: none;
+
+  font-size: 12px !important;
+  font-weight: 650 !important;
+
+  transition: all 180ms ease;
+}
+
+.teacher-logout:hover {
+  color: var(--schedule-red) !important;
+
+  background: var(--schedule-red-light);
+
+  border-color: rgba(230, 57, 70, 0.20);
+
+  transform: none !important;
+}
+
+/* =========================================
+   MAIN
+========================================= */
+
+.teacher-schedule-main {
+  width: min(1180px, calc(100% - 48px));
+
+  margin: 0 auto;
+
+  padding: 48px 0 80px;
+}
+
+/* =========================================
+   PAGE HEADER
+========================================= */
+
+.schedule-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 30px;
+}
+
+.schedule-eyebrow {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 10px;
+
+  color: var(--schedule-red);
+
+  font-size: 11px;
+  font-weight: 850;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.schedule-eyebrow::before {
+  content: "";
+
+  width: 23px;
+  height: 2px;
+
+  border-radius: 999px;
+
+  background: var(--schedule-red);
+}
+
+.schedule-page-header h1 {
+  margin: 0 0 9px;
+
+  color: var(--schedule-blue);
+
+  font-size: clamp(30px, 4vw, 42px);
+
+  line-height: 1.08;
+
+  letter-spacing: -0.035em;
+
+  font-weight: 850;
+}
+
+.schedule-page-header p {
+  margin: 0;
+
+  max-width: 680px;
+
+  color: var(--schedule-text-soft);
+
+  font-size: 14px;
+
+  line-height: 1.7;
+}
+
+.schedule-header-badge {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 10px 14px;
+
+  border: 1px solid var(--schedule-border);
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.78);
+
+  color: var(--schedule-blue);
+
+  font-size: 11px;
+  font-weight: 750;
+
+  white-space: nowrap;
+}
+
+.schedule-header-dot {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: var(--schedule-green);
+
+  box-shadow:
+    0 0 0 4px rgba(20, 128, 74, 0.10);
+}
+
+/* =========================================
+   ADD CLASS PANEL
+========================================= */
+
+.add-class-panel {
+  position: relative;
+
+  margin-bottom: 30px;
+
+  padding: 27px;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--schedule-blue),
+      var(--schedule-blue-dark)
+    );
+
+  color: white;
+
+  box-shadow:
+    0 18px 45px rgba(20, 43, 95, 0.16);
+
+  overflow: hidden;
+}
+
+.add-class-panel::after {
+  content: "";
+
+  position: absolute;
+
+  width: 260px;
+  height: 260px;
+
+  right: -100px;
+  top: -140px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(230, 57, 70, 0.22),
+      transparent 70%
+    );
+
+  pointer-events: none;
+}
+
+.add-class-header {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 23px;
+}
+
+.add-class-header h2 {
+  margin: 0 0 6px;
+
+  color: white;
+
+  font-size: 19px;
+  font-weight: 800;
+
+  letter-spacing: -0.02em;
+}
+
+.add-class-header p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 11px;
+
+  line-height: 1.6;
+}
+
+.add-class-icon {
+  width: 43px;
+  height: 43px;
+
+  border-radius: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: rgba(255, 255, 255, 0.10);
+
+  color: white;
+
+  font-size: 20px;
+  font-weight: 300;
+}
+
+/* =========================================
+   FORM
+========================================= */
+
+.schedule-form-grid {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+
+  grid-template-columns:
+    1.1fr
+    1fr
+    0.8fr
+    0.8fr;
+
+  gap: 15px;
+}
+
+.schedule-field {
+  min-width: 0;
+}
+
+.schedule-field-wide {
+  grid-column: span 2;
+}
+
+.schedule-field label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 10px;
+  font-weight: 750;
+
+  letter-spacing: 0.03em;
+}
+
+.schedule-field input {
+  width: 100%;
+
+  min-height: 42px;
+
+  padding: 10px 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.09);
+
+  color: white;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  outline: none;
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.schedule-field input::placeholder {
+  color: rgba(255, 255, 255, 0.34);
+}
+
+.schedule-field input:focus {
+  background: rgba(255, 255, 255, 0.13);
+
+  border-color: rgba(255, 255, 255, 0.38);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.06);
+}
+
+.schedule-field input[type="date"],
+.schedule-field input[type="time"] {
+  color-scheme: dark;
+}
+
+.schedule-form-bottom {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: flex-end;
+
+  gap: 15px;
+
+  margin-top: 17px;
+}
+
+.schedule-form-bottom .schedule-field {
+  flex: 1;
+}
+
+.schedule-submit-area {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 19px;
+}
+
+.add-class-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 42px;
+
+  padding: 10px 19px;
+
+  border: 1px solid var(--schedule-red);
+
+  border-radius: 8px;
+
+  background: var(--schedule-red);
+
+  color: white;
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 20px rgba(230, 57, 70, 0.22);
+
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.add-class-btn:hover {
+  background: var(--schedule-red-dark);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 26px rgba(230, 57, 70, 0.30);
+}
+
+.add-class-btn:disabled {
+  opacity: 0.65;
+
+  cursor: wait;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+.form-error {
+  display: none;
+
+  position: relative;
+  z-index: 1;
+
+  margin-top: 14px;
+
+  padding: 10px 12px;
+
+  border: 1px solid rgba(255, 120, 130, 0.25);
+
+  border-radius: 8px;
+
+  background: rgba(230, 57, 70, 0.13);
+
+  color: #ffd9dc;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+/* =========================================
+   FILTER
+========================================= */
+
+.schedule-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 18px;
+}
+
+.schedule-list-title {
+  margin: 0;
+
+  color: var(--schedule-blue);
+
+  font-size: 19px;
+
+  font-weight: 800;
+
+  letter-spacing: -0.02em;
+}
+
+.schedule-filter {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+}
+
+.schedule-filter label {
+  color: var(--schedule-muted);
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.06em;
+}
+
+.schedule-filter select {
+  min-width: 150px;
+
+  padding: 9px 30px 9px 11px;
+
+  border: 1px solid var(--schedule-border);
+
+  border-radius: 8px;
+
+  background: white;
+
+  color: var(--schedule-blue);
+
+  font-family: inherit;
+
+  font-size: 11px;
+
+  font-weight: 650;
+
+  outline: none;
+
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.schedule-filter select:focus {
+  border-color: rgba(230, 57, 70, 0.35);
+
+  box-shadow:
+    0 0 0 3px rgba(230, 57, 70, 0.06);
+}
+
+/* =========================================
+   BATCH GROUP
+========================================= */
+
+.batch-group {
+  margin-bottom: 29px;
+}
+
+.batch-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 10px;
+}
+
+.batch-title-area {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.batch-group h2 {
+  margin: 0;
+
+  color: var(--schedule-blue);
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+.batch-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 24px;
+  height: 22px;
+
+  padding: 0 7px;
+
+  border-radius: 6px;
+
+  background: var(--schedule-blue-light);
+
+  color: var(--schedule-blue);
+
+  font-size: 9px;
+
+  font-weight: 850;
+}
+
+/* =========================================
+   CLASS ROW
+========================================= */
+
+.class-row {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns: minmax(0, 1fr) auto;
+
+  gap: 22px;
+
+  align-items: center;
+
+  margin-bottom: 9px;
+
+  padding: 17px 19px;
+
+  border: 1px solid var(--schedule-border);
+
+  border-radius: 12px;
+
+  background: white;
+
+  box-shadow:
+    0 7px 24px rgba(20, 43, 95, 0.045);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.class-row::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+
+  width: 3px;
+
+  border-radius: 0 3px 3px 0;
+
+  background: var(--schedule-red);
+}
+
+.class-row:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(20, 43, 95, 0.10);
+
+  box-shadow:
+    0 13px 30px rgba(20, 43, 95, 0.08);
+}
+
+.class-main {
+  min-width: 0;
+}
+
+.class-main-top {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-bottom: 6px;
+}
+
+.class-date {
+  color: var(--schedule-blue);
+
+  font-size: 13px;
+
+  font-weight: 800;
+}
+
+.class-time {
+  color: var(--schedule-red);
+
+  font-size: 11px;
+
+  font-weight: 750;
+}
+
+.class-tag {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 4px 7px;
+
+  border-radius: 5px;
+
+  background: var(--schedule-blue-light);
+
+  color: var(--schedule-blue);
+
+  font-size: 8px;
+
+  font-weight: 850;
+
+  letter-spacing: 0.04em;
+
+  text-transform: uppercase;
+}
+
+.class-meta {
+  color: var(--schedule-text-soft);
+
+  font-size: 11px;
+
+  line-height: 1.6;
+}
+
+.class-meta strong {
+  color: var(--schedule-text);
+
+  font-weight: 700;
+}
+
+.class-meta a {
+  color: var(--schedule-red);
+
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+.class-meta a:hover {
+  text-decoration: underline;
+}
+
+.class-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  flex-shrink: 0;
+}
+
+.class-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 60px;
+
+  padding: 8px 12px;
+
+  border: 1px solid var(--schedule-border);
+
+  border-radius: 7px;
+
+  background: white;
+
+  color: var(--schedule-blue);
+
+  font-family: inherit;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    background 170ms ease,
+    color 170ms ease;
+}
+
+.class-action-btn:hover {
+  transform: translateY(-1px);
+
+  color: var(--schedule-red);
+
+  border-color: rgba(230, 57, 70, 0.22);
+
+  background: var(--schedule-red-light);
+}
+
+.class-action-btn.danger {
+  color: #c03946;
+}
+
+.class-action-btn.danger:hover {
+  color: #a9212e;
+
+  border-color: rgba(192, 57, 70, 0.25);
+
+  background: #fff5f6;
+}
+
+/* =========================================
+   EDIT FORM
+========================================= */
+
+.edit-card {
+  margin: 8px 0 14px;
+
+  padding: 23px;
+
+  border: 1px solid rgba(20, 43, 95, 0.13);
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f9fbff
+    );
+
+  box-shadow:
+    0 12px 32px rgba(20, 43, 95, 0.08);
+}
+
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 19px;
+}
+
+.edit-header h3 {
+  margin: 0;
+
+  color: var(--schedule-blue);
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+.edit-badge {
+  padding: 6px 9px;
+
+  border-radius: 6px;
+
+  background: var(--schedule-red-light);
+
+  color: var(--schedule-red);
+
+  font-size: 9px;
+
+  font-weight: 800;
+}
+
+.edit-grid {
+  display: grid;
+
+  grid-template-columns:
+    1.1fr
+    1fr
+    0.8fr
+    0.8fr;
+
+  gap: 14px;
+}
+
+.edit-grid-wide {
+  grid-column: span 2;
+}
+
+.edit-field label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: var(--schedule-text-soft);
+
+  font-size: 9px;
+
+  font-weight: 750;
+
+  letter-spacing: 0.04em;
+
+  text-transform: uppercase;
+}
+
+.edit-field input {
+  width: 100%;
+
+  min-height: 40px;
+
+  padding: 9px 11px;
+
+  border: 1px solid var(--schedule-border);
+
+  border-radius: 7px;
+
+  background: white;
+
+  color: var(--schedule-text);
+
+  font-family: inherit;
+
+  font-size: 11px;
+
+  outline: none;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.edit-field input:focus {
+  border-color: rgba(230, 57, 70, 0.35);
+
+  box-shadow:
+    0 0 0 3px rgba(230, 57, 70, 0.06);
+}
+
+.edit-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 18px;
+}
+
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 9px 16px;
+
+  border: 1px solid var(--schedule-red);
+  border-radius: 7px;
+
+  background: var(--schedule-red);
+
+  color: white;
+
+  font-family: inherit;
+
+  font-size: 10px;
+
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.save-btn:hover {
+  background: var(--schedule-red-dark);
+
+  transform: translateY(-1px);
+}
+
+.cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 9px 15px;
+
+  border: 1px solid var(--schedule-border);
+  border-radius: 7px;
+
+  background: white;
+
+  color: var(--schedule-text-soft);
+
+  font-family: inherit;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.cancel-btn:hover {
+  color: var(--schedule-blue);
+
+  background: #f8f9fb;
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.schedule-empty {
+  padding: 65px 25px;
+
+  text-align: center;
+
+  border: 1px dashed #dce2eb;
+
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.schedule-empty-icon {
+  width: 54px;
+  height: 54px;
+
+  margin: 0 auto 16px;
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--schedule-blue-light);
+
+  color: var(--schedule-blue);
+
+  font-size: 21px;
+
+  font-weight: 850;
+}
+
+.schedule-empty h3 {
+  margin: 0 0 8px;
+
+  color: var(--schedule-blue);
+
+  font-size: 17px;
+
+  font-weight: 800;
+}
+
+.schedule-empty p {
+  max-width: 520px;
+
+  margin: 0 auto;
+
+  color: var(--schedule-text-soft);
+
+  font-size: 12px;
+
+  line-height: 1.7;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1050px) {
+
+  .teacher-nav-links {
+    gap: 13px;
+  }
+
+  .teacher-nav-links a:nth-child(2),
+  .teacher-nav-links a:nth-child(3) {
+    display: none;
+  }
+
+  .schedule-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .schedule-form-grid,
+  .edit-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .schedule-field-wide,
+  .edit-grid-wide {
+    grid-column: span 2;
+  }
+
+}
+
+@media (max-width: 850px) {
+
+  .teacher-nav-inner {
+    width: min(100% - 28px, 1180px);
+
+    min-height: 68px;
+  }
+
+  .teacher-brand img {
+    height: 43px;
+  }
+
+  .teacher-nav-links {
+    display: none;
+  }
+
+  .teacher-user {
+    border-left: none;
+
+    padding-left: 0;
+  }
+
+  .teacher-schedule-main {
+    width: min(100% - 30px, 720px);
+
+    padding-top: 35px;
+  }
+
+  .add-class-panel {
+    padding: 21px;
+  }
+
+  .class-row {
+    grid-template-columns: 1fr;
+
+    gap: 14px;
+  }
+
+  .class-actions {
+    justify-content: flex-start;
+  }
+
+}
+
+@media (max-width: 620px) {
+
+  .teacher-user-name {
+    display: none;
+  }
+
+  .schedule-header-badge {
+    display: none;
+  }
+
+  .schedule-page-header h1 {
+    font-size: 30px;
+  }
+
+  .schedule-page-header p {
+    font-size: 13px;
+  }
+
+  .schedule-form-grid,
+  .edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-field-wide,
+  .edit-grid-wide {
+    grid-column: span 1;
+  }
+
+  .add-class-header {
+    margin-bottom: 18px;
+  }
+
+  .schedule-list-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .schedule-filter {
+    width: 100%;
+  }
+
+  .schedule-filter select {
+    flex: 1;
+
+    width: 100%;
+  }
+
+  .class-actions {
+    width: 100%;
+  }
+
+  .class-action-btn {
+    flex: 1;
+  }
+
+  .edit-card {
+    padding: 18px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+}
 </style>
 </head>
+
 <body>
 
-<nav class="dash-nav">
-  <div class="brand"><a href="/teacher/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
-  <div class="who">
-    <span id="userName"></span>
-    <a href="/teacher/dashboard.html">← All tests</a>
-    <a href="/teacher/resources.html">Resources</a>
-    <a href="/teacher/approvals.html">Student approvals</a>
-    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+<!-- =========================================
+     NAVIGATION
+========================================= -->
+
+<nav class="teacher-schedule-nav" id="scheduleNav">
+
+  <div class="teacher-nav-inner">
+
+    <a
+      href="/teacher/dashboard.html"
+      class="teacher-brand"
+    >
+      <img
+        src="/images/logos.png"
+        alt="IELTSbyLE"
+      >
+    </a>
+
+
+    <div class="teacher-nav-right">
+
+      <div class="teacher-nav-links">
+
+        <a href="/teacher/dashboard.html">
+          Dashboard
+        </a>
+
+        <a href="/teacher/resources.html">
+          Resources
+        </a>
+
+        <a href="/teacher/approvals.html">
+          Student approvals
+        </a>
+
+      </div>
+
+
+      <div class="teacher-user">
+
+        <div
+          class="teacher-avatar"
+          id="userAvatar"
+        >
+          T
+        </div>
+
+        <span
+          class="teacher-user-name"
+          id="userName"
+        >
+          Teacher
+        </span>
+
+        <a
+          href="#"
+          id="logoutLink"
+          class="teacher-logout"
+        >
+          Log out
+        </a>
+
+      </div>
+
+    </div>
+
   </div>
+
 </nav>
 
-<main class="dash-main">
-  <div class="dash-head"><h1>Lecture schedule</h1></div>
 
-  <div class="panel">
-    <h2>Add a class</h2>
-    <p class="panel-sub">Only students whose Batch number matches will see this class on their schedule.</p>
-    <div class="inline-row">
-      <div class="field"><label>Batch number</label><input type="text" id="newBatch" placeholder="e.g. Batch 12"></div>
-      <div class="field"><label>Date</label><input type="date" id="newDate"></div>
-      <div class="field"><label>Time</label><input type="time" id="newTime"></div>
-      <div class="field"><label>Class number</label><input type="text" id="newClassNumber" placeholder="e.g. 14"></div>
+<!-- =========================================
+     MAIN
+========================================= -->
+
+<main class="teacher-schedule-main">
+
+  <header class="schedule-page-header">
+
+    <div>
+
+      <div class="schedule-eyebrow">
+        Teacher workspace
+      </div>
+
+      <h1>
+        Lecture schedule
+      </h1>
+
+      <p>
+        Create and manage your IELTS class schedule.
+        Students will automatically see classes assigned to their batch.
+      </p>
+
     </div>
-    <div class="inline-row" style="margin-top:20px;">
-      <div class="field" style="margin-top:0;"><label>Module name</label><input type="text" id="newModule" placeholder="e.g. Reading — Skimming &amp; Scanning"></div>
-      <div class="field" style="margin-top:0;"><label>Teacher name</label><input type="text" id="newTeacherName" placeholder="e.g. Ms. Rahman"></div>
+
+
+    <div class="schedule-header-badge">
+
+      <span class="schedule-header-dot"></span>
+
+      Schedule management
+
     </div>
-    <div class="field">
-      <label>Joining link</label>
-      <input type="url" id="newLink" placeholder="https://meet.google.com/...">
+
+  </header>
+
+
+  <!-- =========================================
+       ADD CLASS
+  ========================================= -->
+
+  <section class="add-class-panel">
+
+    <div class="add-class-header">
+
+      <div>
+
+        <h2>
+          Add a class
+        </h2>
+
+        <p>
+          Only students whose Batch number matches will see this class.
+        </p>
+
+      </div>
+
+
+      <div class="add-class-icon">
+        +
+      </div>
+
     </div>
-    <div class="form-error" id="formError"></div>
-    <div class="submit-row"><button class="button primary" id="addClassBtn" style="padding:11px 22px;">Add class</button></div>
+
+
+    <div class="schedule-form-grid">
+
+      <div class="schedule-field">
+
+        <label for="newBatch">
+          Batch number
+        </label>
+
+        <input
+          type="text"
+          id="newBatch"
+          placeholder="e.g. Batch 12"
+        >
+
+      </div>
+
+
+      <div class="schedule-field">
+
+        <label for="newDate">
+          Date
+        </label>
+
+        <input
+          type="date"
+          id="newDate"
+        >
+
+      </div>
+
+
+      <div class="schedule-field">
+
+        <label for="newTime">
+          Time
+        </label>
+
+        <input
+          type="time"
+          id="newTime"
+        >
+
+      </div>
+
+
+      <div class="schedule-field">
+
+        <label for="newClassNumber">
+          Class number
+        </label>
+
+        <input
+          type="text"
+          id="newClassNumber"
+          placeholder="e.g. 14"
+        >
+
+      </div>
+
+
+      <div class="schedule-field schedule-field-wide">
+
+        <label for="newModule">
+          Module name
+        </label>
+
+        <input
+          type="text"
+          id="newModule"
+          placeholder="e.g. Reading - Skimming & Scanning"
+        >
+
+      </div>
+
+
+      <div class="schedule-field schedule-field-wide">
+
+        <label for="newTeacherName">
+          Teacher name
+        </label>
+
+        <input
+          type="text"
+          id="newTeacherName"
+          placeholder="e.g. Ms. Rahman"
+        >
+
+      </div>
+
+
+      <div class="schedule-field schedule-field-wide">
+
+        <label for="newLink">
+          Joining link
+        </label>
+
+        <input
+          type="url"
+          id="newLink"
+          placeholder="https://meet.google.com/..."
+        >
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="form-error"
+      id="formError"
+    ></div>
+
+
+    <div class="schedule-submit-area">
+
+      <button
+        class="add-class-btn"
+        id="addClassBtn"
+      >
+        <span>+</span>
+        Add class
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================
+       SCHEDULE LIST
+  ========================================= -->
+
+  <div class="schedule-list-header">
+
+    <h2 class="schedule-list-title">
+      Scheduled classes
+    </h2>
+
+
+    <div class="schedule-filter">
+
+      <label for="batchFilter">
+        Batch
+      </label>
+
+      <select id="batchFilter">
+
+        <option value="all">
+          All batches
+        </option>
+
+      </select>
+
+    </div>
+
   </div>
 
-  <div class="filter-row">
-    <label for="batchFilter" style="font-size:13px;font-weight:600;color:var(--ink-soft);">Batch</label>
-    <select id="batchFilter"><option value="all">All batches</option></select>
-  </div>
 
   <div id="scheduleList"></div>
+
 </main>
+
+
+<!-- =========================================
+     SCRIPTS
+========================================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
+
 <script>
+
 let profile;
 let allClasses = [];
 let editingClassId = null;
 
+
+/* =========================================
+   INITIALISE
+========================================= */
+
 (async () => {
-  profile = await Auth.requireRole('teacher');
+
+  profile =
+    await Auth.requireRole('teacher');
+
   if (!profile) return;
-  document.getElementById('userName').textContent = profile.name;
-  document.getElementById('newTeacherName').value = profile.name;
-  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
-  document.getElementById('addClassBtn').addEventListener('click', addClass);
-  document.getElementById('batchFilter').addEventListener('change', renderList);
+
+
+  document.getElementById('userName').textContent =
+    profile.name || 'Teacher';
+
+
+  document.getElementById('userAvatar').textContent =
+    getInitials(profile.name || 'Teacher');
+
+
+  document.getElementById('newTeacherName').value =
+    profile.name || '';
+
+
+  document
+    .getElementById('logoutLink')
+    .addEventListener('click', (e) => {
+
+      e.preventDefault();
+
+      Auth.logout();
+
+    });
+
+
+  document
+    .getElementById('addClassBtn')
+    .addEventListener(
+      'click',
+      addClass
+    );
+
+
+  document
+    .getElementById('batchFilter')
+    .addEventListener(
+      'change',
+      renderList
+    );
+
+
   load();
+
 })();
 
+
+/* =========================================
+   LOAD
+========================================= */
+
 async function load() {
-  const { data, error } = await supabase
-    .from('lecture_schedule').select('*').eq('teacher_id', profile.id)
-    .order('batch_number').order('class_date');
 
-  if (error) { console.error(error); return; }
-  allClasses = data || [];
-  populateBatchFilter();
-  renderList();
-}
+  const { data, error } =
+    await supabase
+      .from('lecture_schedule')
+      .select('*')
+      .eq('teacher_id', profile.id)
+      .order('batch_number')
+      .order('class_date');
 
-function populateBatchFilter() {
-  const select = document.getElementById('batchFilter');
-  const current = select.value;
-  const batches = [...new Set(allClasses.map(c => c.batch_number))].sort();
-  select.innerHTML = '<option value="all">All batches</option>' +
-    batches.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
-  if (batches.includes(current)) select.value = current;
-}
-
-function renderList() {
-  const filter = document.getElementById('batchFilter').value;
-  const el = document.getElementById('scheduleList');
-
-  if (!allClasses.length) {
-    el.innerHTML = `<div class="empty-state"><h3>No classes scheduled yet</h3><p>Add your first class above — it'll appear here and on the schedule of any student in that batch.</p></div>`;
-    return;
-  }
-
-  const filtered = filter === 'all' ? allClasses : allClasses.filter(c => c.batch_number === filter);
-  const byBatch = {};
-  filtered.forEach(c => { (byBatch[c.batch_number] = byBatch[c.batch_number] || []).push(c); });
-  const batches = Object.keys(byBatch).sort();
-
-  el.innerHTML = batches.map(b => `
-    <div class="batch-group">
-      <h2>${escapeHtml(b)}</h2>
-      ${byBatch[b].map(c => editingClassId === c.id ? editClassFormHtml(c) : `
-        <div class="list-row" style="grid-template-columns: 1fr auto;">
-          <div>
-            <div class="title">${formatDate(c.class_date)}${c.class_time ? ` · ${formatTime(c.class_time)}` : ''} <span class="tag">Class ${escapeHtml(c.class_number)}</span></div>
-            <div class="meta">${escapeHtml(c.module_name)} · ${escapeHtml(c.teacher_name)}${c.joining_link ? ` · <a href="${escapeHtml(c.joining_link)}" target="_blank" rel="noopener" style="text-decoration:underline;">Join link</a>` : ''}</div>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button class="small-btn" data-edit="${c.id}">Edit</button>
-            <button class="small-btn danger" data-del="${c.id}">Delete</button>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
-
-  el.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => deleteClass(btn.dataset.del)));
-  el.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => { editingClassId = btn.dataset.edit; renderList(); }));
-  el.querySelectorAll('[data-cancel-edit]').forEach(btn => btn.addEventListener('click', () => { editingClassId = null; renderList(); }));
-  el.querySelectorAll('[data-save-edit]').forEach(btn => btn.addEventListener('click', () => saveClassEdit(btn.dataset.saveEdit)));
-}
-
-function editClassFormHtml(c) {
-  return `
-    <div class="panel" style="margin:12px 0;">
-      <div class="inline-row">
-        <div class="field"><label>Batch number</label><input type="text" id="edit-batch-${c.id}" value="${escapeHtml(c.batch_number)}"></div>
-        <div class="field"><label>Date</label><input type="date" id="edit-date-${c.id}" value="${c.class_date}"></div>
-        <div class="field"><label>Time</label><input type="time" id="edit-time-${c.id}" value="${c.class_time ? c.class_time.slice(0,5) : ''}"></div>
-        <div class="field"><label>Class number</label><input type="text" id="edit-classnum-${c.id}" value="${escapeHtml(c.class_number)}"></div>
-      </div>
-      <div class="inline-row" style="margin-top:20px;">
-        <div class="field" style="margin-top:0;"><label>Module name</label><input type="text" id="edit-module-${c.id}" value="${escapeHtml(c.module_name)}"></div>
-        <div class="field" style="margin-top:0;"><label>Teacher name</label><input type="text" id="edit-teacher-${c.id}" value="${escapeHtml(c.teacher_name)}"></div>
-      </div>
-      <div class="field">
-        <label>Joining link</label>
-        <input type="url" id="edit-link-${c.id}" value="${escapeHtml(c.joining_link || '')}">
-      </div>
-      <div class="submit-row" style="gap:8px;">
-        <button class="button primary" data-save-edit="${c.id}" style="padding:10px 20px;">Save changes</button>
-        <button class="small-btn" data-cancel-edit="${c.id}">Cancel</button>
-      </div>
-    </div>
-  `;
-}
-
-async function saveClassEdit(id) {
-  const batch_number = document.getElementById(`edit-batch-${id}`).value.trim();
-  const class_date = document.getElementById(`edit-date-${id}`).value;
-  const class_time = document.getElementById(`edit-time-${id}`).value || null;
-  const class_number = document.getElementById(`edit-classnum-${id}`).value.trim();
-  const module_name = document.getElementById(`edit-module-${id}`).value.trim();
-  const teacher_name = document.getElementById(`edit-teacher-${id}`).value.trim();
-  const joining_link = document.getElementById(`edit-link-${id}`).value.trim();
-
-  if (!batch_number || !class_date || !class_number || !module_name || !teacher_name) {
-    alert('Batch number, date, class number, module name and teacher name are all required.');
-    return;
-  }
-
-  const { error } = await supabase.from('lecture_schedule')
-    .update({ batch_number, class_date, class_time, class_number, module_name, teacher_name, joining_link })
-    .eq('id', id);
-  if (error) { alert(error.message); return; }
-  editingClassId = null;
-  await load();
-}
-
-async function addClass() {
-  const errorBox = document.getElementById('formError');
-  errorBox.style.display = 'none';
-
-  const batch_number = document.getElementById('newBatch').value.trim();
-  const class_date = document.getElementById('newDate').value;
-  const class_time = document.getElementById('newTime').value || null;
-  const class_number = document.getElementById('newClassNumber').value.trim();
-  const module_name = document.getElementById('newModule').value.trim();
-  const teacher_name = document.getElementById('newTeacherName').value.trim();
-  const joining_link = document.getElementById('newLink').value.trim();
-
-  if (!batch_number || !class_date || !class_number || !module_name || !teacher_name) {
-    errorBox.textContent = 'Batch number, date, class number, module name and teacher name are all required.';
-    errorBox.style.display = 'block';
-    return;
-  }
-
-  const btn = document.getElementById('addClassBtn');
-  btn.disabled = true; btn.textContent = 'Adding…';
-
-  const { error } = await supabase.from('lecture_schedule').insert({
-    teacher_id: profile.id, batch_number, class_date, class_time, class_number, module_name, teacher_name, joining_link
-  });
-
-  btn.disabled = false; btn.textContent = 'Add class';
 
   if (error) {
-    errorBox.textContent = error.message;
-    errorBox.style.display = 'block';
+
+    console.error(error);
+
+    document.getElementById('scheduleList').innerHTML = `
+
+      <div class="schedule-empty">
+
+        <div class="schedule-empty-icon">
+          !
+        </div>
+
+        <h3>
+          Couldn't load the schedule
+        </h3>
+
+        <p>
+          ${escapeHtml(error.message)}
+        </p>
+
+      </div>
+
+    `;
+
     return;
   }
+
+
+  allClasses = data || [];
+
+  populateBatchFilter();
+
+  renderList();
+
+}
+
+
+/* =========================================
+   BATCH FILTER
+========================================= */
+
+function populateBatchFilter() {
+
+  const select =
+    document.getElementById('batchFilter');
+
+
+  const current =
+    select.value;
+
+
+  const batches =
+    [
+      ...new Set(
+        allClasses
+          .map(c => c.batch_number)
+          .filter(Boolean)
+      )
+    ]
+    .sort();
+
+
+  select.innerHTML = `
+
+    <option value="all">
+      All batches
+    </option>
+
+    ${
+      batches
+        .map(
+          batch => `
+            <option value="${escapeHtml(batch)}">
+              ${escapeHtml(batch)}
+            </option>
+          `
+        )
+        .join('')
+    }
+
+  `;
+
+
+  if (batches.includes(current)) {
+    select.value = current;
+  }
+
+}
+
+
+/* =========================================
+   RENDER LIST
+========================================= */
+
+function renderList() {
+
+  const filter =
+    document.getElementById('batchFilter').value;
+
+
+  const el =
+    document.getElementById('scheduleList');
+
+
+  if (!allClasses.length) {
+
+    el.innerHTML = `
+
+      <div class="schedule-empty">
+
+        <div class="schedule-empty-icon">
+          +
+        </div>
+
+        <h3>
+          No classes scheduled yet
+        </h3>
+
+        <p>
+          Add your first class above.
+          It will appear here and on the schedule
+          of every student in that batch.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+  }
+
+
+  const filtered =
+    filter === 'all'
+      ? allClasses
+      : allClasses.filter(
+          c => c.batch_number === filter
+        );
+
+
+  if (!filtered.length) {
+
+    el.innerHTML = `
+
+      <div class="schedule-empty">
+
+        <div class="schedule-empty-icon">
+          —
+        </div>
+
+        <h3>
+          No classes for this batch
+        </h3>
+
+        <p>
+          There are currently no scheduled classes
+          for the selected batch.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+  }
+
+
+  const byBatch = {};
+
+
+  filtered.forEach(c => {
+
+    (
+      byBatch[c.batch_number] =
+      byBatch[c.batch_number] || []
+    ).push(c);
+
+  });
+
+
+  const batches =
+    Object.keys(byBatch).sort();
+
+
+  el.innerHTML =
+    batches
+      .map(batch => {
+
+        const batchClasses =
+          byBatch[batch];
+
+
+        return `
+
+          <section class="batch-group">
+
+            <div class="batch-group-header">
+
+              <div class="batch-title-area">
+
+                <h2>
+                  ${escapeHtml(batch)}
+                </h2>
+
+                <span class="batch-count">
+                  ${batchClasses.length}
+                </span>
+
+              </div>
+
+            </div>
+
+
+            ${
+              batchClasses
+                .map(c => {
+
+                  if (
+                    editingClassId === c.id
+                  ) {
+                    return editClassFormHtml(c);
+                  }
+
+
+                  return `
+
+                    <article class="class-row">
+
+                      <div class="class-main">
+
+                        <div class="class-main-top">
+
+                          <span class="class-date">
+                            ${formatDate(c.class_date)}
+                          </span>
+
+
+                          ${
+                            c.class_time
+                              ? `
+                                <span class="class-time">
+                                  ${formatTime(c.class_time)}
+                                </span>
+                              `
+                              : ''
+                          }
+
+
+                          <span class="class-tag">
+                            Class ${escapeHtml(c.class_number)}
+                          </span>
+
+                        </div>
+
+
+                        <div class="class-meta">
+
+                          <strong>
+                            ${escapeHtml(c.module_name)}
+                          </strong>
+
+                          ·
+
+                          ${escapeHtml(c.teacher_name)}
+
+                          ${
+                            c.joining_link
+                              ? `
+                                ·
+                                <a
+                                  href="${escapeHtml(c.joining_link)}"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Join link ↗
+                                </a>
+                              `
+                              : ''
+                          }
+
+                        </div>
+
+                      </div>
+
+
+                      <div class="class-actions">
+
+                        <button
+                          class="class-action-btn"
+                          data-edit="${c.id}"
+                        >
+                          Edit
+                        </button>
+
+
+                        <button
+                          class="class-action-btn danger"
+                          data-del="${c.id}"
+                        >
+                          Delete
+                        </button>
+
+                      </div>
+
+                    </article>
+
+                  `;
+
+                })
+                .join('')
+            }
+
+          </section>
+
+        `;
+
+      })
+      .join('');
+
+
+  el
+    .querySelectorAll('[data-del]')
+    .forEach(btn => {
+
+      btn.addEventListener(
+        'click',
+        () => deleteClass(btn.dataset.del)
+      );
+
+    });
+
+
+  el
+    .querySelectorAll('[data-edit]')
+    .forEach(btn => {
+
+      btn.addEventListener(
+        'click',
+        () => {
+
+          editingClassId =
+            btn.dataset.edit;
+
+          renderList();
+
+          setTimeout(() => {
+
+            const editForm =
+              document.querySelector(
+                `.edit-card[data-edit-card="${btn.dataset.edit}"]`
+              );
+
+            if (editForm) {
+
+              editForm.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+              });
+
+            }
+
+          }, 40);
+
+        }
+      );
+
+    });
+
+
+  el
+    .querySelectorAll('[data-cancel-edit]')
+    .forEach(btn => {
+
+      btn.addEventListener(
+        'click',
+        () => {
+
+          editingClassId = null;
+
+          renderList();
+
+        }
+      );
+
+    });
+
+
+  el
+    .querySelectorAll('[data-save-edit]')
+    .forEach(btn => {
+
+      btn.addEventListener(
+        'click',
+        () => saveClassEdit(btn.dataset.saveEdit)
+      );
+
+    });
+
+}
+
+
+/* =========================================
+   EDIT FORM
+========================================= */
+
+function editClassFormHtml(c) {
+
+  return `
+
+    <div
+      class="edit-card"
+      data-edit-card="${c.id}"
+    >
+
+      <div class="edit-header">
+
+        <h3>
+          Edit class
+        </h3>
+
+        <span class="edit-badge">
+          ${escapeHtml(c.batch_number)}
+        </span>
+
+      </div>
+
+
+      <div class="edit-grid">
+
+        <div class="edit-field">
+
+          <label>
+            Batch number
+          </label>
+
+          <input
+            type="text"
+            id="edit-batch-${c.id}"
+            value="${escapeHtml(c.batch_number)}"
+          >
+
+        </div>
+
+
+        <div class="edit-field">
+
+          <label>
+            Date
+          </label>
+
+          <input
+            type="date"
+            id="edit-date-${c.id}"
+            value="${escapeHtml(c.class_date)}"
+          >
+
+        </div>
+
+
+        <div class="edit-field">
+
+          <label>
+            Time
+          </label>
+
+          <input
+            type="time"
+            id="edit-time-${c.id}"
+            value="${c.class_time ? escapeHtml(c.class_time.slice(0, 5)) : ''}"
+          >
+
+        </div>
+
+
+        <div class="edit-field">
+
+          <label>
+            Class number
+          </label>
+
+          <input
+            type="text"
+            id="edit-classnum-${c.id}"
+            value="${escapeHtml(c.class_number)}"
+          >
+
+        </div>
+
+
+        <div class="edit-field edit-grid-wide">
+
+          <label>
+            Module name
+          </label>
+
+          <input
+            type="text"
+            id="edit-module-${c.id}"
+            value="${escapeHtml(c.module_name)}"
+          >
+
+        </div>
+
+
+        <div class="edit-field edit-grid-wide">
+
+          <label>
+            Teacher name
+          </label>
+
+          <input
+            type="text"
+            id="edit-teacher-${c.id}"
+            value="${escapeHtml(c.teacher_name)}"
+          >
+
+        </div>
+
+
+        <div class="edit-field edit-grid-wide">
+
+          <label>
+            Joining link
+          </label>
+
+          <input
+            type="url"
+            id="edit-link-${c.id}"
+            value="${escapeHtml(c.joining_link || '')}"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="edit-actions">
+
+        <button
+          class="save-btn"
+          data-save-edit="${c.id}"
+        >
+          Save changes
+        </button>
+
+
+        <button
+          class="cancel-btn"
+          data-cancel-edit="${c.id}"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================
+   SAVE EDIT
+========================================= */
+
+async function saveClassEdit(id) {
+
+  const batch_number =
+    document
+      .getElementById(`edit-batch-${id}`)
+      .value
+      .trim();
+
+
+  const class_date =
+    document
+      .getElementById(`edit-date-${id}`)
+      .value;
+
+
+  const class_time =
+    document
+      .getElementById(`edit-time-${id}`)
+      .value || null;
+
+
+  const class_number =
+    document
+      .getElementById(`edit-classnum-${id}`)
+      .value
+      .trim();
+
+
+  const module_name =
+    document
+      .getElementById(`edit-module-${id}`)
+      .value
+      .trim();
+
+
+  const teacher_name =
+    document
+      .getElementById(`edit-teacher-${id}`)
+      .value
+      .trim();
+
+
+  const joining_link =
+    document
+      .getElementById(`edit-link-${id}`)
+      .value
+      .trim();
+
+
+  if (
+    !batch_number ||
+    !class_date ||
+    !class_number ||
+    !module_name ||
+    !teacher_name
+  ) {
+
+    alert(
+      'Batch number, date, class number, module name and teacher name are all required.'
+    );
+
+    return;
+
+  }
+
+
+  const { error } =
+    await supabase
+      .from('lecture_schedule')
+      .update({
+        batch_number,
+        class_date,
+        class_time,
+        class_number,
+        module_name,
+        teacher_name,
+        joining_link
+      })
+      .eq('id', id);
+
+
+  if (error) {
+
+    alert(error.message);
+
+    return;
+
+  }
+
+
+  editingClassId = null;
+
+  await load();
+
+}
+
+
+/* =========================================
+   ADD CLASS
+========================================= */
+
+async function addClass() {
+
+  const errorBox =
+    document.getElementById('formError');
+
+
+  errorBox.style.display =
+    'none';
+
+
+  const batch_number =
+    document
+      .getElementById('newBatch')
+      .value
+      .trim();
+
+
+  const class_date =
+    document
+      .getElementById('newDate')
+      .value;
+
+
+  const class_time =
+    document
+      .getElementById('newTime')
+      .value || null;
+
+
+  const class_number =
+    document
+      .getElementById('newClassNumber')
+      .value
+      .trim();
+
+
+  const module_name =
+    document
+      .getElementById('newModule')
+      .value
+      .trim();
+
+
+  const teacher_name =
+    document
+      .getElementById('newTeacherName')
+      .value
+      .trim();
+
+
+  const joining_link =
+    document
+      .getElementById('newLink')
+      .value
+      .trim();
+
+
+  if (
+    !batch_number ||
+    !class_date ||
+    !class_number ||
+    !module_name ||
+    !teacher_name
+  ) {
+
+    errorBox.textContent =
+      'Batch number, date, class number, module name and teacher name are all required.';
+
+    errorBox.style.display =
+      'block';
+
+    return;
+
+  }
+
+
+  const btn =
+    document.getElementById('addClassBtn');
+
+
+  btn.disabled = true;
+
+  btn.innerHTML =
+    'Adding...';
+
+
+  const { error } =
+    await supabase
+      .from('lecture_schedule')
+      .insert({
+
+        teacher_id: profile.id,
+
+        batch_number,
+
+        class_date,
+
+        class_time,
+
+        class_number,
+
+        module_name,
+
+        teacher_name,
+
+        joining_link
+
+      });
+
+
+  btn.disabled = false;
+
+  btn.innerHTML =
+    '<span>+</span> Add class';
+
+
+  if (error) {
+
+    errorBox.textContent =
+      error.message;
+
+    errorBox.style.display =
+      'block';
+
+    return;
+
+  }
+
 
   document.getElementById('newBatch').value = '';
   document.getElementById('newDate').value = '';
@@ -219,24 +2586,159 @@ async function addClass() {
   document.getElementById('newClassNumber').value = '';
   document.getElementById('newModule').value = '';
   document.getElementById('newLink').value = '';
+
+
   await load();
+
 }
+
+
+/* =========================================
+   DELETE
+========================================= */
 
 async function deleteClass(id) {
-  if (!confirm('Delete this class from the schedule?')) return;
-  await supabase.from('lecture_schedule').delete().eq('id', id);
+
+  if (
+    !confirm(
+      'Delete this class from the schedule? Students will no longer see it.'
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const { error } =
+    await supabase
+      .from('lecture_schedule')
+      .delete()
+      .eq('id', id);
+
+
+  if (error) {
+
+    alert(error.message);
+
+    return;
+
+  }
+
+
   await load();
+
 }
+
+
+/* =========================================
+   FORMAT DATE
+========================================= */
 
 function formatDate(d) {
-  return new Date(d + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+  return new Date(
+    d + 'T00:00:00'
+  ).toLocaleDateString(
+    undefined,
+    {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }
+  );
+
 }
 
+
+/* =========================================
+   FORMAT TIME
+========================================= */
+
 function formatTime(t) {
-  const [h, m] = t.split(':').map(Number);
-  const dt = new Date(2000, 0, 1, h, m);
-  return dt.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+
+  if (!t) return '';
+
+  const [h, m] =
+    t.split(':').map(Number);
+
+
+  const dt =
+    new Date(
+      2000,
+      0,
+      1,
+      h,
+      m
+    );
+
+
+  return dt.toLocaleTimeString(
+    undefined,
+    {
+      hour: 'numeric',
+      minute: '2-digit'
+    }
+  );
+
 }
+
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function getInitials(name) {
+
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(
+      part =>
+        part
+          .charAt(0)
+          .toUpperCase()
+    )
+    .join('');
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+}
+
+
+/* =========================================
+   NAV SCROLL
+========================================= */
+
+window.addEventListener('scroll', () => {
+
+  const nav =
+    document.getElementById('scheduleNav');
+
+
+  if (!nav) return;
+
+
+  nav.classList.toggle(
+    'scrolled',
+    window.scrollY > 8
+  );
+
+});
+
 </script>
+
 </body>
 </html>
