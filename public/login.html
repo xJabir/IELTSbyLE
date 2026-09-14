@@ -3,64 +3,1218 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Login — London Educators</title>
+<title>Student Login | IELTSbyLE</title>
 <link rel="stylesheet" href="/css/main.css">
+
+<style>
+  :root {
+    --student-red: #e63946;
+    --student-red-dark: #cf3040;
+    --student-red-light: #fff1f2;
+
+    --student-blue: #142b5f;
+    --student-blue-dark: #0e2048;
+    --student-blue-light: #eef3ff;
+
+    --student-text: #17233d;
+    --student-soft: #667085;
+    --student-border: #e7ebf2;
+    --student-bg: #f7f9fc;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Inter, Arial, sans-serif;
+    color: var(--student-text);
+    background:
+      radial-gradient(
+        circle at 15% 20%,
+        rgba(230, 57, 70, 0.08),
+        transparent 28%
+      ),
+      radial-gradient(
+        circle at 85% 80%,
+        rgba(20, 43, 95, 0.08),
+        transparent 30%
+      ),
+      var(--student-bg);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  /* =========================
+     MAIN SHELL
+     ========================= */
+
+  .student-login-shell {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .student-login-shell::before {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: rgba(230, 57, 70, 0.055);
+    top: -180px;
+    left: -150px;
+    pointer-events: none;
+  }
+
+  .student-login-shell::after {
+    content: "";
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: rgba(20, 43, 95, 0.045);
+    right: -220px;
+    bottom: -240px;
+    pointer-events: none;
+  }
+
+  .student-login-layout {
+    width: 100%;
+    max-width: 1080px;
+    min-height: 650px;
+
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+
+    background: #fff;
+
+    border: 1px solid rgba(231, 235, 242, 0.95);
+    border-radius: 24px;
+
+    overflow: hidden;
+
+    box-shadow:
+      0 30px 80px rgba(20, 43, 95, 0.12),
+      0 8px 30px rgba(20, 43, 95, 0.06);
+
+    position: relative;
+    z-index: 1;
+
+    animation: student-card-in 600ms ease both;
+  }
+
+  /* =========================
+     LEFT INTRO PANEL
+     ========================= */
+
+  .student-intro {
+    position: relative;
+
+    padding: 54px 48px;
+
+    background:
+      radial-gradient(
+        circle at 85% 15%,
+        rgba(255,255,255,0.09),
+        transparent 25%
+      ),
+      linear-gradient(
+        145deg,
+        var(--student-blue-dark),
+        var(--student-blue)
+      );
+
+    color: #fff;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    overflow: hidden;
+  }
+
+  .student-intro::before {
+    content: "";
+
+    position: absolute;
+
+    width: 330px;
+    height: 330px;
+
+    border: 1px solid rgba(255,255,255,0.09);
+
+    border-radius: 50%;
+
+    right: -150px;
+    top: -100px;
+  }
+
+  .student-intro::after {
+    content: "";
+
+    position: absolute;
+
+    width: 230px;
+    height: 230px;
+
+    border: 1px solid rgba(255,255,255,0.07);
+
+    border-radius: 50%;
+
+    left: -120px;
+    bottom: -100px;
+  }
+
+  .student-intro-content,
+  .student-intro-bottom {
+    position: relative;
+    z-index: 2;
+  }
+
+  .student-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+
+    margin-bottom: 70px;
+  }
+
+  .student-brand-mark {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
+
+    display: grid;
+    place-items: center;
+
+    background: rgba(255,255,255,0.12);
+
+    border: 1px solid rgba(255,255,255,0.16);
+
+    font-size: 19px;
+    font-weight: 800;
+  }
+
+  .student-brand-text {
+    font-size: 17px;
+    font-weight: 750;
+    letter-spacing: -0.3px;
+  }
+
+  .student-intro-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    width: fit-content;
+
+    padding: 7px 11px;
+
+    border-radius: 999px;
+
+    background: rgba(230,57,70,0.16);
+
+    border: 1px solid rgba(255,255,255,0.12);
+
+    color: #fff;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+
+    margin-bottom: 18px;
+  }
+
+  .student-intro-label::before {
+    content: "";
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: var(--student-red);
+
+    box-shadow:
+      0 0 0 4px rgba(230,57,70,0.15);
+  }
+
+  .student-intro-title {
+    margin: 0;
+
+    max-width: 400px;
+
+    font-size: clamp(34px, 4vw, 48px);
+    line-height: 1.04;
+
+    letter-spacing: -1.8px;
+
+    font-weight: 800;
+  }
+
+  .student-intro-description {
+    margin: 22px 0 0;
+
+    max-width: 400px;
+
+    color: rgba(255,255,255,0.72);
+
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  /* =========================
+     FEATURES
+     ========================= */
+
+  .student-feature-list {
+    display: grid;
+    gap: 14px;
+
+    margin-top: 40px;
+  }
+
+  .student-feature {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    color: rgba(255,255,255,0.88);
+
+    font-size: 13px;
+  }
+
+  .student-feature-icon {
+    width: 32px;
+    height: 32px;
+
+    flex: 0 0 32px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 9px;
+
+    background: rgba(255,255,255,0.09);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    color: #fff;
+
+    font-size: 13px;
+  }
+
+  .student-intro-bottom {
+    padding-top: 35px;
+
+    color: rgba(255,255,255,0.45);
+
+    font-size: 11px;
+
+    letter-spacing: 0.3px;
+  }
+
+  /* =========================
+     RIGHT FORM PANEL
+     ========================= */
+
+  .student-form-panel {
+    padding: 48px 58px;
+
+    display: flex;
+    align-items: center;
+
+    background: #fff;
+  }
+
+  .student-login-card {
+    width: 100%;
+    max-width: 450px;
+
+    margin: 0 auto;
+  }
+
+  .student-back-link {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 7px;
+
+    color: var(--student-soft);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    margin-bottom: 48px;
+
+    transition:
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .student-back-link:hover {
+    color: var(--student-red);
+    transform: translateX(-2px);
+  }
+
+  .student-form-eyebrow {
+    color: var(--student-red);
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+
+    margin-bottom: 10px;
+  }
+
+  .student-form-title {
+    margin: 0;
+
+    color: var(--student-text);
+
+    font-size: 34px;
+    line-height: 1.15;
+
+    letter-spacing: -1px;
+
+    font-weight: 800;
+  }
+
+  .student-form-subtitle {
+    margin: 12px 0 34px;
+
+    color: var(--student-soft);
+
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* =========================
+     FORM FIELDS
+     ========================= */
+
+  .student-field {
+    margin-bottom: 19px;
+  }
+
+  .student-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--student-text);
+
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .student-input-wrap {
+    position: relative;
+  }
+
+  .student-input-icon {
+    position: absolute;
+
+    left: 15px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 17px;
+    height: 17px;
+
+    color: #98a2b3;
+
+    pointer-events: none;
+  }
+
+  .student-field input {
+    width: 100%;
+    height: 50px;
+
+    padding: 0 15px 0 45px;
+
+    border: 1px solid var(--student-border);
+
+    border-radius: 11px;
+
+    background: #fff;
+
+    color: var(--student-text);
+
+    outline: none;
+
+    font-size: 13px;
+
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      background 180ms ease;
+  }
+
+  .student-field input::placeholder {
+    color: #a7afbd;
+  }
+
+  .student-field input:hover {
+    border-color: #d5dbe6;
+  }
+
+  .student-field input:focus {
+    border-color: var(--student-red);
+
+    background: #fff;
+
+    box-shadow:
+      0 0 0 4px rgba(230,57,70,0.09);
+  }
+
+  /* =========================
+     ERROR
+     ========================= */
+
+  .student-form-error {
+    display: none;
+
+    margin: 7px 0 17px;
+
+    padding: 12px 14px;
+
+    border: 1px solid #fecdd3;
+
+    border-radius: 10px;
+
+    background: var(--student-red-light);
+
+    color: #b42332;
+
+    font-size: 12px;
+
+    line-height: 1.55;
+  }
+
+  /* =========================
+     LOGIN BUTTON
+     ========================= */
+
+  .student-submit-row {
+    margin-top: 8px;
+  }
+
+  .student-login-button {
+    width: 100%;
+    height: 51px;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    background:
+      linear-gradient(
+        135deg,
+        var(--student-red),
+        #f04b57
+      );
+
+    color: #fff;
+
+    font-size: 13px;
+    font-weight: 750;
+
+    cursor: pointer;
+
+    box-shadow:
+      0 9px 22px rgba(230,57,70,0.2);
+
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      opacity 180ms ease;
+
+    position: relative;
+
+    overflow: hidden;
+  }
+
+  .student-login-button::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 42%;
+    height: 100%;
+
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.28),
+        transparent
+      );
+
+    transform: translateX(-160%);
+  }
+
+  .student-login-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+
+    box-shadow:
+      0 14px 28px rgba(230,57,70,0.27);
+  }
+
+  .student-login-button:hover:not(:disabled)::after {
+    animation: student-shine 700ms ease;
+  }
+
+  .student-login-button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .student-login-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.68;
+  }
+
+  /* =========================
+     ACCOUNT LINKS
+     ========================= */
+
+  .student-form-links {
+    margin-top: 27px;
+
+    padding-top: 23px;
+
+    border-top: 1px solid var(--student-border);
+
+    display: grid;
+
+    gap: 11px;
+  }
+
+  .student-form-note {
+    margin: 0;
+
+    text-align: center;
+
+    color: var(--student-soft);
+
+    font-size: 12px;
+
+    line-height: 1.6;
+  }
+
+  .student-form-note a {
+    color: var(--student-blue);
+
+    font-weight: 700;
+
+    text-decoration: underline;
+
+    text-decoration-color:
+      rgba(20,43,95,0.25);
+
+    text-underline-offset: 3px;
+
+    transition: color 180ms ease;
+  }
+
+  .student-form-note a:hover {
+    color: var(--student-red);
+  }
+
+  /* =========================
+     SECURITY
+     ========================= */
+
+  .student-security-note {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    margin-top: 25px;
+
+    color: #98a2b3;
+
+    font-size: 10px;
+  }
+
+  .student-security-note svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* =========================
+     ANIMATIONS
+     ========================= */
+
+  @keyframes student-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.99);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes student-shine {
+    from {
+      transform: translateX(-160%);
+    }
+
+    to {
+      transform: translateX(290%);
+    }
+  }
+
+  /* =========================
+     TABLET
+     ========================= */
+
+  @media (max-width: 850px) {
+
+    .student-login-layout {
+      grid-template-columns: 1fr;
+
+      max-width: 560px;
+
+      min-height: auto;
+    }
+
+    .student-intro {
+      padding: 38px 38px 34px;
+
+      min-height: 315px;
+    }
+
+    .student-brand {
+      margin-bottom: 38px;
+    }
+
+    .student-intro-title {
+      font-size: 38px;
+    }
+
+    .student-intro-description {
+      max-width: 480px;
+    }
+
+    .student-feature-list {
+      grid-template-columns: repeat(2, 1fr);
+
+      margin-top: 27px;
+    }
+
+    .student-intro-bottom {
+      display: none;
+    }
+
+    .student-form-panel {
+      padding: 40px 38px 45px;
+    }
+
+    .student-back-link {
+      margin-bottom: 34px;
+    }
+  }
+
+  /* =========================
+     MOBILE
+     ========================= */
+
+  @media (max-width: 560px) {
+
+    .student-login-shell {
+      padding: 0;
+
+      display: block;
+    }
+
+    .student-login-layout {
+      min-height: 100vh;
+
+      border: 0;
+
+      border-radius: 0;
+
+      box-shadow: none;
+    }
+
+    .student-intro {
+      min-height: 300px;
+
+      padding: 28px 24px 30px;
+    }
+
+    .student-brand {
+      margin-bottom: 32px;
+    }
+
+    .student-brand-mark {
+      width: 38px;
+      height: 38px;
+
+      border-radius: 10px;
+    }
+
+    .student-brand-text {
+      font-size: 15px;
+    }
+
+    .student-intro-title {
+      font-size: 32px;
+
+      letter-spacing: -1.2px;
+    }
+
+    .student-intro-description {
+      margin-top: 15px;
+
+      font-size: 12px;
+
+      line-height: 1.65;
+    }
+
+    .student-feature-list {
+      grid-template-columns: 1fr;
+
+      gap: 9px;
+
+      margin-top: 22px;
+    }
+
+    .student-feature {
+      font-size: 11px;
+    }
+
+    .student-feature-icon {
+      width: 28px;
+      height: 28px;
+
+      flex-basis: 28px;
+
+      border-radius: 8px;
+    }
+
+    .student-form-panel {
+      padding: 30px 24px 40px;
+
+      align-items: flex-start;
+    }
+
+    .student-back-link {
+      margin-bottom: 30px;
+    }
+
+    .student-form-title {
+      font-size: 29px;
+    }
+
+    .student-form-subtitle {
+      margin-bottom: 27px;
+    }
+
+    .student-field {
+      margin-bottom: 17px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+  }
+</style>
 </head>
+
 <body>
-<div class="auth-shell">
-  <div class="auth-card">
-    <a href="/index.html" style="font-size:13px;color:var(--ink-soft);"></a>
-    <h1 style="margin-top:14px;">Student login</h1>
-    <p class="sub">Sign in to see your mock tests and band scores.</p>
-    <form id="loginForm">
-      <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" required autocomplete="email">
+
+<div class="student-login-shell">
+
+  <div class="student-login-layout">
+
+    <!-- =========================
+         LEFT INTRO
+         ========================= -->
+
+    <section class="student-intro">
+
+      <div class="student-intro-content">
+
+        <a href="/index.html" class="student-brand">
+          <span class="student-brand-mark">LE</span>
+          <span class="student-brand-text">IELTSbyLE</span>
+        </a>
+
+        <div class="student-intro-label">
+          Student workspace
+        </div>
+
+        <h2 class="student-intro-title">
+          Your IELTS preparation starts here.
+        </h2>
+
+        <p class="student-intro-description">
+          Sign in to continue your IELTS preparation, practise mock tests, follow your progress, and access your learning resources.
+        </p>
+
+        <div class="student-feature-list">
+
+          <div class="student-feature">
+            <span class="student-feature-icon">✓</span>
+            <span>Take realistic IELTS mock tests</span>
+          </div>
+
+          <div class="student-feature">
+            <span class="student-feature-icon">✓</span>
+            <span>Track your band scores</span>
+          </div>
+
+          <div class="student-feature">
+            <span class="student-feature-icon">✓</span>
+            <span>Access learning resources</span>
+          </div>
+
+          <div class="student-feature">
+            <span class="student-feature-icon">✓</span>
+            <span>Book your Speaking test</span>
+          </div>
+
+        </div>
+
       </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" required autocomplete="current-password">
+
+      <div class="student-intro-bottom">
+        London Educators · IELTS preparation platform
       </div>
-      <div class="form-error" id="formError"></div>
-      <div class="submit-row"><button type="submit" class="button primary block" id="submitBtn">Log in</button></div>
-    </form>
-    <p class="form-note">New here? <a href="/signup.html" style="text-decoration:underline;">Create a student account</a></p>
-    <p class="form-note">Teacher? <a href="/teacher-login.html" style="text-decoration:underline;">Log in here</a></p>
+
+    </section>
+
+
+    <!-- =========================
+         RIGHT LOGIN PANEL
+         ========================= -->
+
+    <section class="student-form-panel">
+
+      <div class="student-login-card">
+
+        <a href="/index.html" class="student-back-link">
+          <span>←</span>
+          <span>Back to IELTSbyLE</span>
+        </a>
+
+        <div class="student-form-eyebrow">
+          Student access
+        </div>
+
+        <h1 class="student-form-title">
+          Welcome back
+        </h1>
+
+        <p class="student-form-subtitle">
+          Sign in to access your IELTS preparation dashboard and continue where you left off.
+        </p>
+
+
+        <form id="loginForm">
+
+          <!-- EMAIL -->
+
+          <div class="student-field">
+
+            <label for="email">
+              Email address
+            </label>
+
+            <div class="student-input-wrap">
+
+              <svg
+                class="student-input-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/>
+                <path d="m3 7 9 6 9-6"/>
+              </svg>
+
+              <input
+                type="email"
+                id="email"
+                required
+                autocomplete="email"
+                placeholder="you@example.com"
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- PASSWORD -->
+
+          <div class="student-field">
+
+            <label for="password">
+              Password
+            </label>
+
+            <div class="student-input-wrap">
+
+              <svg
+                class="student-input-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <rect
+                  x="3"
+                  y="10"
+                  width="18"
+                  height="11"
+                  rx="2"
+                />
+
+                <path d="M7 10V7a5 5 0 0 1 10 0v3"/>
+              </svg>
+
+              <input
+                type="password"
+                id="password"
+                required
+                autocomplete="current-password"
+                placeholder="Enter your password"
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- ERROR -->
+
+          <div
+            class="student-form-error"
+            id="formError"
+          ></div>
+
+
+          <!-- BUTTON -->
+
+          <div class="student-submit-row">
+
+            <button
+              type="submit"
+              class="student-login-button"
+              id="submitBtn"
+            >
+              Log in to your account
+            </button>
+
+          </div>
+
+        </form>
+
+
+        <!-- LINKS -->
+
+        <div class="student-form-links">
+
+          <p class="student-form-note">
+            New here?
+            <a href="/signup.html">
+              Create a student account
+            </a>
+          </p>
+
+          <p class="student-form-note">
+            Don't have an enrolled account yet?
+            <a href="/signup-free.html">
+              Create a free account
+            </a>
+          </p>
+
+          <p class="student-form-note">
+            Teacher?
+            <a href="/teacher-login.html">
+              Log in here
+            </a>
+          </p>
+
+        </div>
+
+
+        <!-- SECURITY -->
+
+        <div class="student-security-note">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <rect
+              x="4"
+              y="10"
+              width="16"
+              height="11"
+              rx="2"
+            />
+
+            <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+          </svg>
+
+          Secure authentication powered by Supabase
+
+        </div>
+
+      </div>
+
+    </section>
+
   </div>
+
 </div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
-<script>
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const errorBox = document.getElementById('formError');
-  const btn = document.getElementById('submitBtn');
-  errorBox.style.display = 'none';
-  btn.disabled = true; btn.textContent = 'Logging in…';
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: document.getElementById('email').value,
-    password: document.getElementById('password').value
-  });
+<script>
+
+const loginForm = document.getElementById('loginForm');
+const errorBox = document.getElementById('formError');
+const submitBtn = document.getElementById('submitBtn');
+
+
+function showError(message) {
+
+  errorBox.textContent = message;
+
+  errorBox.style.display = 'block';
+
+}
+
+
+function resetButton() {
+
+  submitBtn.disabled = false;
+
+  submitBtn.textContent = 'Log in to your account';
+
+}
+
+
+loginForm.addEventListener('submit', async (e) => {
+
+  e.preventDefault();
+
+  errorBox.style.display = 'none';
+
+  submitBtn.disabled = true;
+
+  submitBtn.textContent = 'Signing in…';
+
+
+  const email =
+    document.getElementById('email').value.trim();
+
+  const password =
+    document.getElementById('password').value;
+
+
+  const { data, error } =
+    await supabase.auth.signInWithPassword({
+
+      email,
+      password
+
+    });
+
 
   if (error) {
-    errorBox.textContent = error.message;
-    errorBox.style.display = 'block';
-    btn.disabled = false; btn.textContent = 'Log in';
+
+    showError(error.message);
+
+    resetButton();
+
     return;
+
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+
+  const { data: profile } =
+    await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', data.user.id)
+      .single();
+
+
   if (!profile || profile.role !== 'student') {
+
     await supabase.auth.signOut();
-    errorBox.textContent = 'This account is registered as a teacher — use the teacher login page.';
-    errorBox.style.display = 'block';
-    btn.disabled = false; btn.textContent = 'Log in';
+
+    showError(
+      'This account is registered as a teacher. Please use the teacher login page.'
+    );
+
+    resetButton();
+
     return;
+
   }
 
-  window.location.href = '/student/dashboard.html';
+
+  window.location.href =
+    '/student/dashboard.html';
+
 });
+
 </script>
+
 </body>
 </html>
