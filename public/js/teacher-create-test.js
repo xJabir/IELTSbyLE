@@ -101,6 +101,14 @@ function renderDetails() {
           <option value="writing" ${type === 'writing' ? 'selected' : ''}>Writing only</option>
         </select>
       </div>
+      <div class="field">
+        <label>Access</label>
+        <select id="d-locked">
+          <option value="true" ${t.is_locked ? 'selected' : ''}>🔒 Enrolled students only (locked)</option>
+          <option value="false" ${!t.is_locked ? 'selected' : ''}>🔓 Free for everyone, including free accounts</option>
+        </select>
+        <p style="font-size:12px;color:var(--ink-soft);margin-top:6px;">Free accounts always see this test in their list, but can only start it if it's unlocked.</p>
+      </div>
       <div class="inline-row" style="margin-top:20px;">
         <div class="field"><label>Listening (min)</label><input id="d-listen" type="number" min="1" value="${t.listening_duration_min}"></div>
         <div class="field"><label>Reading (min)</label><input id="d-read" type="number" min="1" value="${t.reading_duration_min}"></div>
@@ -114,6 +122,7 @@ function renderDetails() {
       title: document.getElementById('d-title').value,
       description: document.getElementById('d-desc').value,
       test_type: document.getElementById('d-type').value,
+      is_locked: document.getElementById('d-locked').value === 'true',
       listening_duration_min: Number(document.getElementById('d-listen').value),
       reading_duration_min: Number(document.getElementById('d-read').value),
       writing_duration_min: Number(document.getElementById('d-write').value)
