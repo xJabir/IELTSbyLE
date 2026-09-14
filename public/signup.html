@@ -3,87 +3,1354 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Student Account — London Educators</title>
+
+<title>Create Student Account | IELTSbyLE</title>
+
 <link rel="stylesheet" href="/css/main.css">
+
+<style>
+  :root {
+    --signup-red: #e63946;
+    --signup-red-dark: #cf3040;
+    --signup-red-light: #fff1f2;
+
+    --signup-blue: #142b5f;
+    --signup-blue-dark: #0e2048;
+    --signup-blue-light: #eef3ff;
+
+    --signup-text: #17233d;
+    --signup-soft: #667085;
+    --signup-muted: #98a2b3;
+
+    --signup-border: #e7ebf2;
+    --signup-bg: #f7f9fc;
+    --signup-white: #ffffff;
+
+    --signup-green: #16865b;
+    --signup-green-bg: #ecfdf3;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+
+    min-height: 100vh;
+
+    background:
+      radial-gradient(
+        circle at 0% 0%,
+        rgba(230,57,70,0.075),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 100% 100%,
+        rgba(20,43,95,0.08),
+        transparent 35%
+      ),
+      var(--signup-bg);
+
+    color: var(--signup-text);
+  }
+
+  /* =====================================
+     PAGE SHELL
+  ===================================== */
+
+  .signup-shell {
+    min-height: 100vh;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(440px, 570px);
+
+    padding: 24px;
+  }
+
+  /* =====================================
+     BRAND / LEFT SIDE
+  ===================================== */
+
+  .signup-intro {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    min-height: calc(100vh - 48px);
+
+    padding: 46px;
+
+    border-radius: 24px;
+
+    background:
+      radial-gradient(
+        circle at 90% 10%,
+        rgba(230,57,70,0.18),
+        transparent 31%
+      ),
+      linear-gradient(
+        145deg,
+        #142b5f 0%,
+        #0e2048 100%
+      );
+
+    color: #fff;
+
+    box-shadow:
+      0 20px 55px rgba(20,43,95,0.15);
+  }
+
+  .signup-intro::before {
+    content: "";
+
+    position: absolute;
+
+    width: 330px;
+    height: 330px;
+
+    right: -145px;
+    bottom: -170px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,0.09);
+  }
+
+  .signup-intro::after {
+    content: "";
+
+    position: absolute;
+
+    width: 190px;
+    height: 190px;
+
+    right: 95px;
+    bottom: -105px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .intro-content {
+    position: relative;
+    z-index: 2;
+
+    max-width: 570px;
+  }
+
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+
+    margin-bottom: 70px;
+  }
+
+  .brand-logo {
+    width: auto;
+    height: 53px;
+  }
+
+  .intro-eyebrow {
+    margin-bottom: 13px;
+
+    color: #ffb4bb;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .intro-heading {
+    margin: 0 0 18px;
+
+    max-width: 570px;
+
+    font-size: clamp(34px, 4vw, 54px);
+
+    line-height: 1.04;
+
+    letter-spacing: -0.045em;
+  }
+
+  .intro-description {
+    max-width: 510px;
+
+    margin: 0;
+
+    color: rgba(255,255,255,0.73);
+
+    font-size: 15px;
+
+    line-height: 1.75;
+  }
+
+  .intro-features {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-top: 35px;
+
+    max-width: 510px;
+  }
+
+  .intro-feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 11px 13px;
+
+    border: 1px solid rgba(255,255,255,0.1);
+
+    border-radius: 10px;
+
+    background: rgba(255,255,255,0.055);
+
+    color: rgba(255,255,255,0.82);
+
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .feature-icon {
+    width: 25px;
+    height: 25px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: rgba(255,255,255,0.09);
+
+    color: #ffb4bb;
+
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .intro-bottom {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    color: rgba(255,255,255,0.5);
+
+    font-size: 11px;
+  }
+
+  .intro-bottom strong {
+    color: rgba(255,255,255,0.76);
+
+    font-weight: 700;
+  }
+
+  /* =====================================
+     FORM SIDE
+  ===================================== */
+
+  .signup-form-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 25px 45px;
+  }
+
+  .signup-card {
+    width: 100%;
+    max-width: 490px;
+
+    padding: 40px;
+
+    background: rgba(255,255,255,0.96);
+
+    border: 1px solid var(--signup-border);
+
+    border-radius: 20px;
+
+    box-shadow:
+      0 20px 50px rgba(20,43,95,0.07);
+
+    animation: signupCardIn 420ms ease both;
+  }
+
+  @keyframes signupCardIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .mobile-brand {
+    display: none;
+
+    margin-bottom: 28px;
+  }
+
+  .mobile-brand img {
+    height: 45px;
+    width: auto;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-bottom: 25px;
+
+    color: var(--signup-soft);
+
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    transition:
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .back-link:hover {
+    color: var(--signup-red);
+
+    transform: translateX(-2px);
+  }
+
+  .signup-heading {
+    margin: 0 0 8px;
+
+    color: var(--signup-blue);
+
+    font-size: 28px;
+
+    line-height: 1.15;
+
+    letter-spacing: -0.035em;
+  }
+
+  .signup-subheading {
+    margin: 0 0 28px;
+
+    color: var(--signup-soft);
+
+    font-size: 13px;
+
+    line-height: 1.65;
+  }
+
+  /* =====================================
+     FORM
+  ===================================== */
+
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 17px;
+  }
+
+  .field {
+    margin: 0;
+  }
+
+  .field label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--signup-text);
+
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  .field input {
+    width: 100%;
+
+    height: 46px;
+
+    padding: 0 13px;
+
+    border: 1px solid var(--signup-border);
+
+    border-radius: 9px;
+
+    background: #fff;
+
+    color: var(--signup-text);
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      background 180ms ease;
+  }
+
+  .field input::placeholder {
+    color: #a5adba;
+  }
+
+  .field input:hover {
+    border-color: #d5dbe5;
+  }
+
+  .field input:focus {
+    border-color: var(--signup-blue);
+
+    box-shadow:
+      0 0 0 3px rgba(20,43,95,0.08);
+
+    background: #fff;
+  }
+
+  .inline-row {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+  }
+
+  .field-hint {
+    margin-top: 6px;
+
+    color: var(--signup-muted);
+
+    font-size: 10px;
+
+    line-height: 1.45;
+  }
+
+  /* =====================================
+     PASSWORD
+  ===================================== */
+
+  .password-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-top: 6px;
+
+    color: var(--signup-muted);
+
+    font-size: 10px;
+  }
+
+  .password-note-icon {
+    width: 15px;
+    height: 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: var(--signup-blue-light);
+
+    color: var(--signup-blue);
+
+    font-size: 8px;
+    font-weight: 800;
+  }
+
+  /* =====================================
+     ERROR / SUCCESS
+  ===================================== */
+
+  .form-message {
+    display: none;
+
+    padding: 12px 14px;
+
+    border-radius: 9px;
+
+    font-size: 12px;
+
+    line-height: 1.55;
+  }
+
+  .form-message.error {
+    color: var(--signup-red);
+
+    background: var(--signup-red-light);
+
+    border: 1px solid rgba(230,57,70,0.15);
+  }
+
+  .form-message.success {
+    color: var(--signup-green);
+
+    background: var(--signup-green-bg);
+
+    border: 1px solid rgba(22,134,91,0.15);
+  }
+
+  /* =====================================
+     BUTTON
+  ===================================== */
+
+  .signup-submit {
+    position: relative;
+
+    width: 100%;
+
+    height: 48px;
+
+    margin-top: 2px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border: 1px solid var(--signup-red);
+
+    border-radius: 9px;
+
+    background:
+      linear-gradient(
+        135deg,
+        var(--signup-red),
+        #f04b57
+      );
+
+    color: #fff;
+
+    font-family: inherit;
+
+    font-size: 13px;
+    font-weight: 750;
+
+    cursor: pointer;
+
+    box-shadow:
+      0 8px 20px rgba(230,57,70,0.19);
+
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      opacity 180ms ease;
+  }
+
+  .signup-submit::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 40%;
+    height: 100%;
+
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.25),
+        transparent
+      );
+
+    transform: translateX(-160%);
+  }
+
+  .signup-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+
+    box-shadow:
+      0 12px 27px rgba(230,57,70,0.25);
+  }
+
+  .signup-submit:hover:not(:disabled)::after {
+    animation: signupShine 650ms ease;
+  }
+
+  @keyframes signupShine {
+    to {
+      transform: translateX(350%);
+    }
+  }
+
+  .signup-submit:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+    transform: none;
+  }
+
+  /* =====================================
+     FOOTER LINKS
+  ===================================== */
+
+  .account-links {
+    margin-top: 22px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid var(--signup-border);
+  }
+
+  .account-link {
+    display: block;
+
+    margin-top: 11px;
+
+    color: var(--signup-soft);
+
+    text-align: center;
+
+    font-size: 11px;
+
+    line-height: 1.55;
+  }
+
+  .account-link:first-child {
+    margin-top: 0;
+  }
+
+  .account-link a {
+    color: var(--signup-blue);
+
+    font-weight: 750;
+
+    text-decoration: none;
+
+    transition: color 180ms ease;
+  }
+
+  .account-link a:hover {
+    color: var(--signup-red);
+
+    text-decoration: underline;
+  }
+
+  .free-account-link {
+    margin-top: 17px;
+
+    padding: 12px 13px;
+
+    border-radius: 9px;
+
+    background: var(--signup-blue-light);
+
+    border: 1px solid rgba(20,43,95,0.07);
+
+    color: var(--signup-soft);
+  }
+
+  .free-account-link a {
+    color: var(--signup-blue);
+  }
+
+  /* =====================================
+     RESPONSIVE
+  ===================================== */
+
+  @media (max-width: 1050px) {
+
+    .signup-shell {
+      grid-template-columns: minmax(0, 1fr) 500px;
+    }
+
+    .signup-intro {
+      padding: 36px;
+    }
+
+    .signup-form-side {
+      padding: 20px 25px;
+    }
+
+    .intro-features {
+      grid-template-columns: 1fr;
+    }
+
+  }
+
+  @media (max-width: 850px) {
+
+    .signup-shell {
+      display: block;
+
+      padding: 0;
+    }
+
+    .signup-intro {
+      display: none;
+    }
+
+    .signup-form-side {
+      min-height: 100vh;
+
+      padding: 30px 18px;
+    }
+
+    .signup-card {
+      max-width: 510px;
+
+      padding: 32px 27px;
+    }
+
+    .mobile-brand {
+      display: block;
+    }
+
+  }
+
+  @media (max-width: 520px) {
+
+    .signup-form-side {
+      padding: 20px 13px;
+    }
+
+    .signup-card {
+      padding: 27px 20px;
+
+      border-radius: 16px;
+    }
+
+    .signup-heading {
+      font-size: 25px;
+    }
+
+    .inline-row {
+      grid-template-columns: 1fr;
+
+      gap: 17px;
+    }
+
+    .mobile-brand {
+      margin-bottom: 23px;
+    }
+
+    .mobile-brand img {
+      height: 41px;
+    }
+
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+
+  }
+</style>
 </head>
+
 <body>
-<div class="auth-shell">
-  <div class="auth-card">
-    <a href="/index.html" style="font-size:13px;color:var(--ink-soft);"></a>
-    <h1 style="margin-top:14px;">Create your student profile</h1>
-    <p class="sub">One profile holds every mock test you take and every band score you earn.</p>
-    <form id="signupForm">
-      <div class="field">
-        <label for="name">Full name</label>
-        <input type="text" id="name" required autocomplete="name">
+
+<div class="signup-shell">
+
+  <!-- =====================================
+       LEFT INTRODUCTION
+  ===================================== -->
+
+  <section class="signup-intro">
+
+    <div class="intro-content">
+
+      <a
+        href="/index.html"
+        class="brand-link"
+      >
+        <img
+          src="/images/logos.png"
+          alt="IELTSbyLE"
+          class="brand-logo"
+        >
+      </a>
+
+      <div class="intro-eyebrow">
+        IELTSbyLE Student Account
       </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" required autocomplete="email">
-      </div>
-      <div class="inline-row">
-        <div class="field">
-          <label for="batchNumber">Batch number</label>
-          <input type="text" id="batchNumber" required placeholder="e.g. Batch 12">
+
+      <h2 class="intro-heading">
+        Your IELTS preparation starts here.
+      </h2>
+
+      <p class="intro-description">
+        Create your student profile to keep your mock tests,
+        results, resources, class schedule, and speaking
+        practice connected in one place.
+      </p>
+
+
+      <div class="intro-features">
+
+        <div class="intro-feature">
+
+          <span class="feature-icon">
+            ✓
+          </span>
+
+          <span>
+            Track your mock test results
+          </span>
+
         </div>
-        <div class="field">
-          <label for="studentIdNumber">Student ID</label>
-          <input type="text" id="studentIdNumber" required placeholder="e.g. LE-0231">
+
+
+        <div class="intro-feature">
+
+          <span class="feature-icon">
+            ✓
+          </span>
+
+          <span>
+            Access your class schedule
+          </span>
+
         </div>
+
+
+        <div class="intro-feature">
+
+          <span class="feature-icon">
+            ✓
+          </span>
+
+          <span>
+            Book Speaking tests
+          </span>
+
+        </div>
+
+
+        <div class="intro-feature">
+
+          <span class="feature-icon">
+            ✓
+          </span>
+
+          <span>
+            Study with teacher resources
+          </span>
+
+        </div>
+
       </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" required minlength="6" autocomplete="new-password">
+
+    </div>
+
+
+    <div class="intro-bottom">
+
+      <span>
+        Powered by <strong>London Educators</strong>
+      </span>
+
+      <span>
+        IELTS Preparation Platform
+      </span>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================
+       FORM AREA
+  ===================================== -->
+
+  <section class="signup-form-side">
+
+    <div class="signup-card">
+
+      <!-- Mobile logo -->
+
+      <a
+        href="/index.html"
+        class="mobile-brand"
+      >
+        <img
+          src="/images/logos.png"
+          alt="IELTSbyLE"
+        >
+      </a>
+
+
+      <!-- Back -->
+
+      <a
+        href="/index.html"
+        class="back-link"
+      >
+        ← Back to IELTSbyLE
+      </a>
+
+
+      <!-- Heading -->
+
+      <h1 class="signup-heading">
+        Create your student profile
+      </h1>
+
+      <p class="signup-subheading">
+        Set up your account to access your IELTS preparation
+        journey and keep your progress in one place.
+      </p>
+
+
+      <!-- Form -->
+
+      <form
+        id="signupForm"
+        class="signup-form"
+      >
+
+        <!-- Full name -->
+
+        <div class="field">
+
+          <label for="name">
+            Full name
+          </label>
+
+          <input
+            type="text"
+            id="name"
+            required
+            autocomplete="name"
+            placeholder="Enter your full name"
+          >
+
+        </div>
+
+
+        <!-- Email -->
+
+        <div class="field">
+
+          <label for="email">
+            Email address
+          </label>
+
+          <input
+            type="email"
+            id="email"
+            required
+            autocomplete="email"
+            placeholder="you@example.com"
+          >
+
+        </div>
+
+
+        <!-- Batch + Student ID -->
+
+        <div class="inline-row">
+
+          <div class="field">
+
+            <label for="batchNumber">
+              Batch number
+            </label>
+
+            <input
+              type="text"
+              id="batchNumber"
+              required
+              placeholder="e.g. Batch 12"
+            >
+
+            <div class="field-hint">
+              Use the batch number provided by London Educators.
+            </div>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="studentIdNumber">
+              Student ID
+            </label>
+
+            <input
+              type="text"
+              id="studentIdNumber"
+              required
+              placeholder="e.g. LE-0231"
+            >
+
+            <div class="field-hint">
+              Enter your official student ID.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Password -->
+
+        <div class="field">
+
+          <label for="password">
+            Password
+          </label>
+
+          <input
+            type="password"
+            id="password"
+            required
+            minlength="6"
+            autocomplete="new-password"
+            placeholder="Create a password"
+          >
+
+          <div class="password-note">
+
+            <span class="password-note-icon">
+              i
+            </span>
+
+            Password must contain at least 6 characters.
+
+          </div>
+
+        </div>
+
+
+        <!-- Error / success -->
+
+        <div
+          class="form-message"
+          id="formError"
+        ></div>
+
+
+        <!-- Submit -->
+
+        <button
+          type="submit"
+          class="signup-submit"
+          id="submitBtn"
+        >
+          Create student account
+        </button>
+
+      </form>
+
+
+      <!-- Account links -->
+
+      <div class="account-links">
+
+        <div class="account-link">
+
+          Already have an account?
+
+          <a href="/login.html">
+            Log in
+          </a>
+
+        </div>
+
+
+        <div class="account-link">
+
+          Are you a teacher?
+
+          <a href="/teacher-signup.html">
+            Create a teacher account
+          </a>
+
+        </div>
+
+
+        <div class="account-link free-account-link">
+
+          Not enrolled with London Educators yet?
+
+          <a href="/signup-free.html">
+            Create a free account
+          </a>
+
+          to try selected mock tests and resources at no cost.
+
+        </div>
+
       </div>
-      <div class="form-error" id="formError"></div>
-      <div class="submit-row"><button type="submit" class="button primary block" id="submitBtn">Create account</button></div>
-    </form>
-    <p class="form-note">Already have an account? <a href="/login.html" style="text-decoration:underline;">Log in</a></p>
-    <p class="form-note">Teacher, not student? <a href="/teacher-signup.html" style="text-decoration:underline;">Create a teacher account</a></p>
-    <p class="form-note">Not enrolled with us yet? <a href="/signup-free.html" style="text-decoration:underline;">Create a free account</a> to try select mock tests and resources at no cost.</p>
-  </div>
+
+    </div>
+
+  </section>
+
 </div>
+
+
+<!-- =====================================
+     SCRIPTS
+===================================== -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
-<script>
-document.getElementById('signupForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const errorBox = document.getElementById('formError');
-  const btn = document.getElementById('submitBtn');
-  errorBox.style.display = 'none';
-  btn.disabled = true; btn.textContent = 'Creating account…';
 
-  const { data, error } = await supabase.auth.signUp({
-    email: document.getElementById('email').value,
-    password: document.getElementById('password').value,
-    options: { data: {
-      name: document.getElementById('name').value,
-      role: 'student',
-      batch_number: document.getElementById('batchNumber').value,
-      student_id_number: document.getElementById('studentIdNumber').value
-    } }
+<script>
+
+document
+  .getElementById('signupForm')
+  .addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+
+    const errorBox =
+      document.getElementById('formError');
+
+    const btn =
+      document.getElementById('submitBtn');
+
+
+    errorBox.style.display = 'none';
+
+    errorBox.className =
+      'form-message';
+
+
+    btn.disabled = true;
+
+    btn.textContent =
+      'Creating account...';
+
+
+    const name =
+      document
+        .getElementById('name')
+        .value
+        .trim();
+
+
+    const email =
+      document
+        .getElementById('email')
+        .value
+        .trim();
+
+
+    const batchNumber =
+      document
+        .getElementById('batchNumber')
+        .value
+        .trim();
+
+
+    const studentIdNumber =
+      document
+        .getElementById('studentIdNumber')
+        .value
+        .trim();
+
+
+    const password =
+      document
+        .getElementById('password')
+        .value;
+
+
+    /* =====================================
+       BASIC VALIDATION
+    ===================================== */
+
+    if (
+      !name ||
+      !email ||
+      !batchNumber ||
+      !studentIdNumber ||
+      !password
+    ) {
+
+      showError(
+        'Please complete all required fields.'
+      );
+
+      resetButton();
+
+      return;
+
+    }
+
+
+    if (password.length < 6) {
+
+      showError(
+        'Your password must contain at least 6 characters.'
+      );
+
+      resetButton();
+
+      return;
+
+    }
+
+
+    /* =====================================
+       SUPABASE SIGNUP
+    ===================================== */
+
+    const { data, error } =
+      await supabase.auth.signUp({
+
+        email: email,
+
+        password: password,
+
+        options: {
+
+          data: {
+
+            name: name,
+
+            role: 'student',
+
+            batch_number: batchNumber,
+
+            student_id_number: studentIdNumber
+
+          }
+
+        }
+
+      });
+
+
+    /* =====================================
+       ERROR
+    ===================================== */
+
+    if (error) {
+
+      console.error(error);
+
+      showError(
+        error.message
+      );
+
+      resetButton();
+
+      return;
+
+    }
+
+
+    /* =====================================
+       EMAIL CONFIRMATION
+    ===================================== */
+
+    if (!data.session) {
+
+      errorBox.className =
+        'form-message success';
+
+      errorBox.style.display =
+        'block';
+
+      errorBox.textContent =
+        'Account created successfully. Check your email to confirm your account, then log in.';
+
+
+      btn.disabled = true;
+
+      btn.textContent =
+        'Check your email';
+
+      return;
+
+    }
+
+
+    /* =====================================
+       ACTIVE SESSION
+    ===================================== */
+
+    window.location.href =
+      '/student/dashboard.html';
+
   });
 
-  if (error) {
-    errorBox.textContent = error.message;
-    errorBox.style.display = 'block';
-    btn.disabled = false; btn.textContent = 'Create account';
-    return;
-  }
 
-  if (!data.session) {
-    // Email confirmation is turned on in the Supabase project.
-    errorBox.style.display = 'block';
-    errorBox.style.background = '#E4EFE7';
-    errorBox.style.borderColor = 'var(--good)';
-    errorBox.style.color = 'var(--good)';
-    errorBox.textContent = 'Account created — check your email to confirm it, then log in.';
-    btn.textContent = 'Check your email';
-    return;
-  }
+/* =====================================
+   ERROR DISPLAY
+===================================== */
 
-  window.location.href = '/student/dashboard.html';
-});
+function showError(message) {
+
+  const errorBox =
+    document.getElementById('formError');
+
+
+  errorBox.className =
+    'form-message error';
+
+
+  errorBox.textContent =
+    message;
+
+
+  errorBox.style.display =
+    'block';
+
+}
+
+
+/* =====================================
+   RESET BUTTON
+===================================== */
+
+function resetButton() {
+
+  const btn =
+    document.getElementById('submitBtn');
+
+
+  btn.disabled = false;
+
+  btn.textContent =
+    'Create student account';
+
+}
+
 </script>
+
 </body>
 </html>
