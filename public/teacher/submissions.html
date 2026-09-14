@@ -5,83 +5,1680 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Submissions — IELTSbyLE</title>
 <link rel="stylesheet" href="/css/main.css">
+
+<style>
+  :root {
+    --sub-red: #e63946;
+    --sub-red-dark: #c92f3c;
+    --sub-red-light: #fff1f2;
+
+    --sub-blue: #142b5f;
+    --sub-blue-dark: #0d1f46;
+    --sub-blue-light: #eef3ff;
+
+    --sub-text: #17233d;
+    --sub-text-soft: #667085;
+    --sub-border: #e6eaf1;
+    --sub-bg: #f7f9fc;
+
+    --sub-green: #17824b;
+    --sub-green-light: #eaf8f0;
+
+    --sub-orange: #b96a00;
+    --sub-orange-light: #fff6e6;
+
+    --sub-shadow: 0 18px 45px rgba(20, 43, 95, 0.08);
+    --sub-shadow-soft: 0 8px 24px rgba(20, 43, 95, 0.06);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 90% 0%, rgba(230, 57, 70, 0.045), transparent 25%),
+      radial-gradient(circle at 5% 15%, rgba(20, 43, 95, 0.04), transparent 24%),
+      var(--sub-bg);
+    color: var(--sub-text);
+  }
+
+  /* =========================
+     NAVIGATION
+  ========================= */
+
+  .sub-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    width: 100%;
+    min-height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 32px;
+
+    background: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border-bottom: 1px solid rgba(230, 234, 241, 0.85);
+
+    box-shadow: 0 4px 20px rgba(20, 43, 95, 0.035);
+  }
+
+  .sub-brand {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .sub-logo {
+    height: 48px;
+    width: auto;
+    display: block;
+    transition: transform 180ms ease;
+  }
+
+  .sub-logo:hover {
+    transform: scale(1.03);
+  }
+
+  .sub-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .sub-user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: var(--sub-blue);
+    font-size: 13px;
+    font-weight: 700;
+
+    padding-right: 6px;
+  }
+
+  .sub-user-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--sub-red);
+    box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.10);
+  }
+
+  .sub-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .sub-nav-links a {
+    color: #596579;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    transition:
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .sub-nav-links a:hover {
+    color: var(--sub-red);
+    transform: translateY(-1px);
+  }
+
+  .sub-back {
+    color: var(--sub-blue) !important;
+  }
+
+  .sub-back:hover {
+    color: var(--sub-red) !important;
+  }
+
+  .sub-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 9px 15px;
+
+    border: 1px solid var(--sub-border);
+    border-radius: 8px;
+
+    background: #fff;
+    color: var(--sub-blue) !important;
+
+    box-shadow: 0 3px 10px rgba(20, 43, 95, 0.04);
+  }
+
+  .sub-logout:hover {
+    color: var(--sub-red) !important;
+    border-color: rgba(230, 57, 70, 0.22);
+    background: var(--sub-red-light);
+  }
+
+  /* =========================
+     MAIN
+  ========================= */
+
+  .sub-main {
+    width: min(1240px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 42px 0 70px;
+  }
+
+  /* =========================
+     PAGE HEADER
+  ========================= */
+
+  .sub-header {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+
+    margin-bottom: 24px;
+    padding: 34px 36px;
+
+    border-radius: 20px;
+
+    background:
+      radial-gradient(circle at 90% 15%, rgba(230, 57, 70, 0.20), transparent 30%),
+      linear-gradient(135deg, var(--sub-blue-dark), var(--sub-blue));
+
+    color: #fff;
+
+    box-shadow: var(--sub-shadow);
+  }
+
+  .sub-header::before {
+    content: "";
+    position: absolute;
+    width: 230px;
+    height: 230px;
+    right: -90px;
+    bottom: -120px;
+
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .sub-header::after {
+    content: "";
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    right: 90px;
+    top: -80px;
+
+    border-radius: 50%;
+    background: rgba(230, 57, 70, 0.08);
+  }
+
+  .sub-header-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .sub-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 10px;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    color: #ffb3ba;
+  }
+
+  .sub-eyebrow::before {
+    content: "";
+    width: 22px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--sub-red);
+  }
+
+  .sub-header h1 {
+    margin: 0;
+    max-width: 780px;
+
+    color: #fff;
+
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+  }
+
+  .sub-header p {
+    max-width: 700px;
+
+    margin: 11px 0 0;
+
+    color: rgba(255, 255, 255, 0.72);
+
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .sub-header-action {
+    position: relative;
+    z-index: 2;
+
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 11px 17px;
+
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 9px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    color: #fff;
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    backdrop-filter: blur(10px);
+
+    transition:
+      background 180ms ease,
+      transform 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .sub-header-action:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+  }
+
+  /* =========================
+     SUMMARY CARDS
+  ========================= */
+
+  .sub-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+
+    margin-bottom: 24px;
+  }
+
+  .sub-summary-card {
+    position: relative;
+    overflow: hidden;
+
+    padding: 21px 22px;
+
+    background: #fff;
+    border: 1px solid var(--sub-border);
+    border-radius: 15px;
+
+    box-shadow: var(--sub-shadow-soft);
+
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .sub-summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sub-shadow);
+    border-color: rgba(20, 43, 95, 0.12);
+  }
+
+  .sub-summary-card::after {
+    content: "";
+    position: absolute;
+    right: -22px;
+    bottom: -34px;
+
+    width: 90px;
+    height: 90px;
+
+    border-radius: 50%;
+    background: rgba(20, 43, 95, 0.035);
+  }
+
+  .sub-summary-card.highlight::after {
+    background: rgba(230, 57, 70, 0.07);
+  }
+
+  .sub-summary-label {
+    margin-bottom: 8px;
+
+    color: var(--sub-text-soft);
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .sub-summary-value {
+    color: var(--sub-blue);
+
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .sub-summary-card.highlight .sub-summary-value {
+    color: var(--sub-red);
+  }
+
+  .sub-summary-note {
+    margin-top: 7px;
+
+    color: #8a94a6;
+
+    font-size: 12px;
+  }
+
+  /* =========================
+     SUBMISSIONS PANEL
+  ========================= */
+
+  .sub-panel {
+    overflow: hidden;
+
+    background: #fff;
+    border: 1px solid var(--sub-border);
+    border-radius: 18px;
+
+    box-shadow: var(--sub-shadow-soft);
+  }
+
+  .sub-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid var(--sub-border);
+  }
+
+  .sub-panel-title h2 {
+    margin: 0;
+
+    color: var(--sub-blue);
+
+    font-family: var(--serif);
+    font-size: 22px;
+  }
+
+  .sub-panel-title p {
+    margin: 5px 0 0;
+
+    color: var(--sub-text-soft);
+
+    font-size: 13px;
+  }
+
+  .sub-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 34px;
+    height: 30px;
+    padding: 0 10px;
+
+    border-radius: 8px;
+
+    background: var(--sub-blue-light);
+    color: var(--sub-blue);
+
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  /* =========================
+     TABLE
+  ========================= */
+
+  .sub-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .sub-table {
+    width: 100%;
+    min-width: 900px;
+
+    border-collapse: collapse;
+  }
+
+  .sub-table th {
+    padding: 14px 18px;
+
+    background: #fafbfc;
+
+    border-bottom: 1px solid var(--sub-border);
+
+    color: #7b8495;
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .sub-table th:not(:first-child) {
+    text-align: center;
+  }
+
+  .sub-table td {
+    padding: 17px 18px;
+
+    border-bottom: 1px solid #edf0f4;
+
+    color: var(--sub-text);
+
+    font-size: 13px;
+
+    vertical-align: middle;
+  }
+
+  .sub-table tbody tr {
+    transition: background 150ms ease;
+  }
+
+  .sub-table tbody tr:hover {
+    background: #fbfcff;
+  }
+
+  .sub-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .student-cell {
+    min-width: 190px;
+  }
+
+  .student-info {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .student-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: var(--sub-blue-light);
+    color: var(--sub-blue);
+
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .student-name {
+    color: var(--sub-blue);
+
+    font-size: 13px;
+    font-weight: 750;
+    line-height: 1.3;
+  }
+
+  .student-email {
+    margin-top: 3px;
+
+    color: #8a94a6;
+
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .date-cell {
+    color: #697386;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .score {
+    min-width: 55px;
+
+    color: var(--sub-blue);
+
+    font-size: 15px;
+    font-weight: 800;
+
+    text-align: center;
+  }
+
+  .score.missing {
+    color: #a0a8b5;
+    font-weight: 600;
+  }
+
+  .overall-score {
+    color: var(--sub-red);
+  }
+
+  .status-cell {
+    min-width: 145px;
+  }
+
+  .status-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 9px;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    white-space: nowrap;
+  }
+
+  .status-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .status-badge.done {
+    background: var(--sub-green-light);
+    color: var(--sub-green);
+  }
+
+  .status-badge.done::before {
+    background: var(--sub-green);
+  }
+
+  .status-badge.pending {
+    background: var(--sub-orange-light);
+    color: var(--sub-orange);
+  }
+
+  .status-badge.pending::before {
+    background: var(--sub-orange);
+  }
+
+  .open-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 8px 13px;
+
+    border: 1px solid var(--sub-border);
+    border-radius: 8px;
+
+    background: #fff;
+    color: var(--sub-blue);
+
+    text-decoration: none;
+
+    font-size: 11px;
+    font-weight: 750;
+
+    transition:
+      color 160ms ease,
+      border-color 160ms ease,
+      background 160ms ease,
+      transform 160ms ease;
+  }
+
+  .open-btn:hover {
+    color: var(--sub-red);
+    border-color: rgba(230, 57, 70, 0.22);
+    background: var(--sub-red-light);
+    transform: translateY(-1px);
+  }
+
+  /* =========================
+     EMPTY / ERROR
+  ========================= */
+
+  .sub-empty {
+    padding: 70px 25px;
+
+    text-align: center;
+  }
+
+  .sub-empty-icon {
+    width: 58px;
+    height: 58px;
+
+    margin: 0 auto 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: var(--sub-blue-light);
+    color: var(--sub-blue);
+
+    font-size: 23px;
+  }
+
+  .sub-empty h3 {
+    margin: 0 0 7px;
+
+    color: var(--sub-blue);
+
+    font-family: var(--serif);
+    font-size: 21px;
+  }
+
+  .sub-empty p {
+    max-width: 430px;
+    margin: 0 auto;
+
+    color: var(--sub-text-soft);
+
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .sub-error .sub-empty-icon {
+    background: var(--sub-red-light);
+    color: var(--sub-red);
+  }
+
+  /* =========================
+     LOADING
+  ========================= */
+
+  .sub-loading {
+    padding: 60px 25px;
+    text-align: center;
+  }
+
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+
+    margin: 0 auto 14px;
+
+    border: 3px solid #e8edf5;
+    border-top-color: var(--sub-red);
+
+    border-radius: 50%;
+
+    animation: sub-spin 800ms linear infinite;
+  }
+
+  .sub-loading p {
+    margin: 0;
+
+    color: var(--sub-text-soft);
+
+    font-size: 13px;
+  }
+
+  @keyframes sub-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* =========================
+     ANIMATION
+  ========================= */
+
+  .sub-header,
+  .sub-summary-card,
+  .sub-panel {
+    animation: sub-fade-up 500ms ease both;
+  }
+
+  .sub-summary-card:nth-child(2) {
+    animation-delay: 60ms;
+  }
+
+  .sub-summary-card:nth-child(3) {
+    animation-delay: 120ms;
+  }
+
+  .sub-summary-card:nth-child(4) {
+    animation-delay: 180ms;
+  }
+
+  .sub-panel {
+    animation-delay: 240ms;
+  }
+
+  @keyframes sub-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* =========================
+     RESPONSIVE
+  ========================= */
+
+  @media (max-width: 1050px) {
+    .sub-nav {
+      padding: 12px 22px;
+    }
+
+    .sub-nav-links {
+      gap: 12px;
+    }
+
+    .sub-summary {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 850px) {
+    .sub-nav {
+      min-height: 68px;
+    }
+
+    .sub-logo {
+      height: 43px;
+    }
+
+    .sub-nav-right {
+      gap: 10px;
+    }
+
+    .sub-user {
+      display: none;
+    }
+
+    .sub-nav-links a:nth-child(1),
+    .sub-nav-links a:nth-child(2),
+    .sub-nav-links a:nth-child(3) {
+      display: none;
+    }
+
+    .sub-main {
+      width: min(100% - 28px, 1240px);
+      padding-top: 28px;
+    }
+
+    .sub-header {
+      align-items: flex-start;
+      flex-direction: column;
+      padding: 28px 24px;
+    }
+
+    .sub-header-action {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .sub-main {
+      width: calc(100% - 20px);
+      padding-top: 20px;
+      padding-bottom: 45px;
+    }
+
+    .sub-summary {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .sub-summary-card {
+      padding: 17px;
+    }
+
+    .sub-summary-value {
+      font-size: 23px;
+    }
+
+    .sub-summary-note {
+      font-size: 10px;
+    }
+
+    .sub-header {
+      border-radius: 15px;
+      padding: 25px 20px;
+    }
+
+    .sub-header h1 {
+      font-size: 27px;
+    }
+
+    .sub-header p {
+      font-size: 13px;
+    }
+
+    .sub-panel {
+      border-radius: 14px;
+    }
+
+    .sub-panel-head {
+      padding: 18px;
+    }
+
+    .sub-panel-title h2 {
+      font-size: 19px;
+    }
+
+    .sub-panel-title p {
+      font-size: 12px;
+    }
+
+    .sub-table th,
+    .sub-table td {
+      padding: 14px 13px;
+    }
+
+    .student-avatar {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
 </head>
+
 <body>
 
-<nav class="dash-nav">
-  <div class="brand"><a href="/teacher/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
-  <div class="who">
-    <span id="userName"></span>
-    <a href="/teacher/lecture-schedule.html">Lecture schedule</a>
-    <a href="/teacher/resources.html">Resources</a>
-    <a href="/teacher/approvals.html">Student approvals</a>
-    <a href="/teacher/dashboard.html">← All tests</a>
-    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<nav class="sub-nav">
+
+  <div class="sub-brand">
+    <a href="/teacher/dashboard.html">
+      <img
+        src="/images/logos.png"
+        alt="IELTSbyLE"
+        class="sub-logo"
+      >
+    </a>
   </div>
+
+  <div class="sub-nav-right">
+
+    <div class="sub-user">
+      <span class="sub-user-dot"></span>
+      <span id="userName"></span>
+    </div>
+
+    <div class="sub-nav-links">
+      <a href="/teacher/lecture-schedule.html">Lecture schedule</a>
+      <a href="/teacher/resources.html">Resources</a>
+      <a href="/teacher/approvals.html">Student approvals</a>
+
+      <a
+        href="/teacher/dashboard.html"
+        class="sub-back"
+      >
+        ← All tests
+      </a>
+
+      <a
+        href="#"
+        id="logoutLink"
+        class="sub-logout"
+      >
+        Log out
+      </a>
+    </div>
+
+  </div>
+
 </nav>
 
-<main class="dash-main">
-  <div class="dash-head"><h1 id="pageTitle">Submissions</h1></div>
-  <div id="subList"></div>
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="sub-main">
+
+  <!-- Header -->
+  <section class="sub-header">
+
+    <div class="sub-header-content">
+
+      <div class="sub-eyebrow">
+        Teacher workspace
+      </div>
+
+      <h1 id="pageTitle">
+        Submissions
+      </h1>
+
+      <p>
+        Review student attempts, check band scores, and open individual
+        submissions for detailed grading.
+      </p>
+
+    </div>
+
+    <a
+      href="/teacher/dashboard.html"
+      class="sub-header-action"
+    >
+      ← Back to mock tests
+    </a>
+
+  </section>
+
+
+  <!-- Summary -->
+  <section
+    class="sub-summary"
+    id="summary"
+    style="display:none;"
+  >
+
+    <div class="sub-summary-card">
+
+      <div class="sub-summary-label">
+        Total submissions
+      </div>
+
+      <div
+        class="sub-summary-value"
+        id="totalSubmissions"
+      >
+        0
+      </div>
+
+      <div class="sub-summary-note">
+        Completed attempts
+      </div>
+
+    </div>
+
+
+    <div class="sub-summary-card highlight">
+
+      <div class="sub-summary-label">
+        Needs grading
+      </div>
+
+      <div
+        class="sub-summary-value"
+        id="needsGrading"
+      >
+        0
+      </div>
+
+      <div class="sub-summary-note">
+        Requires teacher review
+      </div>
+
+    </div>
+
+
+    <div class="sub-summary-card">
+
+      <div class="sub-summary-label">
+        Graded
+      </div>
+
+      <div
+        class="sub-summary-value"
+        id="gradedCount"
+      >
+        0
+      </div>
+
+      <div class="sub-summary-note">
+        Completed grading
+      </div>
+
+    </div>
+
+
+    <div class="sub-summary-card">
+
+      <div class="sub-summary-label">
+        Average overall
+      </div>
+
+      <div
+        class="sub-summary-value"
+        id="averageBand"
+      >
+        —
+      </div>
+
+      <div class="sub-summary-note">
+        Among graded submissions
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Submissions panel -->
+  <section class="sub-panel">
+
+    <div class="sub-panel-head">
+
+      <div class="sub-panel-title">
+        <h2>Student submissions</h2>
+        <p>
+          Review the results submitted for this mock test.
+        </p>
+      </div>
+
+      <span
+        class="sub-count"
+        id="submissionCount"
+      >
+        0
+      </span>
+
+    </div>
+
+
+    <div id="subList">
+
+      <div class="sub-loading">
+
+        <div class="loading-spinner"></div>
+
+        <p>
+          Loading submissions...
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
 </main>
+
+
+<!-- =========================
+     SCRIPTS
+========================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
+
 <script>
+
 const testId = new URLSearchParams(location.search).get('testId');
 
+
+/* ==========================================
+   INITIALISE PAGE
+========================================== */
+
 (async () => {
+
   const profile = await Auth.requireRole('teacher');
+
   if (!profile) return;
-  document.getElementById('userName').textContent = profile.name;
-  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
-  load();
-})();
 
-async function load() {
-  const { data: test } = await supabase.from('tests').select('title').eq('id', testId).single();
-  if (test) document.getElementById('pageTitle').textContent = `Submissions — ${test.title}`;
+  document.getElementById('userName').textContent =
+    profile.name;
 
-  const { data: submissions, error } = await supabase
-    .from('submissions')
-    .select('*, profiles(name, email)')
-    .eq('test_id', testId)
-    .neq('status', 'in_progress')
-    .order('submitted_at', { ascending: false });
+  document
+    .getElementById('logoutLink')
+    .addEventListener('click', (e) => {
 
-  const el = document.getElementById('subList');
-  if (error) { el.innerHTML = `<div class="empty-state"><h3>Couldn't load submissions</h3><p>${escapeHtml(error.message)}</p></div>`; return; }
-  if (!submissions || !submissions.length) {
-    el.innerHTML = `<div class="empty-state"><h3>No submissions yet</h3><p>They'll appear here once a student finishes this mock test.</p></div>`;
+      e.preventDefault();
+
+      Auth.logout();
+
+    });
+
+
+  if (!testId) {
+
+    renderError('No mock test was selected.');
+
     return;
+
   }
 
-  el.innerHTML = `
-    <table class="band-table">
-      <thead><tr>
-        <th>Student</th><th>Submitted</th><th>Listening</th><th>Reading</th><th>Writing</th><th>Overall</th><th></th>
-      </tr></thead>
-      <tbody>
-        ${submissions.map(s => `
-          <tr>
-            <td>${escapeHtml(s.profiles.name)}<br><span style="font-size:12px;color:var(--ink-soft);">${escapeHtml(s.profiles.email)}</span></td>
-            <td>${s.submitted_at ? s.submitted_at.slice(0, 16).replace('T', ' ') : '—'}</td>
-            <td class="band">${fmt(s.listening_band)}</td>
-            <td class="band">${fmt(s.reading_band)}</td>
-            <td class="band">${fmt(s.writing_band)}</td>
-            <td class="band">${fmt(s.overall_band)}</td>
-            <td>
-              ${s.status === 'graded' ? '<span class="badge done">Graded</span>' : '<span class="badge pending">Needs grade</span>'}
-              <a href="/teacher/grade.html?subId=${s.id}" class="small-btn" style="margin-left:8px;">Open</a>
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
+
+  load();
+
+})();
+
+
+/* ==========================================
+   LOAD SUBMISSIONS
+========================================== */
+
+async function load() {
+
+  const list = document.getElementById('subList');
+
+  try {
+
+    /* Get test title */
+
+    const { data: test, error: testError } =
+      await supabase
+        .from('tests')
+        .select('title')
+        .eq('id', testId)
+        .single();
+
+
+    if (testError) {
+
+      console.error(testError);
+
+    }
+
+
+    if (test) {
+
+      document.getElementById('pageTitle').textContent =
+        `Submissions · ${test.title}`;
+
+      document.title =
+        `${test.title} · Submissions — IELTSbyLE`;
+
+    }
+
+
+    /* Get submissions */
+
+    const { data: submissions, error } =
+      await supabase
+        .from('submissions')
+        .select('*, profiles(name, email)')
+        .eq('test_id', testId)
+        .neq('status', 'in_progress')
+        .order('submitted_at', {
+          ascending: false
+        });
+
+
+    if (error) {
+
+      console.error(error);
+
+      renderError(error.message);
+
+      return;
+
+    }
+
+
+    if (!submissions || !submissions.length) {
+
+      document.getElementById('summary').style.display = 'none';
+
+      document.getElementById('submissionCount').textContent = '0';
+
+      renderEmpty();
+
+      return;
+
+    }
+
+
+    updateSummary(submissions);
+
+    renderSubmissions(submissions);
+
+  } catch (error) {
+
+    console.error(error);
+
+    renderError(
+      'Something went wrong while loading submissions.'
+    );
+
+  }
+
 }
 
-function fmt(v) { return v == null ? '—' : v; }
+
+/* ==========================================
+   SUMMARY
+========================================== */
+
+function updateSummary(submissions) {
+
+  const total = submissions.length;
+
+  const graded = submissions.filter(
+    s => s.status === 'graded'
+  );
+
+  const needsGrading = submissions.filter(
+    s => s.status !== 'graded'
+  );
+
+
+  const gradedWithBand = graded.filter(
+    s => s.overall_band != null
+  );
+
+
+  const average =
+    gradedWithBand.length
+      ? (
+          gradedWithBand.reduce(
+            (sum, s) => sum + Number(s.overall_band),
+            0
+          ) / gradedWithBand.length
+        ).toFixed(1)
+      : '—';
+
+
+  document.getElementById('totalSubmissions').textContent =
+    total;
+
+  document.getElementById('needsGrading').textContent =
+    needsGrading.length;
+
+  document.getElementById('gradedCount').textContent =
+    graded.length;
+
+  document.getElementById('averageBand').textContent =
+    average;
+
+  document.getElementById('submissionCount').textContent =
+    total;
+
+
+  document.getElementById('summary').style.display =
+    'grid';
+
+}
+
+
+/* ==========================================
+   RENDER SUBMISSIONS
+========================================== */
+
+function renderSubmissions(submissions) {
+
+  const el =
+    document.getElementById('subList');
+
+
+  el.innerHTML = `
+
+    <div class="sub-table-wrap">
+
+      <table class="sub-table">
+
+        <thead>
+
+          <tr>
+
+            <th>Student</th>
+
+            <th>Submitted</th>
+
+            <th>Listening</th>
+
+            <th>Reading</th>
+
+            <th>Writing</th>
+
+            <th>Overall</th>
+
+            <th>Status / Action</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${submissions.map(renderSubmissionRow).join('')}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   SUBMISSION ROW
+========================================== */
+
+function renderSubmissionRow(s) {
+
+  const profile =
+    s.profiles || {};
+
+  const name =
+    profile.name || 'Unknown student';
+
+  const email =
+    profile.email || '';
+
+
+  const initials =
+    getInitials(name);
+
+
+  const status =
+    s.status === 'graded'
+      ? `
+        <span class="status-badge done">
+          Graded
+        </span>
+      `
+      : `
+        <span class="status-badge pending">
+          Needs grade
+        </span>
+      `;
+
+
+  const submitted =
+    formatDateTime(s.submitted_at);
+
+
+  return `
+
+    <tr>
+
+      <td class="student-cell">
+
+        <div class="student-info">
+
+          <div class="student-avatar">
+            ${escapeHtml(initials)}
+          </div>
+
+          <div>
+
+            <div class="student-name">
+              ${escapeHtml(name)}
+            </div>
+
+            <div class="student-email">
+              ${escapeHtml(email)}
+            </div>
+
+          </div>
+
+        </div>
+
+      </td>
+
+
+      <td class="date-cell">
+        ${submitted}
+      </td>
+
+
+      <td class="score ${s.listening_band == null ? 'missing' : ''}">
+        ${fmt(s.listening_band)}
+      </td>
+
+
+      <td class="score ${s.reading_band == null ? 'missing' : ''}">
+        ${fmt(s.reading_band)}
+      </td>
+
+
+      <td class="score ${s.writing_band == null ? 'missing' : ''}">
+        ${fmt(s.writing_band)}
+      </td>
+
+
+      <td class="score overall-score ${s.overall_band == null ? 'missing' : ''}">
+        ${fmt(s.overall_band)}
+      </td>
+
+
+      <td class="status-cell">
+
+        <div class="status-wrap">
+
+          ${status}
+
+          <a
+            href="/teacher/grade.html?subId=${encodeURIComponent(s.id)}"
+            class="open-btn"
+          >
+            Open
+          </a>
+
+        </div>
+
+      </td>
+
+    </tr>
+
+  `;
+
+}
+
+
+/* ==========================================
+   EMPTY STATE
+========================================== */
+
+function renderEmpty() {
+
+  document.getElementById('subList').innerHTML = `
+
+    <div class="sub-empty">
+
+      <div class="sub-empty-icon">
+        ✓
+      </div>
+
+      <h3>
+        No submissions yet
+      </h3>
+
+      <p>
+        Student submissions will appear here once someone
+        completes and submits this mock test.
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   ERROR STATE
+========================================== */
+
+function renderError(message) {
+
+  document.getElementById('subList').innerHTML = `
+
+    <div class="sub-empty sub-error">
+
+      <div class="sub-empty-icon">
+        !
+      </div>
+
+      <h3>
+        Couldn't load submissions
+      </h3>
+
+      <p>
+        ${escapeHtml(message)}
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   HELPERS
+========================================== */
+
+function fmt(value) {
+
+  return value == null
+    ? '—'
+    : value;
+
+}
+
+
+function getInitials(name) {
+
+  const parts =
+    String(name)
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+
+  if (!parts.length) {
+    return '?';
+  }
+
+
+  if (parts.length === 1) {
+
+    return parts[0]
+      .slice(0, 2)
+      .toUpperCase();
+
+  }
+
+
+  return (
+    parts[0][0] +
+    parts[parts.length - 1][0]
+  ).toUpperCase();
+
+}
+
+
+function formatDateTime(value) {
+
+  if (!value) {
+    return '—';
+  }
+
+
+  const date =
+    new Date(value);
+
+
+  if (Number.isNaN(date.getTime())) {
+
+    return escapeHtml(
+      String(value)
+        .slice(0, 16)
+        .replace('T', ' ')
+    );
+
+  }
+
+
+  return date.toLocaleString(
+    undefined,
+    {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }
+  );
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+}
+
 </script>
+
 </body>
 </html>
