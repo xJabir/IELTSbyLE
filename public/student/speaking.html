@@ -3,170 +3,2109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Book Your Speaking Test — London Educators</title>
+
+<title>Speaking Test | IELTSbyLE</title>
+
 <link rel="stylesheet" href="/css/main.css">
+
 <style>
-  .date-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
-  .date-pill {
-    flex-shrink: 0; min-width: 76px; text-align: center; padding: 12px 10px; border: 1px solid var(--line);
-    border-radius: 3px; cursor: pointer; background: #fff;
+  :root {
+    --speak-red: #e63946;
+    --speak-red-dark: #cf3040;
+    --speak-red-light: #fff1f2;
+
+    --speak-blue: #142b5f;
+    --speak-blue-dark: #0e2048;
+    --speak-blue-light: #eef3ff;
+
+    --speak-text: #17233d;
+    --speak-soft: #667085;
+    --speak-muted: #98a2b3;
+
+    --speak-border: #e7ebf2;
+    --speak-bg: #f7f9fc;
+    --speak-white: #fff;
+
+    --speak-green: #16865b;
+    --speak-green-bg: #ecfdf3;
+
+    --speak-orange: #b56b00;
+    --speak-orange-bg: #fff8e7;
   }
-  .date-pill .dow { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; }
-  .date-pill .dom { font-family: var(--serif); font-size: 20px; margin-top: 2px; }
-  .date-pill.full { opacity: 0.4; cursor: not-allowed; }
-  .date-pill.selected { border-color: var(--seal); border-width: 2px; }
-  .slot-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border: 1px solid var(--line); margin-bottom: 8px; background: #fff; }
-  .slot-row .time { font-family: var(--mono); font-size: 16px; }
-  .slot-row .seats { font-size: 13px; color: var(--ink-soft); }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(
+        circle at 5% 0%,
+        rgba(230,57,70,0.045),
+        transparent 28%
+      ),
+      radial-gradient(
+        circle at 95% 8%,
+        rgba(20,43,95,0.055),
+        transparent 30%
+      ),
+      var(--speak-bg);
+
+    color: var(--speak-text);
+  }
+
+  /* =====================================
+     NAVIGATION
+  ===================================== */
+
+  .speak-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+
+    min-height: 76px;
+    padding: 12px 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    background: rgba(255,255,255,0.92);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border-bottom: 1px solid rgba(231,235,242,0.85);
+
+    transition:
+      background 220ms ease,
+      box-shadow 220ms ease;
+  }
+
+  .speak-nav.scrolled {
+    background: rgba(255,255,255,0.98);
+    box-shadow: 0 10px 35px rgba(20,43,95,0.08);
+  }
+
+  .speak-brand {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .speak-brand a {
+    display: flex;
+    align-items: center;
+  }
+
+  .speak-logo {
+    height: 50px;
+    width: auto;
+    display: block;
+
+    transition: transform 180ms ease;
+  }
+
+  .speak-logo:hover {
+    transform: scale(1.035);
+  }
+
+  .speak-nav-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 18px;
+  }
+
+  .speak-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .speak-nav-links a {
+    color: var(--speak-soft);
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    transition:
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .speak-nav-links a:hover {
+    color: var(--speak-red);
+    transform: translateY(-1px);
+  }
+
+  .speak-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 7px 11px;
+
+    background: var(--speak-blue-light);
+
+    border: 1px solid rgba(20,43,95,0.08);
+    border-radius: 9px;
+
+    color: var(--speak-blue);
+
+    font-size: 13px;
+    font-weight: 700;
+
+    white-space: nowrap;
+  }
+
+  .speak-avatar {
+    width: 29px;
+    height: 29px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: var(--speak-blue);
+    color: #fff;
+
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .speak-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 9px 15px;
+
+    border: 1px solid var(--speak-border);
+    border-radius: 8px;
+
+    background: #fff;
+    color: var(--speak-blue);
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    transition:
+      background 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .speak-logout:hover {
+    background: var(--speak-red-light);
+    border-color: rgba(230,57,70,0.2);
+    color: var(--speak-red);
+    transform: translateY(-1px);
+  }
+
+  /* =====================================
+     MAIN
+  ===================================== */
+
+  .speak-main {
+    width: 100%;
+    max-width: 1120px;
+
+    margin: 0 auto;
+
+    padding: 44px 28px 70px;
+  }
+
+  /* =====================================
+     HERO
+  ===================================== */
+
+  .speak-hero {
+    position: relative;
+    overflow: hidden;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px;
+
+    gap: 30px;
+
+    padding: 36px;
+
+    margin-bottom: 22px;
+
+    border-radius: 20px;
+
+    background:
+      radial-gradient(
+        circle at 100% 0%,
+        rgba(230,57,70,0.16),
+        transparent 35%
+      ),
+      linear-gradient(
+        135deg,
+        #142b5f 0%,
+        #0e2048 100%
+      );
+
+    color: #fff;
+
+    box-shadow:
+      0 18px 45px rgba(20,43,95,0.16);
+  }
+
+  .speak-hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 230px;
+    height: 230px;
+
+    right: -100px;
+    bottom: -145px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .speak-eyebrow {
+    margin-bottom: 10px;
+
+    color: #ffb4bb;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .speak-hero h1 {
+    position: relative;
+    z-index: 2;
+
+    margin: 0 0 11px;
+
+    font-size: clamp(28px, 4vw, 40px);
+
+    line-height: 1.08;
+
+    letter-spacing: -0.035em;
+  }
+
+  .speak-hero p {
+    position: relative;
+    z-index: 2;
+
+    max-width: 650px;
+
+    margin: 0;
+
+    color: rgba(255,255,255,0.75);
+
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .hero-speaking-icon {
+    position: relative;
+    z-index: 2;
+
+    width: 104px;
+    height: 104px;
+
+    align-self: center;
+    justify-self: center;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 27px;
+
+    background: rgba(255,255,255,0.09);
+
+    border: 1px solid rgba(255,255,255,0.13);
+
+    font-size: 43px;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  /* =====================================
+     CURRENT BOOKING
+  ===================================== */
+
+  .booking-card {
+    position: relative;
+    overflow: hidden;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+
+    align-items: center;
+
+    gap: 25px;
+
+    padding: 23px 25px;
+
+    margin-bottom: 25px;
+
+    background: #fff;
+
+    border: 1px solid rgba(22,134,91,0.18);
+
+    border-radius: 16px;
+
+    box-shadow:
+      0 8px 25px rgba(20,43,95,0.05);
+
+    animation: speakFadeIn 280ms ease both;
+  }
+
+  .booking-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 4px;
+    height: 100%;
+
+    background: var(--speak-green);
+  }
+
+  .booking-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-bottom: 8px;
+
+    color: var(--speak-green);
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .booking-status::before {
+    content: "";
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+  }
+
+  .booking-title {
+    margin: 0 0 5px;
+
+    color: var(--speak-blue);
+
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .booking-date {
+    color: var(--speak-soft);
+
+    font-size: 13px;
+  }
+
+  .booking-date strong {
+    color: var(--speak-text);
+  }
+
+  .cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 16px;
+
+    border-radius: 8px;
+
+    border: 1px solid rgba(230,57,70,0.18);
+
+    background: var(--speak-red-light);
+
+    color: var(--speak-red);
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 750;
+
+    cursor: pointer;
+
+    transition:
+      background 180ms ease,
+      border-color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .cancel-btn:hover {
+    background: #ffe5e7;
+    border-color: rgba(230,57,70,0.3);
+
+    transform: translateY(-1px);
+  }
+
+  /* =====================================
+     BOOKING INFORMATION
+  ===================================== */
+
+  .booking-heading {
+    margin: 0 0 5px;
+
+    color: var(--speak-blue);
+
+    font-size: 20px;
+    font-weight: 800;
+
+    letter-spacing: -0.02em;
+  }
+
+  .booking-subheading {
+    margin: 0 0 18px;
+
+    color: var(--speak-soft);
+
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .single-booking-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    padding: 16px 18px;
+
+    background: var(--speak-blue-light);
+
+    border: 1px solid rgba(20,43,95,0.08);
+
+    border-radius: 12px;
+
+    color: var(--speak-soft);
+
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .single-booking-note-icon {
+    flex-shrink: 0;
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: #fff;
+
+    color: var(--speak-blue);
+
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  /* =====================================
+     DATE SELECTOR
+  ===================================== */
+
+  .schedule-section {
+    margin-top: 5px;
+  }
+
+  .date-strip-wrapper {
+    position: relative;
+
+    margin-bottom: 24px;
+  }
+
+  .date-strip {
+    display: flex;
+    gap: 9px;
+
+    overflow-x: auto;
+
+    padding: 4px 3px 12px;
+
+    scrollbar-width: thin;
+    scrollbar-color: #d8deea transparent;
+
+    scroll-behavior: smooth;
+  }
+
+  .date-strip::-webkit-scrollbar {
+    height: 5px;
+  }
+
+  .date-strip::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .date-strip::-webkit-scrollbar-thumb {
+    background: #d8deea;
+    border-radius: 999px;
+  }
+
+  .date-pill {
+    position: relative;
+
+    flex: 0 0 84px;
+
+    min-height: 91px;
+
+    padding: 12px 9px;
+
+    text-align: center;
+
+    background: #fff;
+
+    border: 1px solid var(--speak-border);
+
+    border-radius: 13px;
+
+    cursor: pointer;
+
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      background 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .date-pill:hover:not(.full) {
+    transform: translateY(-2px);
+
+    border-color: rgba(20,43,95,0.18);
+
+    box-shadow:
+      0 8px 18px rgba(20,43,95,0.06);
+  }
+
+  .date-pill.selected {
+    background: var(--speak-blue);
+
+    border-color: var(--speak-blue);
+
+    box-shadow:
+      0 8px 20px rgba(20,43,95,0.17);
+  }
+
+  .date-pill.full {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    background: #f8fafc;
+  }
+
+  .date-pill .dow {
+    margin-bottom: 5px;
+
+    color: var(--speak-soft);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .date-pill.selected .dow {
+    color: rgba(255,255,255,0.66);
+  }
+
+  .date-pill .dom {
+    color: var(--speak-blue);
+
+    font-size: 25px;
+    line-height: 1;
+
+    font-weight: 800;
+
+    letter-spacing: -0.03em;
+  }
+
+  .date-pill.selected .dom {
+    color: #fff;
+  }
+
+  .date-pill .date-month {
+    margin-top: 5px;
+
+    color: var(--speak-soft);
+
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .date-pill.selected .date-month {
+    color: rgba(255,255,255,0.65);
+  }
+
+  .date-pill .full-label {
+    margin-top: 6px;
+
+    color: var(--speak-red);
+
+    font-size: 9px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+  }
+
+  .date-pill.selected .full-label {
+    color: #ffb4bb;
+  }
+
+  /* =====================================
+     SELECTED DATE HEADER
+  ===================================== */
+
+  .selected-date-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 12px;
+  }
+
+  .selected-date-title {
+    margin: 0;
+
+    color: var(--speak-blue);
+
+    font-size: 19px;
+    font-weight: 800;
+
+    letter-spacing: -0.02em;
+  }
+
+  .selected-date-note {
+    color: var(--speak-soft);
+
+    font-size: 12px;
+  }
+
+  /* =====================================
+     SLOT CARDS
+  ===================================== */
+
+  .slot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .slot-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 16px 18px;
+
+    background: #fff;
+
+    border: 1px solid var(--speak-border);
+
+    border-radius: 13px;
+
+    box-shadow:
+      0 4px 14px rgba(20,43,95,0.025);
+
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .slot-row:hover {
+    transform: translateY(-2px);
+
+    border-color: rgba(20,43,95,0.12);
+
+    box-shadow:
+      0 10px 25px rgba(20,43,95,0.065);
+  }
+
+  .slot-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    min-width: 0;
+  }
+
+  .slot-icon {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: var(--speak-blue-light);
+
+    color: var(--speak-blue);
+
+    font-size: 17px;
+  }
+
+  .slot-time {
+    margin-bottom: 4px;
+
+    color: var(--speak-text);
+
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .slot-seats {
+    color: var(--speak-soft);
+
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .slot-seats.available {
+    color: var(--speak-green);
+  }
+
+  .slot-seats.full {
+    color: var(--speak-red);
+  }
+
+  .slot-book-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 86px;
+
+    padding: 10px 17px;
+
+    border: 1px solid var(--speak-red);
+
+    border-radius: 8px;
+
+    background:
+      linear-gradient(
+        135deg,
+        var(--speak-red),
+        #f04b57
+      );
+
+    color: #fff;
+
+    font-family: inherit;
+
+    font-size: 12px;
+    font-weight: 750;
+
+    cursor: pointer;
+
+    box-shadow:
+      0 6px 15px rgba(230,57,70,0.16);
+
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      opacity 180ms ease;
+  }
+
+  .slot-book-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    box-shadow:
+      0 9px 20px rgba(230,57,70,0.23);
+  }
+
+  .slot-book-btn:disabled {
+    cursor: not-allowed;
+
+    color: #98a2b3;
+
+    background: #f2f4f7;
+
+    border-color: #e4e7ec;
+
+    box-shadow: none;
+
+    opacity: 0.8;
+  }
+
+  /* =====================================
+     EMPTY STATE
+  ===================================== */
+
+  .speak-empty {
+    padding: 60px 25px;
+
+    text-align: center;
+
+    background: #fff;
+
+    border: 1px solid var(--speak-border);
+
+    border-radius: 16px;
+
+    box-shadow:
+      0 5px 18px rgba(20,43,95,0.035);
+  }
+
+  .speak-empty-icon {
+    width: 60px;
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 17px;
+
+    border-radius: 17px;
+
+    background: var(--speak-blue-light);
+
+    color: var(--speak-blue);
+
+    font-size: 25px;
+  }
+
+  .speak-empty h3 {
+    margin: 0 0 7px;
+
+    color: var(--speak-blue);
+
+    font-size: 16px;
+  }
+
+  .speak-empty p {
+    max-width: 450px;
+
+    margin: 0 auto;
+
+    color: var(--speak-soft);
+
+    font-size: 13px;
+
+    line-height: 1.65;
+  }
+
+  /* =====================================
+     LOADING
+  ===================================== */
+
+  .speak-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 180px;
+
+    color: var(--speak-soft);
+
+    font-size: 13px;
+  }
+
+  .loading-spinner {
+    width: 20px;
+    height: 20px;
+
+    margin-right: 10px;
+
+    border: 2px solid #e5e7eb;
+
+    border-top-color: var(--speak-red);
+
+    border-radius: 50%;
+
+    animation: speakSpin 700ms linear infinite;
+  }
+
+  @keyframes speakSpin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes speakFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* =====================================
+     RESPONSIVE
+  ===================================== */
+
+  @media (max-width: 1050px) {
+
+    .speak-nav-links {
+      display: none;
+    }
+
+  }
+
+  @media (max-width: 760px) {
+
+    .speak-nav {
+      min-height: 68px;
+      padding: 10px 16px;
+    }
+
+    .speak-logo {
+      height: 43px;
+    }
+
+    .speak-user {
+      display: none;
+    }
+
+    .speak-nav-right {
+      gap: 8px;
+    }
+
+    .speak-main {
+      padding: 25px 15px 50px;
+    }
+
+    .speak-hero {
+      grid-template-columns: 1fr;
+
+      padding: 27px 23px;
+
+      border-radius: 16px;
+    }
+
+    .speak-hero h1 {
+      font-size: 29px;
+    }
+
+    .speak-hero p {
+      font-size: 13px;
+    }
+
+    .hero-speaking-icon {
+      display: none;
+    }
+
+    .booking-card {
+      grid-template-columns: 1fr;
+
+      gap: 16px;
+
+      padding: 20px;
+    }
+
+    .cancel-btn {
+      width: 100%;
+    }
+
+    .selected-date-header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .slot-row {
+      grid-template-columns: 1fr;
+
+      gap: 14px;
+    }
+
+    .slot-book-btn {
+      width: 100%;
+    }
+
+  }
+
+  @media (max-width: 440px) {
+
+    .speak-logout {
+      padding: 8px 11px;
+      font-size: 11px;
+    }
+
+    .date-pill {
+      flex-basis: 78px;
+      min-height: 86px;
+    }
+
+    .slot-left {
+      gap: 11px;
+    }
+
+    .slot-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+
+  }
 </style>
 </head>
+
 <body>
 
-<nav class="dash-nav">
-  <div class="brand"><a href="/student/dashboard.html"><img src="/images/logos.png" alt="IELTSbyLE" class="brand-logo"></a></div>
-  <div class="who">
-    <a href="/student/dashboard.html">Dashboard</a>
-    <a href="/student/resources.html">Resources</a>
-    <a href="/student/mock-tests.html">Mock tests</a>
-    <a href="/student/schedule.html">Class schedule</a>
-    <a href="/student/results.html">My results</a>
-    <span id="userName"></span>
-    <a href="#" id="logoutLink" class="button ghost" style="padding:7px 14px;">Log out</a>
+<!-- =====================================
+     NAVIGATION
+===================================== -->
+
+<nav class="speak-nav" id="speakNav">
+
+  <div class="speak-brand">
+    <a href="/student/dashboard.html">
+      <img
+        src="/images/logos.png"
+        alt="IELTSbyLE"
+        class="speak-logo"
+      >
+    </a>
   </div>
+
+  <div class="speak-nav-right">
+
+    <div class="speak-nav-links">
+
+      <a href="/student/dashboard.html">
+        Dashboard
+      </a>
+
+      <a href="/student/resources.html">
+        Resources
+      </a>
+
+      <a href="/student/mock-tests.html">
+        Mock tests
+      </a>
+
+      <a href="/student/schedule.html">
+        Class schedule
+      </a>
+
+      <a href="/student/results.html">
+        My results
+      </a>
+
+    </div>
+
+    <div class="speak-user">
+
+      <span class="speak-avatar" id="userAvatar">
+        S
+      </span>
+
+      <span id="userName">
+        Student
+      </span>
+
+    </div>
+
+    <a
+      href="#"
+      id="logoutLink"
+      class="speak-logout"
+    >
+      Log out
+    </a>
+
+  </div>
+
 </nav>
 
-<main class="dash-main">
-  <div class="dash-head"><h1>Book your Speaking test</h1></div>
+
+<!-- =====================================
+     MAIN
+===================================== -->
+
+<main class="speak-main">
+
+  <!-- HERO -->
+
+  <section class="speak-hero">
+
+    <div>
+
+      <div class="speak-eyebrow">
+        IELTS Speaking Practice
+      </div>
+
+      <h1>
+        Book your Speaking test
+      </h1>
+
+      <p>
+        Choose a convenient date and time from the available speaking
+        sessions. Your teacher will conduct the test according to the
+        IELTS speaking format.
+      </p>
+
+    </div>
+
+    <div class="hero-speaking-icon">
+      🎙
+    </div>
+
+  </section>
+
+
+  <!-- CURRENT BOOKING -->
+
   <div id="currentBooking"></div>
-  <div id="bookingArea"></div>
+
+
+  <!-- BOOKING AREA -->
+
+  <div id="bookingArea">
+
+    <div class="speak-loading">
+      <span class="loading-spinner"></span>
+      Loading speaking slots...
+    </div>
+
+  </div>
+
 </main>
+
+
+<!-- =====================================
+     SCRIPTS
+===================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
+
 <script>
+
 let profile;
-let availability = []; // rows from speaking_slot_availability
+
+let availability = [];
+
 let selectedDate = null;
+
 let myBooking = null;
 
+
+/* =====================================
+   INITIALIZATION
+===================================== */
+
 (async () => {
-  profile = await Auth.requireApprovedRole('student');
+
+  profile =
+    await Auth.requireApprovedRole('student');
+
   if (!profile) return;
-  document.getElementById('userName').textContent = profile.name;
-  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+
+
+  document.getElementById('userName').textContent =
+    profile.name || 'Student';
+
+
+  const avatar =
+    getInitials(profile.name);
+
+
+  document.getElementById('userAvatar').textContent =
+    avatar;
+
+
+  document
+    .getElementById('logoutLink')
+    .addEventListener('click', (e) => {
+
+      e.preventDefault();
+
+      Auth.logout();
+
+    });
+
+
   load();
+
 })();
 
+
+/* =====================================
+   LOAD DATA
+===================================== */
+
 async function load() {
-  const today = new Date().toISOString().slice(0, 10);
-  const in60 = new Date(Date.now() + 60 * 24 * 3600 * 1000).toISOString().slice(0, 10);
 
-  const [{ data: avail }, { data: booking }] = await Promise.all([
-    supabase.from('speaking_slot_availability').select('*').gte('slot_date', today).lte('slot_date', in60).order('slot_date').order('slot_time'),
-    supabase.from('speaking_bookings').select('*, speaking_slots(slot_date, slot_time)').eq('student_id', profile.id).eq('status', 'booked').maybeSingle()
-  ]);
+  const bookingArea =
+    document.getElementById('bookingArea');
 
-  availability = avail || [];
-  myBooking = booking || null;
-  renderCurrentBooking();
-  renderBookingArea();
-}
 
-function renderCurrentBooking() {
-  const el = document.getElementById('currentBooking');
-  if (!myBooking) { el.innerHTML = ''; return; }
-  const slot = myBooking.speaking_slots;
-  el.innerHTML = `
-    <div class="panel" style="border-color:var(--seal);">
-      <h2>You're booked in</h2>
-      <p class="panel-sub" style="margin-bottom:0;">${formatDate(slot.slot_date)} at ${formatTime(slot.slot_time)}</p>
-      <div class="submit-row"><button class="small-btn danger" id="cancelBookingBtn">Cancel this booking</button></div>
+  bookingArea.innerHTML = `
+    <div class="speak-loading">
+      <span class="loading-spinner"></span>
+      Loading speaking slots...
     </div>
   `;
-  document.getElementById('cancelBookingBtn').addEventListener('click', async () => {
-    if (!confirm('Cancel your speaking test booking?')) return;
-    const { error } = await supabase.from('speaking_bookings').update({ status: 'cancelled' }).eq('id', myBooking.id);
-    if (error) { alert(error.message); return; }
-    await load();
-  });
+
+
+  const today =
+    new Date()
+      .toISOString()
+      .slice(0, 10);
+
+
+  const in60 =
+    new Date(
+      Date.now() +
+      60 * 24 * 3600 * 1000
+    )
+      .toISOString()
+      .slice(0, 10);
+
+
+  const [
+    { data: avail, error: availError },
+    { data: booking, error: bookingError }
+  ] = await Promise.all([
+
+    supabase
+      .from('speaking_slot_availability')
+      .select('*')
+      .gte('slot_date', today)
+      .lte('slot_date', in60)
+      .order('slot_date')
+      .order('slot_time'),
+
+    supabase
+      .from('speaking_bookings')
+      .select(
+        '*, speaking_slots(slot_date, slot_time)'
+      )
+      .eq('student_id', profile.id)
+      .eq('status', 'booked')
+      .maybeSingle()
+
+  ]);
+
+
+  if (availError) {
+
+    console.error(availError);
+
+    bookingArea.innerHTML = `
+      <div class="speak-empty">
+
+        <div class="speak-empty-icon">
+          !
+        </div>
+
+        <h3>
+          Couldn't load speaking slots
+        </h3>
+
+        <p>
+          ${escapeHtml(availError.message)}
+        </p>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  if (bookingError) {
+
+    console.error(bookingError);
+
+  }
+
+
+  availability =
+    avail || [];
+
+
+  myBooking =
+    booking || null;
+
+
+  renderCurrentBooking();
+
+  renderBookingArea();
+
 }
 
-function renderBookingArea() {
-  const el = document.getElementById('bookingArea');
-  if (myBooking) {
-    el.innerHTML = `<p style="color:var(--ink-soft);font-size:14px;">You can only hold one upcoming speaking test at a time — cancel the one above if you'd like to pick a different slot.</p>`;
+
+/* =====================================
+   CURRENT BOOKING
+===================================== */
+
+function renderCurrentBooking() {
+
+  const el =
+    document.getElementById('currentBooking');
+
+
+  if (!myBooking) {
+
+    el.innerHTML = '';
+
     return;
+
   }
 
-  const byDate = {};
-  availability.forEach(row => {
-    byDate[row.slot_date] = byDate[row.slot_date] || [];
-    byDate[row.slot_date].push(row);
-  });
-  const dates = Object.keys(byDate).sort();
 
-  if (!dates.length) {
-    el.innerHTML = `<div class="empty-state"><h3>No speaking slots open yet</h3><p>Ask your teacher to add some — they'll appear here once available.</p></div>`;
+  const slot =
+    myBooking.speaking_slots;
+
+
+  if (!slot) {
+
+    el.innerHTML = '';
+
     return;
+
   }
 
-  if (!selectedDate || !byDate[selectedDate]) selectedDate = dates.find(d => byDate[d].some(r => r.remaining > 0)) || dates[0];
 
   el.innerHTML = `
-    <div class="date-strip" id="dateStrip"></div>
-    <div id="slotList"></div>
+
+    <section class="booking-card">
+
+      <div>
+
+        <div class="booking-status">
+          Speaking test booked
+        </div>
+
+        <h2 class="booking-title">
+          Your upcoming speaking test
+        </h2>
+
+        <div class="booking-date">
+
+          <strong>
+            ${formatDate(slot.slot_date)}
+          </strong>
+
+          <span>
+            at
+          </span>
+
+          <strong>
+            ${formatTime(slot.slot_time)}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="cancel-btn"
+        id="cancelBookingBtn"
+      >
+        Cancel this booking
+      </button>
+
+    </section>
+
   `;
 
-  const strip = document.getElementById('dateStrip');
-  strip.innerHTML = dates.map(d => {
-    const dayFull = byDate[d].every(r => r.remaining <= 0);
-    const dt = new Date(d + 'T00:00:00');
-    const cls = ['date-pill'];
-    if (dayFull) cls.push('full');
-    if (d === selectedDate) cls.push('selected');
-    return `<div class="${cls.join(' ')}" data-date="${d}">
-      <div class="dow">${dt.toLocaleDateString(undefined, { weekday: 'short' })}</div>
-      <div class="dom">${dt.getDate()}</div>
-      ${dayFull ? '<div style="font-size:10px;color:var(--seal);margin-top:2px;">Full</div>' : ''}
-    </div>`;
-  }).join('');
-  strip.querySelectorAll('.date-pill').forEach(pill => {
-    pill.addEventListener('click', () => { selectedDate = pill.dataset.date; renderBookingArea(); });
-  });
 
-  const slotListEl = document.getElementById('slotList');
-  const slotsForDate = (byDate[selectedDate] || []).slice().sort((a, b) => a.slot_time.localeCompare(b.slot_time));
-  slotListEl.innerHTML = `<h3 style="font-family:var(--serif);font-size:18px;margin:20px 0 12px;">${formatDate(selectedDate)}</h3>` +
-    slotsForDate.map(s => `
-      <div class="slot-row">
-        <div>
-          <div class="time">${formatTime(s.slot_time)}</div>
-          <div class="seats">${s.remaining > 0 ? `${s.remaining} seat${s.remaining === 1 ? '' : 's'} left` : 'Full'}</div>
-        </div>
-        <button class="button primary" style="padding:9px 18px;" data-slot="${s.id}" ${s.remaining <= 0 ? 'disabled' : ''}>Book</button>
-      </div>
-    `).join('');
+  document
+    .getElementById('cancelBookingBtn')
+    .addEventListener(
+      'click',
+      cancelBooking
+    );
 
-  slotListEl.querySelectorAll('[data-slot]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      const { error } = await supabase.rpc('book_speaking_slot', { p_slot_id: btn.dataset.slot });
-      if (error) { alert(error.message); btn.disabled = false; return; }
-      await load();
-    });
-  });
 }
+
+
+/* =====================================
+   CANCEL BOOKING
+===================================== */
+
+async function cancelBooking() {
+
+  if (
+    !confirm(
+      'Cancel your speaking test booking?'
+    )
+  ) {
+    return;
+  }
+
+
+  const btn =
+    document.getElementById(
+      'cancelBookingBtn'
+    );
+
+
+  if (btn) {
+
+    btn.disabled = true;
+
+    btn.textContent =
+      'Cancelling...';
+
+  }
+
+
+  const { error } =
+    await supabase
+      .from('speaking_bookings')
+      .update({
+        status: 'cancelled'
+      })
+      .eq('id', myBooking.id);
+
+
+  if (error) {
+
+    alert(error.message);
+
+    if (btn) {
+
+      btn.disabled = false;
+
+      btn.textContent =
+        'Cancel this booking';
+
+    }
+
+    return;
+
+  }
+
+
+  myBooking = null;
+
+  selectedDate = null;
+
+  await load();
+
+}
+
+
+/* =====================================
+   BOOKING AREA
+===================================== */
+
+function renderBookingArea() {
+
+  const el =
+    document.getElementById(
+      'bookingArea'
+    );
+
+
+  if (myBooking) {
+
+    el.innerHTML = `
+
+      <section class="single-booking-note">
+
+        <div class="single-booking-note-icon">
+          ✓
+        </div>
+
+        <div>
+          You can only hold one upcoming speaking test
+          at a time. Cancel your current booking above if
+          you would like to choose a different slot.
+        </div>
+
+      </section>
+
+    `;
+
+    return;
+
+  }
+
+
+  const byDate = {};
+
+
+  availability.forEach(row => {
+
+    if (!byDate[row.slot_date]) {
+
+      byDate[row.slot_date] = [];
+
+    }
+
+    byDate[row.slot_date].push(row);
+
+  });
+
+
+  const dates =
+    Object.keys(byDate).sort();
+
+
+  if (!dates.length) {
+
+    el.innerHTML = `
+
+      <div class="speak-empty">
+
+        <div class="speak-empty-icon">
+          🎙
+        </div>
+
+        <h3>
+          No speaking slots open yet
+        </h3>
+
+        <p>
+          Your teacher has not opened any speaking
+          sessions yet. Available dates and times will
+          appear here once new slots are added.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  if (
+    !selectedDate ||
+    !byDate[selectedDate]
+  ) {
+
+    selectedDate =
+      dates.find(
+        d =>
+          byDate[d].some(
+            r => r.remaining > 0
+          )
+      ) || dates[0];
+
+  }
+
+
+  el.innerHTML = `
+
+    <section class="schedule-section">
+
+      <div>
+
+        <h2 class="booking-heading">
+          Choose a date
+        </h2>
+
+        <p class="booking-subheading">
+          Select a date below to see the available
+          speaking test times.
+        </p>
+
+      </div>
+
+
+      <div class="date-strip-wrapper">
+
+        <div
+          class="date-strip"
+          id="dateStrip"
+        ></div>
+
+      </div>
+
+
+      <div id="slotList"></div>
+
+    </section>
+
+  `;
+
+
+  renderDateStrip(
+    dates,
+    byDate
+  );
+
+
+  renderSlotList(
+    byDate
+  );
+
+}
+
+
+/* =====================================
+   DATE STRIP
+===================================== */
+
+function renderDateStrip(
+  dates,
+  byDate
+) {
+
+  const strip =
+    document.getElementById(
+      'dateStrip'
+    );
+
+
+  strip.innerHTML =
+    dates.map(d => {
+
+      const dayFull =
+        byDate[d].every(
+          r => r.remaining <= 0
+        );
+
+
+      const dt =
+        new Date(
+          d + 'T00:00:00'
+        );
+
+
+      const isSelected =
+        d === selectedDate;
+
+
+      return `
+
+        <div
+          class="
+            date-pill
+            ${dayFull ? 'full' : ''}
+            ${isSelected ? 'selected' : ''}
+          "
+          data-date="${escapeHtml(d)}"
+          ${dayFull ? 'aria-disabled="true"' : ''}
+        >
+
+          <div class="dow">
+            ${dt.toLocaleDateString(
+              undefined,
+              { weekday: 'short' }
+            )}
+          </div>
+
+          <div class="dom">
+            ${dt.getDate()}
+          </div>
+
+          <div class="date-month">
+            ${dt.toLocaleDateString(
+              undefined,
+              { month: 'short' }
+            )}
+          </div>
+
+          ${
+            dayFull
+              ? `
+                <div class="full-label">
+                  Full
+                </div>
+              `
+              : ''
+          }
+
+        </div>
+
+      `;
+
+    }).join('');
+
+
+  strip
+    .querySelectorAll('.date-pill')
+    .forEach(pill => {
+
+      pill.addEventListener(
+        'click',
+        () => {
+
+          if (
+            pill.classList.contains('full')
+          ) {
+            return;
+          }
+
+
+          selectedDate =
+            pill.dataset.date;
+
+
+          renderBookingArea();
+
+        }
+      );
+
+    });
+
+}
+
+
+/* =====================================
+   SLOT LIST
+===================================== */
+
+function renderSlotList(
+  byDate
+) {
+
+  const slotListEl =
+    document.getElementById(
+      'slotList'
+    );
+
+
+  const slotsForDate =
+    (byDate[selectedDate] || [])
+      .slice()
+      .sort(
+        (a, b) =>
+          a.slot_time.localeCompare(
+            b.slot_time
+          )
+      );
+
+
+  const availableCount =
+    slotsForDate.filter(
+      s => s.remaining > 0
+    ).length;
+
+
+  slotListEl.innerHTML = `
+
+    <div class="selected-date-header">
+
+      <div>
+
+        <h3 class="selected-date-title">
+          ${formatDate(selectedDate)}
+        </h3>
+
+        <div class="selected-date-note">
+          ${
+            availableCount
+              ? `${availableCount} available session${availableCount === 1 ? '' : 's'}`
+              : 'No available sessions'
+          }
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="slot-list">
+
+      ${
+        slotsForDate.length
+          ? slotsForDate.map(
+              s => {
+
+                const available =
+                  s.remaining > 0;
+
+
+                return `
+
+                  <div class="slot-row">
+
+                    <div class="slot-left">
+
+                      <div class="slot-icon">
+                        ◷
+                      </div>
+
+                      <div>
+
+                        <div class="slot-time">
+                          ${formatTime(s.slot_time)}
+                        </div>
+
+                        <div
+                          class="
+                            slot-seats
+                            ${available ? 'available' : 'full'}
+                          "
+                        >
+                          ${
+                            available
+                              ? `${s.remaining} seat${s.remaining === 1 ? '' : 's'} left`
+                              : 'This session is full'
+                          }
+                        </div>
+
+                      </div>
+
+                    </div>
+
+
+                    <button
+                      type="button"
+                      class="slot-book-btn"
+                      data-slot="${escapeHtml(s.id)}"
+                      ${!available ? 'disabled' : ''}
+                    >
+                      ${
+                        available
+                          ? 'Book slot'
+                          : 'Full'
+                      }
+                    </button>
+
+                  </div>
+
+                `;
+
+              }
+            ).join('')
+          : `
+            <div class="speak-empty">
+
+              <div class="speak-empty-icon">
+                ◷
+              </div>
+
+              <h3>
+                No sessions on this date
+              </h3>
+
+              <p>
+                Please choose another date to find
+                an available speaking test session.
+              </p>
+
+            </div>
+          `
+      }
+
+    </div>
+
+  `;
+
+
+  slotListEl
+    .querySelectorAll('[data-slot]')
+    .forEach(btn => {
+
+      btn.addEventListener(
+        'click',
+        () => bookSlot(btn)
+      );
+
+    });
+
+}
+
+
+/* =====================================
+   BOOK SLOT
+===================================== */
+
+async function bookSlot(btn) {
+
+  const slotId =
+    btn.dataset.slot;
+
+
+  if (!slotId) return;
+
+
+  btn.disabled = true;
+
+  btn.textContent =
+    'Booking...';
+
+
+  const { error } =
+    await supabase.rpc(
+      'book_speaking_slot',
+      {
+        p_slot_id: slotId
+      }
+    );
+
+
+  if (error) {
+
+    alert(error.message);
+
+    btn.disabled = false;
+
+    btn.textContent =
+      'Book slot';
+
+    return;
+
+  }
+
+
+  await load();
+
+}
+
+
+/* =====================================
+   FORMATTING
+===================================== */
 
 function formatDate(d) {
-  return new Date(d + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+
+  return new Date(
+    d + 'T00:00:00'
+  ).toLocaleDateString(
+    undefined,
+    {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    }
+  );
+
 }
+
+
 function formatTime(t) {
-  const [h, m] = t.split(':');
-  const hour = Number(h);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const h12 = ((hour + 11) % 12) + 1;
+
+  const [h, m] =
+    t.split(':');
+
+
+  const hour =
+    Number(h);
+
+
+  const ampm =
+    hour >= 12
+      ? 'PM'
+      : 'AM';
+
+
+  const h12 =
+    ((hour + 11) % 12) + 1;
+
+
   return `${h12}:${m} ${ampm}`;
+
 }
+
+
+function getInitials(name) {
+
+  if (!name) return 'S';
+
+
+  const parts =
+    name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+
+  if (parts.length === 1) {
+
+    return parts[0]
+      .substring(0, 2)
+      .toUpperCase();
+
+  }
+
+
+  return (
+    parts[0].charAt(0) +
+    parts[parts.length - 1].charAt(0)
+  ).toUpperCase();
+
+}
+
+
+/* =====================================
+   NAV SCROLL
+===================================== */
+
+window.addEventListener(
+  'scroll',
+  () => {
+
+    const nav =
+      document.getElementById(
+        'speakNav'
+      );
+
+
+    nav.classList.toggle(
+      'scrolled',
+      window.scrollY > 8
+    );
+
+  },
+  { passive: true }
+);
+
 </script>
+
 </body>
 </html>
