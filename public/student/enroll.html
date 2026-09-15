@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Enroll | IELTSbyLE</title>
+
+<link rel="stylesheet" href="/css/main.css">
+
+<style>
+
+/* =========================================================
+   IELTSbyLE ENROLL PAGE
+   ========================================================= */
+
+:root {
+  --dash-red: #e63946;
+  --dash-red-dark: #cf3040;
+  --dash-red-light: #fff1f2;
+
+  --dash-blue: #142b5f;
+  --dash-blue-dark: #0e2048;
+  --dash-blue-light: #eef3ff;
+
+  --dash-text: #17233d;
+  --dash-text-soft: #667085;
+
+  --dash-border: #e7ebf2;
+  --dash-bg: #f7f9fc;
+
+  --dash-white: #ffffff;
+
+  --dash-shadow:
+    0 12px 35px rgba(20, 43, 95, 0.07);
+
+  --dash-radius: 16px;
+}
+
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(230, 57, 70, 0.045),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 95% 10%,
+      rgba(20, 43, 95, 0.05),
+      transparent 28%
+    ),
+    var(--dash-bg);
+
+  color: var(--dash-text);
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+/* ---------- Navbar (shared with dashboard) ---------- */
+
+.dash-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  min-height: 74px;
+
+  padding: 10px 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: rgba(255,255,255,0.92);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-bottom: 1px solid rgba(228,233,242,0.8);
+
+  box-shadow:
+    0 4px 18px rgba(20,43,95,0.035);
+}
+
+.brand { display: flex; align-items: center; flex-shrink: 0; }
+.brand a { display: flex; align-items: center; }
+.brand-logo { width: auto; height: 48px; display: block; transition: transform 0.25s ease; }
+.brand-logo:hover { transform: scale(1.035); }
+
+.who { display: flex; align-items: center; gap: 20px; font-size: 13px; font-weight: 600; }
+
+.who a:not(.button) {
+  color: #526078;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.who a:not(.button):hover { color: var(--dash-red); transform: translateY(-1px); }
+
+.who a.active { color: var(--dash-red); }
+
+#userName { color: var(--dash-blue); font-size: 13px; font-weight: 700; padding-left: 4px; }
+
+.dash-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(230,57,70,0.2);
+  background: #fff;
+  color: var(--dash-red) !important;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dash-logout:hover {
+  background: var(--dash-red);
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(230,57,70,0.18);
+}
+
+
+/* ---------- Main ---------- */
+
+.enroll-main {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 48px 0 70px;
+}
+
+.enroll-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 44px;
+}
+
+.enroll-head h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--dash-blue);
+  margin: 0 0 12px;
+}
+
+.enroll-head p {
+  margin: 0;
+  color: var(--dash-text-soft);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+
+/* ---------- Batch cards ---------- */
+
+.batch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.batch-card {
+  position: relative;
+  overflow: hidden;
+
+  background: var(--dash-white);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--dash-radius);
+  box-shadow: var(--dash-shadow);
+
+  padding: 34px 32px 32px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.batch-badge {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+
+  background: var(--dash-red);
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.batch-kind {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--dash-blue);
+  background: var(--dash-blue-light);
+  padding: 5px 10px;
+  border-radius: 7px;
+  margin-bottom: 14px;
+}
+
+.batch-card h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--dash-text);
+  margin: 0 0 18px;
+}
+
+.batch-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.batch-price-old {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dash-text-soft);
+  text-decoration: line-through;
+}
+
+.batch-price-new {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--dash-red);
+}
+
+.batch-price-unit {
+  font-size: 13px;
+  color: var(--dash-text-soft);
+  margin-bottom: 26px;
+}
+
+.batch-features {
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+  flex-grow: 1;
+}
+
+.batch-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--dash-text-soft);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.batch-features li::before {
+  content: "✓";
+  color: var(--good, #2E6B4F);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.batch-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 48px;
+
+  border-radius: 10px;
+  border: none;
+
+  background: var(--dash-blue);
+  color: #fff;
+
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.batch-cta:hover {
+  background: var(--dash-blue-dark);
+  transform: translateY(-1px);
+}
+
+.batch-note {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 13px;
+  color: var(--dash-text-soft);
+}
+
+
+@media (max-width: 860px) {
+  .who {
+    display: none;
+  }
+
+  .batch-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+</style>
+</head>
+<body>
+
+
+<!-- =======================================================
+     NAVIGATION
+     ======================================================= -->
+
+<nav class="dash-nav">
+
+  <div class="brand">
+
+    <a href="/student/dashboard.html">
+
+      <img
+        src="/images/logos.png"
+        alt="IELTSbyLE"
+        class="brand-logo"
+      >
+
+    </a>
+
+  </div>
+
+
+  <div class="who">
+
+    <a href="/student/resources.html">
+      Resources
+    </a>
+
+    <a href="/student/mock-tests.html">
+      Mock Tests
+    </a>
+
+    <a href="/student/schedule.html" id="navSchedule">
+      Class Schedule
+    </a>
+
+    <a href="/student/enroll.html" id="navEnroll" class="active" style="display:none;">
+      Enroll
+    </a>
+
+    <a href="/student/speaking.html">
+      Speaking Test
+    </a>
+
+    <a href="/student/results.html">
+      My Results
+    </a>
+
+    <span id="userName"></span>
+
+    <a
+      href="#"
+      id="logoutLink"
+      class="dash-logout"
+    >
+      Log out
+    </a>
+
+  </div>
+
+</nav>
+
+
+<!-- =======================================================
+     MAIN
+     ======================================================= -->
+
+<main class="enroll-main">
+
+  <div class="enroll-head">
+
+    <h1>
+      Enroll with London Educators
+    </h1>
+
+    <p>
+      Get the complete IELTSbyLE experience — teacher-led classes,
+      full mock test access, speaking sessions, and results tracking.
+      Choose the batch that works best for you.
+    </p>
+
+  </div>
+
+
+  <div class="batch-grid">
+
+    <!-- Online batch -->
+    <div class="batch-card">
+
+      <div class="batch-badge">
+        50% OFF
+      </div>
+
+      <span class="batch-kind">
+        Online
+      </span>
+
+      <h2>
+        IELTS Online Batch
+      </h2>
+
+      <div class="batch-price-row">
+        <span class="batch-price-old">
+          ৳12,000
+        </span>
+        <span class="batch-price-new">
+          ৳6,000
+        </span>
+      </div>
+
+      <p class="batch-price-unit">
+        One-time enrollment fee — 50% discount applied
+      </p>
+
+      <ul class="batch-features">
+        <li>Live online classes with your teacher</li>
+        <li>Full access to mock tests and resources</li>
+        <li>Speaking test sessions and feedback</li>
+        <li>Class schedule and results tracking</li>
+      </ul>
+
+      <a href="/signup.html" class="batch-cta">
+        Enroll in Online Batch
+      </a>
+
+    </div>
+
+
+    <!-- Offline batch -->
+    <div class="batch-card">
+
+      <div class="batch-badge">
+        50% OFF
+      </div>
+
+      <span class="batch-kind">
+        Offline
+      </span>
+
+      <h2>
+        IELTS Offline Batch
+      </h2>
+
+      <div class="batch-price-row">
+        <span class="batch-price-old">
+          ৳15,000
+        </span>
+        <span class="batch-price-new">
+          ৳7,500
+        </span>
+      </div>
+
+      <p class="batch-price-unit">
+        One-time enrollment fee — 50% discount applied
+      </p>
+
+      <ul class="batch-features">
+        <li>In-person classes at our London Educators campus</li>
+        <li>Full access to mock tests and resources</li>
+        <li>Speaking test sessions and feedback</li>
+        <li>Class schedule and results tracking</li>
+      </ul>
+
+      <a href="/signup.html" class="batch-cta">
+        Enroll in Offline Batch
+      </a>
+
+    </div>
+
+  </div>
+
+  <p class="batch-note">
+    Already have a batch number from London Educators? Use the
+    Enroll button above and enter it during sign-up.
+  </p>
+
+</main>
+
+
+<script src="/js/supabase-client.js"></script>
+
+<script>
+
+(async () => {
+
+  const profile =
+    await Auth.requireApprovedRole('student');
+
+  if (!profile) return;
+
+
+  if (profile.account_type === 'external') {
+    document.getElementById('navSchedule').style.display = 'none';
+    document.getElementById('navEnroll').style.display = '';
+  }
+
+
+  document.getElementById('userName').textContent =
+    profile.name;
+
+
+  document
+    .getElementById('logoutLink')
+    .addEventListener('click', (e) => {
+
+      e.preventDefault();
+
+      Auth.logout();
+
+    });
+
+})();
+
+</script>
+
+</body>
+</html>
