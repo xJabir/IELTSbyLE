@@ -1412,8 +1412,12 @@ body {
       Resources
     </a>
 
-    <a href="/student/schedule.html">
+    <a href="/student/schedule.html" id="navSchedule">
       Class schedule
+    </a>
+
+    <a href="/signup.html" id="navEnroll" style="display:none;">
+      Enroll
     </a>
 
     <a href="/student/speaking.html">
@@ -1593,6 +1597,12 @@ body {
     await Auth.requireApprovedRole('student');
 
   if (!profile) return;
+
+
+  if (profile.account_type === 'external') {
+    document.getElementById('navSchedule').style.display = 'none';
+    document.getElementById('navEnroll').style.display = '';
+  }
 
 
   document.getElementById('userName').textContent =
