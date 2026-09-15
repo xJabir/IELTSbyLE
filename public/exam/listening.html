@@ -136,9 +136,19 @@ function renderAllSections() {
   document.getElementById('questionsPane').innerHTML = `
     <div class="audio-banner" id="audioBanner"><span class="playing-dot idle"></span> Recording will begin shortly.</div>
     ${session.sections.map(section => {
+      const layoutIds = ExamRuntime.layoutBlankIds(section.layout);
+      const matchingItems = [];
+      const plainHtml = section.questions.map((q, i) => {
+        const num = globalNum + i + 1;
+        if (layoutIds.has(q.id)) return '';
+        if (q.question_type === 'matching') { matchingItems.push({ q, num }); return ''; }
+        return renderQuestion(q, num);
+      }).join('');
       const html = `
         <div class="section-divider">${ExamRuntime.escapeHtml(section.title)} — Questions ${globalNum + 1}–${globalNum + section.questions.length}</div>
-        ${section.questions.map((q, i) => renderQuestion(q, globalNum + i + 1)).join('')}
+        ${ExamRuntime.renderLayoutHtml(section.layout, section, answers)}
+        ${ExamRuntime.renderMatchingHtml(matchingItems, answers)}
+        ${plainHtml}
       `;
       globalNum += section.questions.length;
       return html;
@@ -151,6 +161,7 @@ function renderAllSections() {
       renderNav();
     });
   });
+  ExamRuntime.wireMatching(document.getElementById('questionsPane'));
   renderNav();
 }
 
