@@ -111,3 +111,35 @@ html, body {
 .exam-modal h2 { font-family: 'Fraunces', serif; font-size: 21px; margin: 0 0 12px; }
 .exam-modal p { font-size: 14.5px; color: #444; line-height: 1.5; margin-bottom: 20px; }
 .exam-modal .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* Table / note completion layouts */
+.q-layout-intro { font-size: 14px; color: #333; margin-bottom: 14px; line-height: 1.5; }
+.q-layout-note { font-size: 15.5px; line-height: 2; }
+.q-layout-table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin-top: 4px; }
+.q-layout-table th, .q-layout-table td {
+  border: 1px solid #CCC; padding: 10px 12px; text-align: left; vertical-align: top;
+}
+.q-layout-table th { background: #F5F4EF; font-weight: 700; }
+
+/* Matching / drag & drop */
+.q-match-bank { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 20px 32px; }
+.q-match-chip {
+  border: 1px solid #999; background: #FBFBEA; padding: 8px 14px; border-radius: 3px;
+  font-size: 14.5px; cursor: grab; user-select: none;
+}
+.q-match-chip.placed { opacity: 0.35; cursor: default; }
+.q-match-chip.selected { border-color: #B00000; box-shadow: 0 0 0 1px #B00000; }
+.q-match-target {
+  display: inline-flex; align-items: center; gap: 8px; min-width: 180px; min-height: 38px;
+  border: 1px dashed #999; border-radius: 3px; padding: 6px 10px; margin-left: 32px; margin-top: 8px;
+  font-size: 14.5px; background: #fff;
+}
+.q-match-target.dragover { border-color: #B00000; background: #FFF6C8; }
+.q-match-target .placed-chip {
+  display: inline-flex; align-items: center; gap: 6px; background: #333; color: #fff;
+  padding: 5px 10px; border-radius: 2px;
+}
+.q-match-target .placed-chip button {
+  border: none; background: none; color: #fff; cursor: pointer; font-weight: 700; padding: 0;
+}
+.q-match-target .placeholder { color: #888; }
