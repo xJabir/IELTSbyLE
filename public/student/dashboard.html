@@ -1159,7 +1159,11 @@ body {
       Mock Tests
     </a>
 
-    <a href="/signup.html">
+    <a href="/student/schedule.html" id="navSchedule">
+      Class Schedule
+    </a>
+
+    <a href="/signup.html" id="navEnroll" style="display:none;">
       Enroll
     </a>
 
@@ -1353,6 +1357,9 @@ body {
   /* External / Free account */
 
   if (profile.account_type === 'external') {
+
+    document.getElementById('navSchedule').style.display = 'none';
+    document.getElementById('navEnroll').style.display = '';
 
     document.getElementById('accountBanner').innerHTML = `
 
