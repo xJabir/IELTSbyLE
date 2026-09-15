@@ -62,6 +62,16 @@ const ExamRuntime = {
     return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   },
 
+  // Same **bold** / *italic* / newline convention as the teacher's layout
+  // intro editor — text is escaped first, so markers are the only thing
+  // treated specially.
+  formatIntroHtml(s) {
+    return ExamRuntime.escapeHtml(s || '')
+      .replace(/\n/g, '<br>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  },
+
   // ===================== TABLE / NOTE COMPLETION LAYOUTS =====================
   // Renders a passage/section's optional `layout` (built in the test builder)
   // as a flowing note or a table, with each blank as a normal text input
@@ -83,13 +93,13 @@ const ExamRuntime = {
 
     if (layout.type === 'note') {
       return `
-        ${layout.intro ? `<p class="q-layout-intro">${ExamRuntime.escapeHtml(layout.intro)}</p>` : ''}
+        ${layout.intro ? `<p class="q-layout-intro">${ExamRuntime.formatIntroHtml(layout.intro)}</p>` : ''}
         <p class="q-layout-note">${partsHtml(layout.parts)}</p>
       `;
     }
 
     return `
-      ${layout.intro ? `<p class="q-layout-intro">${ExamRuntime.escapeHtml(layout.intro)}</p>` : ''}
+      ${layout.intro ? `<p class="q-layout-intro">${ExamRuntime.formatIntroHtml(layout.intro)}</p>` : ''}
       <table class="q-layout-table">
         <tr>${(layout.columns || []).map(c => `<th>${ExamRuntime.escapeHtml(c)}</th>`).join('')}</tr>
         ${(layout.rows || []).map(row => `<tr>${(row || []).map(cell => `<td>${partsHtml(cell)}</td>`).join('')}</tr>`).join('')}
