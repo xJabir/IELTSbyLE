@@ -132,6 +132,283 @@ function renderDetails() {
   });
 }
 
+// ============================= TABLE / NOTE LAYOUT =============================
+// An optional richer view for a passage/section: instead of showing its
+// "layout_blank" questions as a plain list, render them woven into a table
+// or a flowing note/sentence-completion paragraph — same as real IELTS
+// "complete the table/notes" tasks. Each blank still IS an ordinary question
+// row (type 'layout_blank'); the layout JSON just says where each one's
+// input box sits and what surrounding text/table cells to show around it.
+// Grading is untouched — students still submit {question_id, answer_text}.
+
+const draftLayouts = new Map(); // containerId -> layout object currently being edited
+
+function blankQuestionsFor(container) {
+  return (container.questions || []).filter(q => q.question_type === 'layout_blank');
+}
+
+function usedBlankIds(layout) {
+  const used = new Set();
+  const walk = parts => (parts || []).forEach(p => { if (p.type === 'blank' && p.question_id) used.add(p.question_id); });
+  if (layout && layout.type === 'note') walk(layout.parts);
+  if (layout && layout.type === 'table') (layout.rows || []).forEach(row => (row || []).forEach(walk));
+  return used;
+}
+
+function getParts(draft, path) {
+  if (path === 'note') { draft.parts = draft.parts || []; return draft.parts; }
+  const [, rStr, cStr] = path.split(':');
+  const r = Number(rStr), c = Number(cStr);
+  draft.rows[r] = draft.rows[r] || [];
+  draft.rows[r][c] = draft.rows[r][c] || [];
+  return draft.rows[r][c];
+}
+
+function partsPreviewHtml(parts, blanksById) {
+  return (parts || []).map(p => {
+    if (p.type === 'blank') {
+      const q = blanksById.get(p.question_id);
+      return `<span style="display:inline-block;min-width:70px;border-bottom:2px solid var(--builder-blue,#142b5f);color:var(--builder-blue,#142b5f);font-weight:700;">${q ? esc(q.correct_answer) : '(unlinked)'}</span>`;
+    }
+    return esc(p.value || '');
+  }).join('');
+}
+
+function layoutPreviewHtml(layout, container) {
+  const blanksById = new Map((container.questions || []).map(q => [q.id, q]));
+  if (!layout || !layout.type || layout.type === 'none') {
+    return '<p style="font-size:13px;color:var(--ink-soft, #667085);">No layout yet — its "layout blank" questions (if any) are just shown as a plain list to students.</p>';
+  }
+  if (layout.type === 'note') {
+    return `
+      ${layout.intro ? `<p style="font-size:13px;font-weight:600;margin-bottom:8px;">${esc(layout.intro)}</p>` : ''}
+      <p style="font-size:14px;line-height:1.9;">${partsPreviewHtml(layout.parts, blanksById)}</p>
+    `;
+  }
+  return `
+    ${layout.intro ? `<p style="font-size:13px;font-weight:600;margin-bottom:8px;">${esc(layout.intro)}</p>` : ''}
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <tr>${(layout.columns || []).map(c => `<th style="text-align:left;border:1px solid var(--builder-border,#e7ebf2);padding:6px;">${esc(c)}</th>`).join('')}</tr>
+      ${(layout.rows || []).map(row => `<tr>${(row || []).map(cell => `<td style="border:1px solid var(--builder-border,#e7ebf2);padding:6px;">${partsPreviewHtml(cell, blanksById)}</td>`).join('')}</tr>`).join('')}
+    </table>
+  `;
+}
+
+function partsListHtml(draft, path, blanks) {
+  const parts = getParts(draft, path);
+  const used = usedBlankIds(draft);
+  const options = blanks.length
+    ? blanks.map(q => {
+        const disabled = used.has(q.id);
+        return `<option value="${q.id}" ${disabled ? 'disabled' : ''}>${esc(q.question_text).slice(0, 40)} → ${esc(q.correct_answer)}${disabled ? ' (already placed)' : ''}</option>`;
+      }).join('')
+    : '';
+  return `
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0;">
+      ${parts.length ? parts.map((p, i) => `
+        <span style="display:inline-flex;align-items:center;gap:5px;background:${p.type === 'blank' ? '#eef3ff' : '#f3f4f7'};border-radius:6px;padding:4px 8px;font-size:12px;">
+          ${p.type === 'blank' ? '⬚ ' + esc((blanks.find(b => b.id === p.question_id) || {}).correct_answer || 'unlinked') : esc(p.value)}
+          <button type="button" data-part-remove="${path}::${i}" style="border:0;background:none;color:var(--builder-red,#e63946);cursor:pointer;font-weight:800;">×</button>
+        </span>
+      `).join('') : '<span style="font-size:12px;color:var(--ink-soft,#667085);">Nothing here yet.</span>'}
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+      <input type="text" data-part-text-input="${path}" placeholder="Add text…" style="flex:1;min-width:120px;padding:6px 8px;">
+      <button type="button" class="small-btn" data-part-add-text="${path}">+ Text</button>
+      ${blanks.length ? `
+        <select data-part-blank-select="${path}" style="padding:6px 8px;">${options}</select>
+        <button type="button" class="small-btn" data-part-add-blank="${path}">+ Blank</button>
+      ` : `<span style="font-size:11px;color:var(--ink-soft,#667085);">Add a "layout blank" question below to insert a blank here.</span>`}
+    </div>
+  `;
+}
+
+function tableEditorHtml(draft, blanks) {
+  draft.columns = draft.columns && draft.columns.length ? draft.columns : ['Column 1'];
+  draft.rows = draft.rows && draft.rows.length ? draft.rows : [draft.columns.map(() => [])];
+  return `
+    <div style="margin:10px 0;">
+      <label style="font-size:12px;font-weight:700;">Columns</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;">
+        ${draft.columns.map((c, ci) => `
+          <span style="display:inline-flex;gap:4px;align-items:center;">
+            <input type="text" data-col-input="${ci}" value="${esc(c)}" style="width:130px;padding:5px 7px;">
+            <button type="button" class="small-btn danger" data-col-remove="${ci}">×</button>
+          </span>
+        `).join('')}
+      </div>
+      <button type="button" class="small-btn" data-col-add>+ Add column</button>
+      <button type="button" class="small-btn" data-row-add style="margin-left:6px;">+ Add row</button>
+    </div>
+    ${draft.rows.map((row, ri) => `
+      <div style="border:1px solid var(--builder-border,#e7ebf2);border-radius:8px;padding:10px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong style="font-size:12px;">Row ${ri + 1}</strong>
+          <button type="button" class="small-btn danger" data-row-remove="${ri}">Delete row</button>
+        </div>
+        ${draft.columns.map((c, ci) => `
+          <div style="margin-top:8px;">
+            <label style="font-size:11px;color:var(--ink-soft,#667085);">${esc(c)}</label>
+            ${partsListHtml(draft, `cell:${ri}:${ci}`, blanks)}
+          </div>
+        `).join('')}
+      </div>
+    `).join('')}
+  `;
+}
+
+function layoutEditorHtml(container, kind) {
+  const cid = container.id;
+  const draft = draftLayouts.get(cid);
+  const blanks = blankQuestionsFor(container);
+  return `
+    <div class="field">
+      <label>Layout type</label>
+      <select data-layout-type="${cid}">
+        <option value="none" ${!draft.type || draft.type === 'none' ? 'selected' : ''}>None — plain question list</option>
+        <option value="note" ${draft.type === 'note' ? 'selected' : ''}>Note / sentence completion (flowing text with blanks)</option>
+        <option value="table" ${draft.type === 'table' ? 'selected' : ''}>Table completion (grid with blanks)</option>
+      </select>
+    </div>
+    ${draft.type && draft.type !== 'none' ? `
+      <div class="field"><label>Instructions shown above it (optional)</label><input type="text" data-layout-intro="${cid}" value="${esc(draft.intro || '')}" placeholder="e.g. Complete the notes below. Write NO MORE THAN TWO WORDS for each answer."></div>
+    ` : ''}
+    ${draft.type === 'note' ? `<label style="font-size:12px;font-weight:700;">Body</label>${partsListHtml(draft, 'note', blanks)}` : ''}
+    ${draft.type === 'table' ? tableEditorHtml(draft, blanks) : ''}
+    <div class="submit-row" style="gap:8px;margin-top:14px;">
+      <button class="button primary" data-layout-save="${cid}" style="padding:9px 18px;">Save layout</button>
+      <button class="small-btn" data-layout-cancel="${cid}">Cancel</button>
+    </div>
+  `;
+}
+
+function layoutPanelHtml(container, kind) {
+  const cid = container.id;
+  if (draftLayouts.has(cid)) {
+    return `
+      <div style="margin-top:16px;border-top:1px dashed var(--builder-border,#e7ebf2);padding-top:14px;">
+        <strong style="font-size:13px;">Table / note layout</strong>
+        ${layoutEditorHtml(container, kind)}
+      </div>
+    `;
+  }
+  return `
+    <div style="margin-top:16px;border-top:1px dashed var(--builder-border,#e7ebf2);padding-top:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <strong style="font-size:13px;">Table / note layout</strong>
+        <div style="display:flex;gap:8px;">
+          ${container.layout
+            ? `<button class="small-btn" data-layout-edit="${cid}">Edit layout</button><button class="small-btn danger" data-layout-remove="${cid}">Remove layout</button>`
+            : `<button class="small-btn" data-layout-add="${cid}">+ Add table/note layout</button>`}
+        </div>
+      </div>
+      ${layoutPreviewHtml(container.layout, container)}
+    </div>
+  `;
+}
+
+function wireLayoutPanel(el, container, kind) {
+  const cid = container.id;
+  const rerender = kind === 'reading' ? renderReading : renderListening;
+
+  const addBtn = el.querySelector(`[data-layout-add="${cid}"]`);
+  if (addBtn) addBtn.addEventListener('click', () => { draftLayouts.set(cid, { type: 'none' }); rerender(); });
+
+  const editBtn = el.querySelector(`[data-layout-edit="${cid}"]`);
+  if (editBtn) editBtn.addEventListener('click', () => {
+    draftLayouts.set(cid, JSON.parse(JSON.stringify(container.layout || { type: 'none' })));
+    rerender();
+  });
+
+  const removeBtn = el.querySelector(`[data-layout-remove="${cid}"]`);
+  if (removeBtn) removeBtn.addEventListener('click', async () => {
+    if (!confirm('Remove this table/note layout? The underlying blank questions are kept.')) return;
+    const table = kind === 'reading' ? 'reading_passages' : 'listening_sections';
+    const { error } = await supabase.from(table).update({ layout: null }).eq('id', cid);
+    if (error) { alert(error.message); return; }
+    await loadAll();
+    switchTab(kind);
+  });
+
+  if (!draftLayouts.has(cid)) return;
+  const draft = draftLayouts.get(cid);
+  const blanks = blankQuestionsFor(container);
+
+  const typeSel = el.querySelector(`[data-layout-type="${cid}"]`);
+  if (typeSel) typeSel.addEventListener('change', () => {
+    const v = typeSel.value;
+    draftLayouts.set(cid,
+      v === 'none' ? { type: 'none' } :
+      v === 'note' ? { type: 'note', intro: draft.intro || '', parts: draft.parts || [] } :
+      { type: 'table', intro: draft.intro || '', columns: draft.columns || ['Column 1'], rows: draft.rows || [] });
+    rerender();
+  });
+
+  const introInput = el.querySelector(`[data-layout-intro="${cid}"]`);
+  if (introInput) introInput.addEventListener('input', () => { draft.intro = introInput.value; });
+
+  el.querySelectorAll('[data-part-add-text]').forEach(btn => btn.addEventListener('click', () => {
+    const path = btn.dataset.partAddText;
+    const input = el.querySelector(`[data-part-text-input="${path}"]`);
+    const value = input.value.trim();
+    if (!value) return;
+    getParts(draft, path).push({ type: 'text', value });
+    rerender();
+  }));
+  el.querySelectorAll('[data-part-add-blank]').forEach(btn => btn.addEventListener('click', () => {
+    const path = btn.dataset.partAddBlank;
+    const select = el.querySelector(`[data-part-blank-select="${path}"]`);
+    if (!select || !select.value) return;
+    getParts(draft, path).push({ type: 'blank', question_id: select.value });
+    rerender();
+  }));
+  el.querySelectorAll('[data-part-remove]').forEach(btn => btn.addEventListener('click', () => {
+    const [path, idxStr] = btn.dataset.partRemove.split('::');
+    getParts(draft, path).splice(Number(idxStr), 1);
+    rerender();
+  }));
+
+  el.querySelectorAll('[data-col-input]').forEach(inp => inp.addEventListener('input', () => {
+    draft.columns[Number(inp.dataset.colInput)] = inp.value;
+  }));
+  el.querySelectorAll('[data-col-remove]').forEach(btn => btn.addEventListener('click', () => {
+    const ci = Number(btn.dataset.colRemove);
+    draft.columns.splice(ci, 1);
+    (draft.rows || []).forEach(row => row.splice(ci, 1));
+    rerender();
+  }));
+  const colAddBtn = el.querySelector('[data-col-add]');
+  if (colAddBtn) colAddBtn.addEventListener('click', () => {
+    draft.columns.push(`Column ${draft.columns.length + 1}`);
+    (draft.rows || []).forEach(row => row.push([]));
+    rerender();
+  });
+  const rowAddBtn = el.querySelector('[data-row-add]');
+  if (rowAddBtn) rowAddBtn.addEventListener('click', () => {
+    draft.rows = draft.rows || [];
+    draft.rows.push(draft.columns.map(() => []));
+    rerender();
+  });
+  el.querySelectorAll('[data-row-remove]').forEach(btn => btn.addEventListener('click', () => {
+    draft.rows.splice(Number(btn.dataset.rowRemove), 1);
+    rerender();
+  }));
+
+  const saveBtn = el.querySelector(`[data-layout-save="${cid}"]`);
+  if (saveBtn) saveBtn.addEventListener('click', async () => {
+    const table = kind === 'reading' ? 'reading_passages' : 'listening_sections';
+    const payload = (!draft.type || draft.type === 'none') ? null : draft;
+    const { error } = await supabase.from(table).update({ layout: payload }).eq('id', cid);
+    if (error) { alert(error.message); return; }
+    draftLayouts.delete(cid);
+    await loadAll();
+    switchTab(kind);
+  });
+
+  const cancelBtn = el.querySelector(`[data-layout-cancel="${cid}"]`);
+  if (cancelBtn) cancelBtn.addEventListener('click', () => { draftLayouts.delete(cid); rerender(); });
+}
+
 // ============================= READING =============================
 
 function renderReading() {
@@ -189,6 +466,7 @@ function renderReading() {
         `;
         }).join('')}
       </div>
+      ${layoutPanelHtml(p, 'reading')}
       <details style="margin-top:12px;">
         <summary style="cursor:pointer;font-size:14px;color:var(--seal);">+ Add a question to this passage</summary>
         ${questionFormHtml(p.id, 'reading')}
@@ -209,6 +487,7 @@ function renderReading() {
   }));
   wireQuestionForms(el, 'reading');
   wireQuestionEditForms(el, 'reading');
+  state.passages.forEach(p => wireLayoutPanel(list, p, 'reading'));
 }
 
 async function savePassageEdit(id) {
@@ -312,6 +591,7 @@ function renderListening() {
         `;
         }).join('')}
       </div>
+      ${layoutPanelHtml(s, 'listening')}
       <details style="margin-top:12px;">
         <summary style="cursor:pointer;font-size:14px;color:var(--seal);">+ Add a question to this section</summary>
         ${questionFormHtml(s.id, 'listening')}
@@ -333,6 +613,7 @@ function renderListening() {
   list.querySelectorAll('[data-upload-audio]').forEach(input => input.addEventListener('change', () => handleAudioUpload(input)));
   wireQuestionForms(el, 'listening');
   wireQuestionEditForms(el, 'listening');
+  state.sections.forEach(s => wireLayoutPanel(list, s, 'listening'));
 }
 
 async function saveSectionEdit(id) {
@@ -522,11 +803,13 @@ function questionFormHtml(parentId, kind) {
           <option value="multiple_choice">Multiple choice</option>
           <option value="fill_blank">Fill in the blank</option>
           <option value="short_answer">Short answer</option>
+          <option value="matching">Matching (drag &amp; drop)</option>
+          <option value="layout_blank">Blank for a table / note layout</option>
         </select>
       </div>
-      <div class="field"><label>Question text</label><textarea rows="2" data-qtext="${parentId}" placeholder="Question wording"></textarea></div>
+      <div class="field"><label>Question text</label><textarea rows="2" data-qtext="${parentId}" placeholder="For a table/note blank, a short internal label is fine — e.g. Q11 answer"></textarea></div>
       <div class="field" data-qoptions-wrap="${parentId}">
-        <label>Options (multiple choice only — one per line)</label>
+        <label>Options (one per line — used for multiple choice, and as the shared drag-and-drop word bank for matching questions in this ${kind === 'reading' ? 'passage' : 'section'})</label>
         <textarea rows="3" data-qoptions="${parentId}" placeholder="London&#10;Paris&#10;Rome"></textarea>
       </div>
       <div class="field">
@@ -553,11 +836,13 @@ function questionEditFormHtml(q, kind) {
           <option value="multiple_choice" ${q.question_type === 'multiple_choice' ? 'selected' : ''}>Multiple choice</option>
           <option value="fill_blank" ${q.question_type === 'fill_blank' ? 'selected' : ''}>Fill in the blank</option>
           <option value="short_answer" ${q.question_type === 'short_answer' ? 'selected' : ''}>Short answer</option>
+          <option value="matching" ${q.question_type === 'matching' ? 'selected' : ''}>Matching (drag &amp; drop)</option>
+          <option value="layout_blank" ${q.question_type === 'layout_blank' ? 'selected' : ''}>Blank for a table / note layout</option>
         </select>
       </div>
       <div class="field"><label>Question text</label><textarea rows="2" data-eqtext="${q.id}">${esc(q.question_text)}</textarea></div>
       <div class="field">
-        <label>Options (multiple choice only — one per line)</label>
+        <label>Options (one per line — multiple choice, or the shared drag-and-drop word bank for matching)</label>
         <textarea rows="3" data-eqoptions="${q.id}">${esc(optionsVal)}</textarea>
       </div>
       <div class="field">
@@ -581,9 +866,7 @@ function wireQuestionForms(container, kind) {
       const optionsRaw = container.querySelector(`[data-qoptions="${parentId}"]`).value.trim();
       const correct_answer = container.querySelector(`[data-qanswer="${parentId}"]`).value.trim();
       if (!question_text || !correct_answer) return;
-      const options = question_type === 'multiple_choice' ? optionsRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
-      const table = kind === 'reading' ? 'reading_questions' : 'listening_questions';
-      const parentField = kind === 'reading' ? 'passage_id' : 'section_id';
+      const options = (question_type === 'multiple_choice' || question_type === 'matching') ? optionsRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
       const siblingCount = kind === 'reading'
         ? state.passages.find(p => p.id === parentId).questions.length
         : state.sections.find(s => s.id === parentId).questions.length;
@@ -606,7 +889,7 @@ function wireQuestionEditForms(container, kind) {
       const optionsRaw = container.querySelector(`[data-eqoptions="${qid}"]`).value.trim();
       const correct_answer = container.querySelector(`[data-eqanswer="${qid}"]`).value.trim();
       if (!question_text || !correct_answer) return;
-      const options = question_type === 'multiple_choice' ? optionsRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
+      const options = (question_type === 'multiple_choice' || question_type === 'matching') ? optionsRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
       const table = kind === 'reading' ? 'reading_questions' : 'listening_questions';
       const { error } = await supabase.from(table)
         .update({ question_type, question_text, options, correct_answer }).eq('id', qid);
