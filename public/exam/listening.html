@@ -138,15 +138,17 @@ function renderAllSections() {
     ${session.sections.map(section => {
       const layoutIds = ExamRuntime.layoutBlankIds(section.layout);
       const matchingItems = [];
+      const numbersById = new Map();
       const plainHtml = section.questions.map((q, i) => {
         const num = globalNum + i + 1;
+        numbersById.set(q.id, num);
         if (layoutIds.has(q.id)) return '';
         if (q.question_type === 'matching') { matchingItems.push({ q, num }); return ''; }
         return renderQuestion(q, num);
       }).join('');
       const html = `
         <div class="section-divider">${ExamRuntime.escapeHtml(section.title)} — Questions ${globalNum + 1}–${globalNum + section.questions.length}</div>
-        ${ExamRuntime.renderLayoutHtml(section.layout, section, answers)}
+        ${ExamRuntime.renderLayoutHtml(section.layout, section, answers, numbersById)}
         ${ExamRuntime.renderMatchingHtml(matchingItems, answers)}
         ${plainHtml}
       `;
