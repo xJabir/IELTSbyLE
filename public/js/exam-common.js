@@ -78,11 +78,12 @@ const ExamRuntime = {
   // carrying data-answer-for="<question id>" — the caller's existing generic
   // `[data-answer-for]` wiring picks these up exactly like any other question,
   // so no extra wiring is needed for layouts themselves.
-  renderLayoutHtml(layout, container, answers) {
+  renderLayoutHtml(layout, container, answers, numbersById) {
     const blanksById = new Map((container.questions || []).map(q => [q.id, q]));
     const blankHtml = (p) => {
       const val = ExamRuntime.escapeHtml(answers.get(p.question_id) || '');
-      return `<input type="text" class="q-blank-input" data-answer-for="${p.question_id}" value="${val}">`;
+      const num = (numbersById && numbersById.get(p.question_id)) || '';
+      return `<input type="text" class="q-blank-input" data-answer-for="${p.question_id}" value="${val}" placeholder="${num}" size="4">`;
     };
     const partsHtml = (parts) => (parts || []).map(p => p.type === 'blank' && blanksById.has(p.question_id)
       ? blankHtml(p)
