@@ -23,6 +23,16 @@ const editingWritingTasks = new Set();
 
 function esc(s) { return escapeHtml(s); }
 
+// Turns a **bold** / *italic* / newline-separated intro string into safe
+// HTML. Text is escaped first, so the markdown markers are the only thing
+// that gets special treatment.
+function formatIntroHtml(s) {
+  return esc(s || '')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+}
+
 async function loadAll() {
   const { data: test } = await supabase.from('tests').select('*').eq('id', testId).single();
 
@@ -181,12 +191,12 @@ function layoutPreviewHtml(layout, container) {
   }
   if (layout.type === 'note') {
     return `
-      ${layout.intro ? `<p style="font-size:13px;font-weight:600;margin-bottom:8px;">${esc(layout.intro)}</p>` : ''}
+      ${layout.intro ? `<p style="font-size:13px;font-weight:600;margin-bottom:8px;">${formatIntroHtml(layout.intro)}</p>` : ''}
       <p style="font-size:14px;line-height:1.9;">${partsPreviewHtml(layout.parts, blanksById)}</p>
     `;
   }
   return `
-    ${layout.intro ? `<p style="font-size:13px;font-weight:600;margin-bottom:8px;">${esc(layout.intro)}</p>` : ''}
+    ${layout.intro ? `<p style="font-size:13px;font-weight:600;margin-bottom:8px;">${formatIntroHtml(layout.intro)}</p>` : ''}
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
       <tr>${(layout.columns || []).map(c => `<th style="text-align:left;border:1px solid var(--builder-border,#e7ebf2);padding:6px;">${esc(c)}</th>`).join('')}</tr>
       ${(layout.rows || []).map(row => `<tr>${(row || []).map(cell => `<td style="border:1px solid var(--builder-border,#e7ebf2);padding:6px;">${partsPreviewHtml(cell, blanksById)}</td>`).join('')}</tr>`).join('')}
@@ -271,7 +281,15 @@ function layoutEditorHtml(container, kind) {
       </select>
     </div>
     ${draft.type && draft.type !== 'none' ? `
-      <div class="field"><label>Instructions shown above it (optional)</label><input type="text" data-layout-intro="${cid}" value="${esc(draft.intro || '')}" placeholder="e.g. Complete the notes below. Write NO MORE THAN TWO WORDS for each answer."></div>
+      <div class="field">
+        <label>Instructions shown above it (optional)</label>
+        <div style="display:flex;gap:6px;margin-bottom:6px;">
+          <button type="button" class="small-btn" data-intro-bold="${cid}" style="font-weight:800;">B</button>
+          <button type="button" class="small-btn" data-intro-italic="${cid}" style="font-style:italic;">I</button>
+          <span style="font-size:11px;color:var(--ink-soft,#667085);align-self:center;">Select text, then click B/I. Press Enter for a new line.</span>
+        </div>
+        <textarea data-layout-intro="${cid}" rows="3" placeholder="e.g. Complete the notes below.\nWrite NO MORE THAN TWO WORDS for each answer.">${esc(draft.intro || '')}</textarea>
+      </div>
     ` : ''}
     ${draft.type === 'note' ? `<label style="font-size:12px;font-weight:700;">Body</label>${partsListHtml(draft, 'note', blanks)}` : ''}
     ${draft.type === 'table' ? tableEditorHtml(draft, blanks) : ''}
@@ -346,6 +364,22 @@ function wireLayoutPanel(el, container, kind) {
 
   const introInput = el.querySelector(`[data-layout-intro="${cid}"]`);
   if (introInput) introInput.addEventListener('input', () => { draft.intro = introInput.value; });
+
+  function wrapIntroSelection(marker) {
+    if (!introInput) return;
+    const start = introInput.selectionStart;
+    const end = introInput.selectionEnd;
+    const val = introInput.value;
+    const selected = val.slice(start, end) || 'text';
+    introInput.value = val.slice(0, start) + marker + selected + marker + val.slice(end);
+    draft.intro = introInput.value;
+    introInput.focus();
+    introInput.setSelectionRange(start + marker.length, start + marker.length + selected.length);
+  }
+  const boldBtn = el.querySelector(`[data-intro-bold="${cid}"]`);
+  if (boldBtn) boldBtn.addEventListener('click', () => wrapIntroSelection('**'));
+  const italicBtn = el.querySelector(`[data-intro-italic="${cid}"]`);
+  if (italicBtn) italicBtn.addEventListener('click', () => wrapIntroSelection('*'));
 
   el.querySelectorAll('[data-part-add-text]').forEach(btn => btn.addEventListener('click', () => {
     const path = btn.dataset.partAddText;
