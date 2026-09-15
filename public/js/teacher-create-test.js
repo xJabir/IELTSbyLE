@@ -157,6 +157,15 @@ function blankQuestionsFor(container) {
   return (container.questions || []).filter(q => q.question_type === 'layout_blank');
 }
 
+// Question id -> its automatic display number (same numbering shown in the
+// plain question list above), so the layout builder never needs the teacher
+// to type a number themselves.
+function numberMapFor(container, numOffset) {
+  const map = new Map();
+  (container.questions || []).forEach((q, i) => map.set(q.id, numOffset + i + 1));
+  return map;
+}
+
 function usedBlankIds(layout) {
   const used = new Set();
   const walk = parts => (parts || []).forEach(p => { if (p.type === 'blank' && p.question_id) used.add(p.question_id); });
@@ -174,50 +183,53 @@ function getParts(draft, path) {
   return draft.rows[r][c];
 }
 
-function partsPreviewHtml(parts, blanksById) {
+function partsPreviewHtml(parts, blanksById, numberMap) {
   return (parts || []).map(p => {
     if (p.type === 'blank') {
       const q = blanksById.get(p.question_id);
-      return `<span style="display:inline-block;min-width:70px;border-bottom:2px solid var(--builder-blue,#142b5f);color:var(--builder-blue,#142b5f);font-weight:700;">${q ? esc(q.correct_answer) : '(unlinked)'}</span>`;
+      const num = numberMap && numberMap.get(p.question_id);
+      return `<span style="display:inline-block;min-width:70px;border-bottom:2px solid var(--builder-blue,#142b5f);color:var(--builder-blue,#142b5f);font-weight:700;">${q ? (num ? 'Q' + num + ': ' : '') + esc(q.correct_answer || '(no answer yet)') : '(unlinked)'}</span>`;
     }
     return esc(p.value || '');
   }).join('');
 }
 
-function layoutPreviewHtml(layout, container) {
+function layoutPreviewHtml(layout, container, numOffset) {
   const blanksById = new Map((container.questions || []).map(q => [q.id, q]));
+  const numberMap = numberMapFor(container, numOffset);
   if (!layout || !layout.type || layout.type === 'none') {
     return '<p style="font-size:13px;color:var(--ink-soft, #667085);">No layout yet — its "layout blank" questions (if any) are just shown as a plain list to students.</p>';
   }
   if (layout.type === 'note') {
     return `
       ${layout.intro ? `<p style="font-size:13px;font-weight:600;margin-bottom:8px;">${formatIntroHtml(layout.intro)}</p>` : ''}
-      <p style="font-size:14px;line-height:1.9;">${partsPreviewHtml(layout.parts, blanksById)}</p>
+      <p style="font-size:14px;line-height:1.9;">${partsPreviewHtml(layout.parts, blanksById, numberMap)}</p>
     `;
   }
   return `
     ${layout.intro ? `<p style="font-size:13px;font-weight:600;margin-bottom:8px;">${formatIntroHtml(layout.intro)}</p>` : ''}
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
       <tr>${(layout.columns || []).map(c => `<th style="text-align:left;border:1px solid var(--builder-border,#e7ebf2);padding:6px;">${esc(c)}</th>`).join('')}</tr>
-      ${(layout.rows || []).map(row => `<tr>${(row || []).map(cell => `<td style="border:1px solid var(--builder-border,#e7ebf2);padding:6px;">${partsPreviewHtml(cell, blanksById)}</td>`).join('')}</tr>`).join('')}
+      ${(layout.rows || []).map(row => `<tr>${(row || []).map(cell => `<td style="border:1px solid var(--builder-border,#e7ebf2);padding:6px;">${partsPreviewHtml(cell, blanksById, numberMap)}</td>`).join('')}</tr>`).join('')}
     </table>
   `;
 }
 
-function partsListHtml(draft, path, blanks) {
+function partsListHtml(draft, path, blanks, numberMap) {
   const parts = getParts(draft, path);
   const used = usedBlankIds(draft);
   const options = blanks.length
     ? blanks.map(q => {
         const disabled = used.has(q.id);
-        return `<option value="${q.id}" ${disabled ? 'disabled' : ''}>${esc(q.question_text).slice(0, 40)} → ${esc(q.correct_answer)}${disabled ? ' (already placed)' : ''}</option>`;
+        const num = numberMap.get(q.id);
+        return `<option value="${q.id}" ${disabled ? 'disabled' : ''}>Q${num}${q.correct_answer ? ' → ' + esc(q.correct_answer) : ' (no answer set yet)'}${disabled ? ' — already placed' : ''}</option>`;
       }).join('')
     : '';
   return `
     <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0;">
       ${parts.length ? parts.map((p, i) => `
         <span style="display:inline-flex;align-items:center;gap:5px;background:${p.type === 'blank' ? '#eef3ff' : '#f3f4f7'};border-radius:6px;padding:4px 8px;font-size:12px;">
-          ${p.type === 'blank' ? '⬚ ' + esc((blanks.find(b => b.id === p.question_id) || {}).correct_answer || 'unlinked') : esc(p.value)}
+          ${p.type === 'blank' ? '⬚ Q' + numberMap.get(p.question_id) + ': ' + esc((blanks.find(b => b.id === p.question_id) || {}).correct_answer || '(no answer yet)') : esc(p.value)}
           <button type="button" data-part-remove="${path}::${i}" style="border:0;background:none;color:var(--builder-red,#e63946);cursor:pointer;font-weight:800;">×</button>
         </span>
       `).join('') : '<span style="font-size:12px;color:var(--ink-soft,#667085);">Nothing here yet.</span>'}
@@ -233,7 +245,7 @@ function partsListHtml(draft, path, blanks) {
   `;
 }
 
-function tableEditorHtml(draft, blanks) {
+function tableEditorHtml(draft, blanks, numberMap) {
   draft.columns = draft.columns && draft.columns.length ? draft.columns : ['Column 1'];
   draft.rows = draft.rows && draft.rows.length ? draft.rows : [draft.columns.map(() => [])];
   return `
@@ -259,7 +271,7 @@ function tableEditorHtml(draft, blanks) {
         ${draft.columns.map((c, ci) => `
           <div style="margin-top:8px;">
             <label style="font-size:11px;color:var(--ink-soft,#667085);">${esc(c)}</label>
-            ${partsListHtml(draft, `cell:${ri}:${ci}`, blanks)}
+            ${partsListHtml(draft, `cell:${ri}:${ci}`, blanks, numberMap)}
           </div>
         `).join('')}
       </div>
@@ -267,10 +279,11 @@ function tableEditorHtml(draft, blanks) {
   `;
 }
 
-function layoutEditorHtml(container, kind) {
+function layoutEditorHtml(container, kind, numOffset) {
   const cid = container.id;
   const draft = draftLayouts.get(cid);
   const blanks = blankQuestionsFor(container);
+  const numberMap = numberMapFor(container, numOffset);
   return `
     <div class="field">
       <label>Layout type</label>
@@ -291,8 +304,8 @@ function layoutEditorHtml(container, kind) {
         <textarea data-layout-intro="${cid}" rows="3" placeholder="e.g. Complete the notes below.\nWrite NO MORE THAN TWO WORDS for each answer.">${esc(draft.intro || '')}</textarea>
       </div>
     ` : ''}
-    ${draft.type === 'note' ? `<label style="font-size:12px;font-weight:700;">Body</label>${partsListHtml(draft, 'note', blanks)}` : ''}
-    ${draft.type === 'table' ? tableEditorHtml(draft, blanks) : ''}
+    ${draft.type === 'note' ? `<label style="font-size:12px;font-weight:700;">Body</label>${partsListHtml(draft, 'note', blanks, numberMap)}` : ''}
+    ${draft.type === 'table' ? tableEditorHtml(draft, blanks, numberMap) : ''}
     <div class="submit-row" style="gap:8px;margin-top:14px;">
       <button class="button primary" data-layout-save="${cid}" style="padding:9px 18px;">Save layout</button>
       <button class="small-btn" data-layout-cancel="${cid}">Cancel</button>
@@ -300,13 +313,13 @@ function layoutEditorHtml(container, kind) {
   `;
 }
 
-function layoutPanelHtml(container, kind) {
+function layoutPanelHtml(container, kind, numOffset) {
   const cid = container.id;
   if (draftLayouts.has(cid)) {
     return `
       <div style="margin-top:16px;border-top:1px dashed var(--builder-border,#e7ebf2);padding-top:14px;">
         <strong style="font-size:13px;">Table / note layout</strong>
-        ${layoutEditorHtml(container, kind)}
+        ${layoutEditorHtml(container, kind, numOffset)}
       </div>
     `;
   }
@@ -320,7 +333,7 @@ function layoutPanelHtml(container, kind) {
             : `<button class="small-btn" data-layout-add="${cid}">+ Add table/note layout</button>`}
         </div>
       </div>
-      ${layoutPreviewHtml(container.layout, container)}
+      ${layoutPreviewHtml(container.layout, container, numOffset)}
     </div>
   `;
 }
@@ -494,13 +507,13 @@ function renderReading() {
                 <button class="small-btn danger" data-del-question="${q.id}">Delete</button>
               </div>
             </div>
-            <p style="font-size:14px;">${esc(q.question_text)}</p>
-            <p style="font-size:13px;color:var(--ink-soft);">Answer: ${esc(q.correct_answer)}</p>
+            <p style="font-size:14px;">${q.question_text ? esc(q.question_text) : '<em style="color:var(--ink-soft);">(no question text — probably used inside a table/note layout)</em>'}</p>
+            <p style="font-size:13px;color:var(--ink-soft);">Answer: ${q.correct_answer ? esc(q.correct_answer) : '(none set yet)'}</p>
           </div>
         `;
         }).join('')}
       </div>
-      ${layoutPanelHtml(p, 'reading')}
+      ${layoutPanelHtml(p, 'reading', numOffset)}
       <details style="margin-top:12px;">
         <summary style="cursor:pointer;font-size:14px;color:var(--seal);">+ Add a question to this passage</summary>
         ${questionFormHtml(p.id, 'reading')}
@@ -619,13 +632,13 @@ function renderListening() {
                 <button class="small-btn danger" data-del-lquestion="${q.id}">Delete</button>
               </div>
             </div>
-            <p style="font-size:14px;">${esc(q.question_text)}</p>
-            <p style="font-size:13px;color:var(--ink-soft);">Answer: ${esc(q.correct_answer)}</p>
+            <p style="font-size:14px;">${q.question_text ? esc(q.question_text) : '<em style="color:var(--ink-soft);">(no question text — probably used inside a table/note layout)</em>'}</p>
+            <p style="font-size:13px;color:var(--ink-soft);">Answer: ${q.correct_answer ? esc(q.correct_answer) : '(none set yet)'}</p>
           </div>
         `;
         }).join('')}
       </div>
-      ${layoutPanelHtml(s, 'listening')}
+      ${layoutPanelHtml(s, 'listening', numOffset)}
       <details style="margin-top:12px;">
         <summary style="cursor:pointer;font-size:14px;color:var(--seal);">+ Add a question to this section</summary>
         ${questionFormHtml(s.id, 'listening')}
@@ -841,14 +854,14 @@ function questionFormHtml(parentId, kind) {
           <option value="layout_blank">Blank for a table / note layout</option>
         </select>
       </div>
-      <div class="field"><label>Question text</label><textarea rows="2" data-qtext="${parentId}" placeholder="For a table/note blank, a short internal label is fine — e.g. Q11 answer"></textarea></div>
+      <div class="field"><label>Question text (optional — leave blank for a table/note blank; its number is assigned automatically)</label><textarea rows="2" data-qtext="${parentId}" placeholder="Optional — only needed if you want a plain list item too"></textarea></div>
       <div class="field" data-qoptions-wrap="${parentId}">
         <label>Options (one per line — used for multiple choice, and as the shared drag-and-drop word bank for matching questions in this ${kind === 'reading' ? 'passage' : 'section'})</label>
         <textarea rows="3" data-qoptions="${parentId}" placeholder="London&#10;Paris&#10;Rome"></textarea>
       </div>
       <div class="field">
-        <label>Correct answer</label>
-        <input type="text" data-qanswer="${parentId}" placeholder="e.g. true, or London, or accept several: colour | color">
+        <label>Correct answer (words or numbers both work — e.g. 12, or accept several: 12 | twelve)</label>
+        <input type="text" data-qanswer="${parentId}" placeholder="e.g. true, or London, or 12">
       </div>
       <button class="small-btn" data-save-question="${parentId}" data-kind="${kind}" style="margin-top:6px;">Add question</button>
     </div>
@@ -899,8 +912,14 @@ function wireQuestionForms(container, kind) {
       const question_text = container.querySelector(`[data-qtext="${parentId}"]`).value.trim();
       const optionsRaw = container.querySelector(`[data-qoptions="${parentId}"]`).value.trim();
       const correct_answer = container.querySelector(`[data-qanswer="${parentId}"]`).value.trim();
-      if (!question_text || !correct_answer) return;
+      // Question text and correct answer are both optional — a table/note
+      // blank often doesn't need its own text (the table supplies that),
+      // and a teacher may want to add the answer later via Edit. Numeric
+      // answers (e.g. "12") are plain text here too, so they're accepted
+      // exactly like any word answer — no extra handling needed.
       const options = (question_type === 'multiple_choice' || question_type === 'matching') ? optionsRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
+      const table = kind === 'reading' ? 'reading_questions' : 'listening_questions';
+      const parentField = kind === 'reading' ? 'passage_id' : 'section_id';
       const siblingCount = kind === 'reading'
         ? state.passages.find(p => p.id === parentId).questions.length
         : state.sections.find(s => s.id === parentId).questions.length;
@@ -922,7 +941,6 @@ function wireQuestionEditForms(container, kind) {
       const question_text = container.querySelector(`[data-eqtext="${qid}"]`).value.trim();
       const optionsRaw = container.querySelector(`[data-eqoptions="${qid}"]`).value.trim();
       const correct_answer = container.querySelector(`[data-eqanswer="${qid}"]`).value.trim();
-      if (!question_text || !correct_answer) return;
       const options = (question_type === 'multiple_choice' || question_type === 'matching') ? optionsRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
       const table = kind === 'reading' ? 'reading_questions' : 'listening_questions';
       const { error } = await supabase.from(table)
