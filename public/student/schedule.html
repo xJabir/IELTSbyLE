@@ -1345,6 +1345,12 @@ let viewMonth = today.getMonth();
   if (!profile) return;
 
 
+  if (profile.account_type === 'external') {
+    window.location.href = '/student/dashboard.html';
+    return;
+  }
+
+
   const userName =
     document.getElementById('userName');
 
