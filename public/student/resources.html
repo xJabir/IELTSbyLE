@@ -814,7 +814,8 @@ body {
       <div class="resource-nav-links">
         <a href="/student/dashboard.html">Dashboard</a>
         <a href="/student/mock-tests.html">Mock tests</a>
-        <a href="/student/schedule.html">Class schedule</a>
+        <a href="/student/schedule.html" id="navSchedule">Class schedule</a>
+        <a href="/signup.html" id="navEnroll" style="display:none;">Enroll</a>
         <a href="/student/speaking.html">Speaking test</a>
         <a href="/student/results.html">My results</a>
       </div>
@@ -980,6 +981,11 @@ let currentProfile = null;
   if (!profile) return;
 
   currentProfile = profile;
+
+  if (profile.account_type === 'external') {
+    document.getElementById('navSchedule').style.display = 'none';
+    document.getElementById('navEnroll').style.display = '';
+  }
 
   const userName = document.getElementById('userName');
   const userAvatar = document.getElementById('userAvatar');
