@@ -99,8 +99,10 @@ function render() {
 
   const layoutIds = ExamRuntime.layoutBlankIds(passage.layout);
   const matchingItems = [];
+  const numbersById = new Map();
   const plainHtml = passage.questions.map((q, i) => {
     const num = globalNum + i + 1;
+    numbersById.set(q.id, num);
     if (layoutIds.has(q.id)) return '';
     if (q.question_type === 'matching') { matchingItems.push({ q, num }); return ''; }
     return renderQuestion(q, num);
@@ -108,7 +110,7 @@ function render() {
 
   document.getElementById('questionsPane').innerHTML = `
     <div class="section-divider">Questions ${globalNum + 1}–${globalNum + passage.questions.length}</div>
-    ${ExamRuntime.renderLayoutHtml(passage.layout, passage, answers)}
+    ${ExamRuntime.renderLayoutHtml(passage.layout, passage, answers, numbersById)}
     ${ExamRuntime.renderMatchingHtml(matchingItems, answers)}
     ${plainHtml}
   `;
