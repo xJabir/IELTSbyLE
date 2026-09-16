@@ -1903,10 +1903,23 @@ function renderTestList(filter) {
     tests.map((t, index) => {
 
       const finished =
-        allResults.find(
+        allResults
+          .filter(
+            r =>
+              r.test_id === t.id
+          )
+          .sort(
+            (a, b) =>
+              new Date(b.submitted_at || 0) -
+              new Date(a.submitted_at || 0)
+          )[0];
+
+
+      const attemptCount =
+        allResults.filter(
           r =>
             r.test_id === t.id
-        );
+        ).length;
 
 
       const progress =
@@ -1946,7 +1959,32 @@ function renderTestList(filter) {
       `;
 
 
-      if (progress) {
+      if (locked) {
+
+        badge = `
+
+          <span class="test-status locked">
+            🔒 Enrollment required
+          </span>
+
+        `;
+
+
+        action = `
+
+          <button
+            class="test-action disabled"
+            disabled
+            title="Ask your teacher to enrol you for access"
+          >
+            Locked
+          </button>
+
+        `;
+
+      }
+
+      else if (progress) {
 
         badge = `
 
@@ -1977,7 +2015,7 @@ function renderTestList(filter) {
           badge = `
 
             <span class="test-status graded">
-              Graded
+              Graded${attemptCount > 1 ? ` · ${attemptCount} attempts` : ''}
             </span>
 
           `;
@@ -1989,7 +2027,7 @@ function renderTestList(filter) {
           badge = `
 
             <span class="test-status awaiting">
-              Awaiting writing grade
+              Awaiting writing grade${attemptCount > 1 ? ` · ${attemptCount} attempts` : ''}
             </span>
 
           `;
@@ -2006,30 +2044,12 @@ function renderTestList(filter) {
             View result
           </a>
 
-        `;
-
-      }
-
-      else if (locked) {
-
-        badge = `
-
-          <span class="test-status locked">
-            🔒 Enrollment required
-          </span>
-
-        `;
-
-
-        action = `
-
-          <button
-            class="test-action disabled"
-            disabled
-            title="Ask your teacher to enrol you for access"
+          <a
+            href="/exam/intro.html?testId=${t.id}"
+            class="test-action primary"
           >
-            Locked
-          </button>
+            Retake
+          </a>
 
         `;
 
