@@ -103,6 +103,11 @@ create table if not exists public.reading_passages (
 );
 alter table public.reading_passages enable row level security;
 
+-- Optional table/note completion layout (see listening_sections.layout below
+-- for the JSON shape). Safe to re-run.
+alter table public.reading_passages add column if not exists layout jsonb;
+
+
 drop policy if exists "teachers manage passages on their tests" on public.reading_passages;
 create policy "teachers manage passages on their tests"
   on public.reading_passages for all to authenticated
@@ -144,6 +149,25 @@ create table if not exists public.listening_sections (
   audio_url text default ''
 );
 alter table public.listening_sections enable row level security;
+
+-- Optional table/note completion layout for this section, e.g.:
+-- {
+--   "type": "table",                       -- or "note"
+--   "intro": "Complete the table below...",
+--   "columns": ["Types of guitars", "Features", "People/Location"],
+--   "rows": [
+--     [ [{"type":"text","value":"Electric guitars"}],
+--       [{"type":"text","value":"Used with amplifiers"}],
+--       [{"type":"text","value":"Suitable for "},{"type":"blank","question_id":"..."}] ]
+--   ]
+-- }
+-- A "note" layout uses "parts" (same [{"type":"text"|"blank",...}] shape)
+-- instead of "columns"/"rows". Each blank part's question_id must point at
+-- a listening_questions / reading_questions row of type 'layout_blank' that
+-- belongs to the same section/passage — that row's correct_answer is what
+-- grades the blank, same as any other question.
+alter table public.listening_sections add column if not exists layout jsonb;
+
 
 drop policy if exists "teachers manage listening sections on their tests" on public.listening_sections;
 create policy "teachers manage listening sections on their tests"
@@ -492,6 +516,7 @@ begin
     'passages', coalesce((
       select jsonb_agg(jsonb_build_object(
         'id', p.id, 'order_num', p.order_num, 'title', p.title, 'passage_text', p.passage_text,
+        'layout', p.layout,
         'questions', coalesce((
           select jsonb_agg(jsonb_build_object(
             'id', q.id, 'order_num', q.order_num, 'question_type', q.question_type,
@@ -505,6 +530,7 @@ begin
     'sections', coalesce((
       select jsonb_agg(jsonb_build_object(
         'id', s.id, 'order_num', s.order_num, 'title', s.title, 'audio_url', s.audio_url,
+        'layout', s.layout,
         'questions', coalesce((
           select jsonb_agg(jsonb_build_object(
             'id', q.id, 'order_num', q.order_num, 'question_type', q.question_type,
@@ -809,6 +835,18 @@ create policy "anyone can read listening audio"
 drop policy if exists "teachers can upload listening audio" on storage.objects;
 create policy "teachers can upload listening audio"
   on storage.objects for insert to authenticated
+  with check (
+    bucket_id = 'listening-audio'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'teacher')
+  );
+
+drop policy if exists "teachers can update listening audio" on storage.objects;
+create policy "teachers can update listening audio"
+  on storage.objects for update to authenticated
+  using (
+    bucket_id = 'listening-audio'
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'teacher')
+  )
   with check (
     bucket_id = 'listening-audio'
     and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'teacher')
