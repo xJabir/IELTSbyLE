@@ -724,8 +724,8 @@ function renderListening() {
     <div class="builder-item">
       <div class="builder-item-head">
         ${editingThisSection
-          ? `<input type="text" id="edit-s-title-${s.id}" value="${esc(s.title)}" style="flex:1;margin-right:10px;">`
-          : `<span class="tag">Section ${si + 1}: ${esc(s.title)}</span>`}
+          ? `<textarea id="edit-s-title-${s.id}" rows="2" style="flex:1;margin-right:10px;">${esc(s.title)}</textarea>`
+          : `<span class="tag" style="white-space:pre-wrap;">Section ${si + 1}: ${esc(s.title)}</span>`}
         <div style="display:flex;gap:8px;">
           ${editingThisSection
             ? `<button class="button primary" data-save-section="${s.id}" style="padding:6px 14px;">Save</button>
@@ -802,7 +802,7 @@ function showSectionForm() {
   const wrap = document.createElement('div');
   wrap.className = 'builder-item';
   wrap.innerHTML = `
-    <div class="field"><label>Section title</label><input type="text" id="new-s-title" placeholder="e.g. Section 1 — Booking a hotel room"></div>
+    <div class="field"><label>Section title</label><textarea id="new-s-title" rows="2" placeholder="e.g. Section 1 — Booking a hotel room&#10;Press Enter for a new line"></textarea></div>
     <div class="submit-row"><button class="button primary" id="saveNewSection" style="padding:9px 18px;">Add section</button></div>
   `;
   list.appendChild(wrap);
