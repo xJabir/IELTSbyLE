@@ -734,7 +734,8 @@ function renderListening() {
           <button class="small-btn danger" data-del-section="${s.id}">Delete section</button>
         </div>
       </div>
-      <p style="font-size:13px;color:var(--ink-soft);">${s.audio_url ? `Audio attached ✓ <a href="${s.audio_url}" target="_blank">Preview</a>` : 'No audio uploaded yet'}</p>
+      <p style="font-size:13px;color:var(--ink-soft);">${s.audio_url ? `Audio attached ✓ <a href="${s.audio_url}" target="_blank">Preview</a> <button class="small-btn danger" data-remove-audio="${s.id}" style="margin-left:6px;">Remove audio</button>` : 'No audio uploaded yet'}</p>
+      <label style="font-size:12px;color:var(--ink-soft);display:block;margin-bottom:4px;">${s.audio_url ? 'Replace audio:' : 'Upload audio:'}</label>
       <input type="file" accept=".mp3,.wav,.m4a,.ogg,audio/*" data-upload-audio="${s.id}">
       <div style="margin-top:14px;">
         <strong style="font-size:13px;">Questions (${s.questions.length})${s.questions.length ? ` — numbered ${numOffset + 1}–${numOffset + s.questions.length} on the real test` : ''}</strong>
@@ -782,6 +783,7 @@ function renderListening() {
     (b.dataset.kind === 'reading' ? renderReading : renderListening)();
   }));
   list.querySelectorAll('[data-upload-audio]').forEach(input => input.addEventListener('change', () => handleAudioUpload(input)));
+  list.querySelectorAll('[data-remove-audio]').forEach(b => b.addEventListener('click', () => removeSectionAudio(b.dataset.removeAudio)));
   wireQuestionForms(el, 'listening');
   wireQuestionEditForms(el, 'listening');
   state.sections.forEach(s => wireLayoutPanel(list, s, 'listening'));
@@ -843,14 +845,41 @@ async function handleAudioUpload(input) {
     const { error: uploadError } = await supabase.storage.from('listening-audio').upload(path, file, { upsert: true });
     if (uploadError) throw uploadError;
     const { data: pub } = supabase.storage.from('listening-audio').getPublicUrl(path);
-    const { error: updateError } = await supabase.from('listening_sections').update({ audio_url: pub.publicUrl }).eq('id', sectionId);
+    // .select() matters here: without it an UPDATE that matches zero rows
+    // (e.g. RLS quietly filtering it out because this account didn't create
+    // the test) succeeds with no error, the audio_url is never written, and
+    // the section silently shows "No audio uploaded yet" again after reload.
+    const { data: updated, error: updateError } = await supabase
+      .from('listening_sections')
+      .update({ audio_url: pub.publicUrl })
+      .eq('id', sectionId)
+      .select();
     if (updateError) throw updateError;
+    if (!updated || !updated.length) {
+      throw new Error("The audio uploaded, but couldn't be attached to this section. This usually means the section belongs to a test created by a different teacher account — open it from the account that created the test and try again.");
+    }
     await loadAll();
     switchTab('listening');
   } catch (e) {
     alert(e.message);
     input.disabled = false;
   }
+}
+
+async function removeSectionAudio(sectionId) {
+  if (!confirm('Remove the audio from this section? The section and its questions are kept.')) return;
+  const { data: updated, error } = await supabase
+    .from('listening_sections')
+    .update({ audio_url: '' })
+    .eq('id', sectionId)
+    .select();
+  if (error) { alert(error.message); return; }
+  if (!updated || !updated.length) {
+    alert("Couldn't remove the audio — this section may belong to a test created by a different teacher account.");
+    return;
+  }
+  await loadAll();
+  switchTab('listening');
 }
 
 // ============================= WRITING =============================
