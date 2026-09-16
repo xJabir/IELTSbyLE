@@ -147,7 +147,7 @@ function renderAllSections() {
         return renderQuestion(q, num);
       }).join('');
       const html = `
-        <div class="section-divider">${ExamRuntime.escapeHtml(section.title)} — Questions ${globalNum + 1}–${globalNum + section.questions.length}</div>
+        <div class="section-divider">${ExamRuntime.escapeHtml(section.title).replace(/\n/g, '<br>')} — Questions ${globalNum + 1}–${globalNum + section.questions.length}</div>
         ${ExamRuntime.renderLayoutHtml(section.layout, section, answers, numbersById)}
         ${ExamRuntime.renderMatchingHtml(matchingItems, answers)}
         ${plainHtml}
