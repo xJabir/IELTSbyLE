@@ -92,6 +92,97 @@ async function togglePublish() {
   await loadAll();
 }
 
+// ============================= PDF IMPORT =============================
+// Lets the teacher upload a PDF instead of typing everything by hand. The
+// PDF is sent (as base64) to the "import-test-pdf" Supabase Edge Function,
+// which asks Claude to read it and hand back passages/sections + their
+// questions (and any table/note layout) in the same shape this builder
+// already uses. We then insert that as real rows via the normal RLS'd
+// client calls — the edge function itself never touches the database.
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = () => reject(new Error('Could not read the file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function importTestFromPdf(file, kind, statusEl) {
+  try {
+    statusEl.textContent = 'Reading PDF…';
+    const pdf_base64 = await fileToBase64(file);
+
+    statusEl.textContent = 'Extracting with AI — this can take a minute…';
+    const { data, error } = await supabase.functions.invoke('import-test-pdf', { body: { pdf_base64 } });
+    if (error) throw error;
+    if (data && data.error) throw new Error(data.error);
+    if (!data || !Array.isArray(data.containers) || !data.containers.length) {
+      throw new Error('No passages/sections were recognised in that PDF.');
+    }
+
+    statusEl.textContent = 'Saving…';
+    await saveImportedContainers(data.containers, kind);
+
+    statusEl.textContent = '';
+    await loadAll();
+    switchTab(kind);
+    alert(`Imported ${data.containers.length} ${kind === 'reading' ? 'passage(s)' : 'section(s)'}. Please review the questions, correct answers, and layout before publishing — AI extraction can make mistakes.`);
+  } catch (err) {
+    statusEl.textContent = '';
+    alert('Import failed: ' + (err.message || err));
+  }
+}
+
+async function saveImportedContainers(containers, kind) {
+  const parentTable = kind === 'reading' ? 'reading_passages' : 'listening_sections';
+  const questionTable = kind === 'reading' ? 'reading_questions' : 'listening_questions';
+  const parentField = kind === 'reading' ? 'passage_id' : 'section_id';
+  const existingCount = kind === 'reading' ? state.passages.length : state.sections.length;
+
+  for (let ci = 0; ci < containers.length; ci++) {
+    const c = containers[ci];
+    const order_num = existingCount + ci + 1;
+    const parentPayload = kind === 'reading'
+      ? { test_id: testId, order_num, title: c.title || `Passage ${order_num}`, passage_text: c.passage_text || '' }
+      : { test_id: testId, order_num, title: c.title || `Section ${order_num}` };
+
+    const { data: parentRow, error: parentErr } = await supabase.from(parentTable).insert(parentPayload).select().single();
+    if (parentErr) throw parentErr;
+
+    const questions = Array.isArray(c.questions) ? c.questions : [];
+    const insertedIds = [];
+    for (let qi = 0; qi < questions.length; qi++) {
+      const q = questions[qi] || {};
+      const payload = {
+        [parentField]: parentRow.id,
+        question_type: q.question_type || 'short_answer',
+        question_text: q.question_text || '',
+        options: Array.isArray(q.options) ? q.options : [],
+        correct_answer: q.correct_answer || '',
+        order_num: qi + 1
+      };
+      const { data: qRow, error: qErr } = await supabase.from(questionTable).insert(payload).select().single();
+      if (qErr) throw qErr;
+      insertedIds.push(qRow.id);
+    }
+
+    if (c.layout && c.layout.type && c.layout.type !== 'none') {
+      const translateParts = parts => (parts || [])
+        .map(p => p && p.type === 'blank'
+          ? { type: 'blank', question_id: insertedIds[p.ref] }
+          : { type: 'text', value: (p && p.value) || '' })
+        .filter(p => p.type !== 'blank' || p.question_id);
+      const layout = c.layout.type === 'note'
+        ? { type: 'note', intro: c.layout.intro || '', parts: translateParts(c.layout.parts) }
+        : { type: 'table', intro: c.layout.intro || '', columns: c.layout.columns || [], rows: (c.layout.rows || []).map(row => (row || []).map(translateParts)) };
+      const { error: layoutErr } = await supabase.from(parentTable).update({ layout }).eq('id', parentRow.id);
+      if (layoutErr) throw layoutErr;
+    }
+  }
+}
+
 // ============================= DETAILS =============================
 
 function renderDetails() {
@@ -463,9 +554,20 @@ function renderReading() {
   el.innerHTML = `
     <div class="panel">
       <h2>Reading passages</h2>
-      <p class="panel-sub">Add one panel per passage, then attach questions underneath it.</p>
+      <div class="builder-item" style="background:#f7f9fc;">
+        <strong style="font-size:14px;">Upload a mock test (PDF)</strong>
+        <p style="font-size:12px;color:var(--ink-soft);margin:4px 0 8px;">
+          Upload a reading passage (with its questions) as a PDF and it'll be turned into a new passage automatically —
+          including tables, note-completion blanks, and matching questions where the PDF has them.
+          AI extraction isn't perfect, so always check it over afterwards, especially the correct answers.
+        </p>
+        <input type="file" accept="application/pdf" id="readingPdfInput">
+        <button class="small-btn" id="importReadingPdfBtn">Import PDF</button>
+        <span id="readingPdfStatus" style="font-size:12px;color:var(--ink-soft);margin-left:8px;"></span>
+      </div>
+      <p class="panel-sub" style="margin-top:18px;">Or add a passage manually below — add one panel per passage, then attach questions underneath it.</p>
       <div id="passageList"></div>
-      <button class="small-btn" id="addPassageBtn" style="margin-top:14px;">+ Add passage</button>
+      <button class="small-btn" id="addPassageBtn" style="margin-top:14px;">+ Add passage manually</button>
     </div>
   `;
   const list = document.getElementById('passageList');
@@ -523,6 +625,11 @@ function renderReading() {
   }).join('') || '<p style="color:var(--ink-soft);font-size:14px;">No passages yet.</p>';
 
   document.getElementById('addPassageBtn').addEventListener('click', () => showPassageForm());
+  document.getElementById('importReadingPdfBtn').addEventListener('click', () => {
+    const input = document.getElementById('readingPdfInput');
+    if (!input.files[0]) { alert('Choose a PDF first.'); return; }
+    importTestFromPdf(input.files[0], 'reading', document.getElementById('readingPdfStatus'));
+  });
   list.querySelectorAll('[data-del-passage]').forEach(b => b.addEventListener('click', () => deletePassage(b.dataset.delPassage)));
   list.querySelectorAll('[data-edit-passage]').forEach(b => b.addEventListener('click', () => { editingPassages.add(b.dataset.editPassage); renderReading(); }));
   list.querySelectorAll('[data-cancel-passage]').forEach(b => b.addEventListener('click', () => { editingPassages.delete(b.dataset.cancelPassage); renderReading(); }));
@@ -592,9 +699,21 @@ function renderListening() {
   el.innerHTML = `
     <div class="panel">
       <h2>Listening sections</h2>
-      <p class="panel-sub">Upload one audio clip per section (mp3/wav/m4a/ogg), then attach its questions.</p>
+      <div class="builder-item" style="background:#f7f9fc;">
+        <strong style="font-size:14px;">Upload a mock test (PDF)</strong>
+        <p style="font-size:12px;color:var(--ink-soft);margin:4px 0 8px;">
+          Upload a listening section's question sheet as a PDF and it'll be turned into a new section automatically —
+          including tables, note-completion blanks, and matching questions where the PDF has them.
+          You'll still need to upload the audio clip yourself afterwards. Always check the result over,
+          especially the correct answers.
+        </p>
+        <input type="file" accept="application/pdf" id="listeningPdfInput">
+        <button class="small-btn" id="importListeningPdfBtn">Import PDF</button>
+        <span id="listeningPdfStatus" style="font-size:12px;color:var(--ink-soft);margin-left:8px;"></span>
+      </div>
+      <p class="panel-sub" style="margin-top:18px;">Or add a section manually below — upload one audio clip per section (mp3/wav/m4a/ogg), then attach its questions.</p>
       <div id="sectionList"></div>
-      <button class="small-btn" id="addSectionBtn" style="margin-top:14px;">+ Add section</button>
+      <button class="small-btn" id="addSectionBtn" style="margin-top:14px;">+ Add section manually</button>
     </div>
   `;
   const list = document.getElementById('sectionList');
@@ -648,6 +767,11 @@ function renderListening() {
   }).join('') || '<p style="color:var(--ink-soft);font-size:14px;">No sections yet.</p>';
 
   document.getElementById('addSectionBtn').addEventListener('click', () => showSectionForm());
+  document.getElementById('importListeningPdfBtn').addEventListener('click', () => {
+    const input = document.getElementById('listeningPdfInput');
+    if (!input.files[0]) { alert('Choose a PDF first.'); return; }
+    importTestFromPdf(input.files[0], 'listening', document.getElementById('listeningPdfStatus'));
+  });
   list.querySelectorAll('[data-del-section]').forEach(b => b.addEventListener('click', () => deleteSection(b.dataset.delSection)));
   list.querySelectorAll('[data-edit-section]').forEach(b => b.addEventListener('click', () => { editingSections.add(b.dataset.editSection); renderListening(); }));
   list.querySelectorAll('[data-cancel-section]').forEach(b => b.addEventListener('click', () => { editingSections.delete(b.dataset.cancelSection); renderListening(); }));
