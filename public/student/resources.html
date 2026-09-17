@@ -442,6 +442,54 @@ body {
   color: var(--resource-muted);
 }
 
+.essentials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.essentials-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--resource-border);
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.essentials-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--resource-shadow);
+}
+
+.essentials-tile.active {
+  border-color: var(--resource-red);
+  background: var(--resource-red-light);
+}
+
+.essentials-tile-icon {
+  font-size: 22px;
+}
+
+.essentials-tile-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--resource-text);
+  line-height: 1.3;
+}
+
+.essentials-tile-count {
+  font-size: 11.5px;
+  color: var(--resource-muted);
+  font-weight: 600;
+}
+
 .cue-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1079,7 +1127,35 @@ body {
 
     </button>
 
+
+    <button class="module-tab" data-module="essentials">
+
+      <span class="module-icon">E</span>
+
+      <span class="module-tab-content">
+        <span class="module-tab-title">IELTS Essentials</span>
+        <span class="module-tab-count" data-count="essentials">
+          0 resources
+        </span>
+      </span>
+
+    </button>
+
   </div>
+
+
+  <!-- =========================================
+       ESSENTIALS CATEGORIES
+  ========================================= -->
+
+  <section class="cue-tool" id="essentialsCategories" style="display:none;">
+
+    <h2>IELTS Essentials</h2>
+    <p>Core language-building material — pick a category below.</p>
+
+    <div class="essentials-grid" id="essentialsGrid"></div>
+
+  </section>
 
 
   <!-- =========================================
@@ -1140,7 +1216,17 @@ body {
 let allResources = [];
 let allCueCards = [];
 let activeModule = 'listening';
+let activeSubCategory = 'vocabulary_builder';
 let currentProfile = null;
+
+const ESSENTIALS_CATEGORIES = [
+  { slug: 'vocabulary_builder', label: 'Vocabulary Builder', icon: '📘' },
+  { slug: 'grammar_sentence_building', label: 'Grammar & Sentence Building', icon: '✍️' },
+  { slug: 'collocations', label: 'Collocations', icon: '🔗' },
+  { slug: 'linking_words_cohesion', label: 'Linking Words & Cohesion', icon: '🧩' },
+  { slug: 'paraphrase_bank', label: 'Paraphrase Bank', icon: '🔄' },
+  { slug: 'academic_language_bank', label: 'Academic Language Bank', icon: '🎓' }
+];
 
 
 /* =========================================
@@ -1196,6 +1282,11 @@ let currentProfile = null;
 
         document.getElementById('cueTool').style.display =
           activeModule === 'speaking' ? '' : 'none';
+
+        document.getElementById('essentialsCategories').style.display =
+          activeModule === 'essentials' ? '' : 'none';
+
+        if (activeModule === 'essentials') renderEssentialsGrid();
 
         updateSectionHeading();
 
@@ -1403,7 +1494,8 @@ function updateModuleCounts() {
     'listening',
     'reading',
     'writing',
-    'speaking'
+    'speaking',
+    'essentials'
   ];
 
 
@@ -1431,6 +1523,49 @@ function updateModuleCounts() {
 
 
 /* =========================================
+   ESSENTIALS CATEGORY GRID
+========================================= */
+
+function renderEssentialsGrid() {
+
+  const grid = document.getElementById('essentialsGrid');
+
+  grid.innerHTML = ESSENTIALS_CATEGORIES.map(cat => {
+
+    const count = allResources.filter(
+      r => r.module === 'essentials' && r.sub_category === cat.slug
+    ).length;
+
+    return `
+      <button class="essentials-tile ${cat.slug === activeSubCategory ? 'active' : ''}" data-subcat="${cat.slug}">
+        <span class="essentials-tile-icon">${cat.icon}</span>
+        <span class="essentials-tile-label">${escapeHtml(cat.label)}</span>
+        <span class="essentials-tile-count">${count} ${count === 1 ? 'resource' : 'resources'}</span>
+      </button>
+    `;
+
+  }).join('');
+
+  grid.querySelectorAll('.essentials-tile').forEach(tile => {
+
+    tile.addEventListener('click', () => {
+
+      activeSubCategory = tile.dataset.subcat;
+
+      grid.querySelectorAll('.essentials-tile').forEach(t => t.classList.remove('active'));
+      tile.classList.add('active');
+
+      updateSectionHeading();
+      render();
+
+    });
+
+  });
+
+}
+
+
+/* =========================================
    UPDATE SECTION HEADING
 ========================================= */
 
@@ -1444,13 +1579,21 @@ function updateSectionHeading() {
 
 
   const count = allResources.filter(
-    resource => resource.module === activeModule
+    resource => resource.module === activeModule &&
+      (activeModule !== 'essentials' || resource.sub_category === activeSubCategory)
   ).length;
 
 
-  const moduleName =
+  let moduleName =
     activeModule.charAt(0).toUpperCase() +
     activeModule.slice(1);
+
+  if (activeModule === 'essentials') {
+
+    const cat = ESSENTIALS_CATEGORIES.find(c => c.slug === activeSubCategory) || ESSENTIALS_CATEGORIES[0];
+    moduleName = cat.label;
+
+  }
 
 
   title.textContent =
@@ -1475,15 +1618,21 @@ function render() {
 
   const items =
     allResources.filter(
-      resource => resource.module === activeModule
+      resource => resource.module === activeModule &&
+        (activeModule !== 'essentials' || resource.sub_category === activeSubCategory)
     );
 
 
   if (!items.length) {
 
-    const moduleName =
+    let moduleName =
       activeModule.charAt(0).toUpperCase() +
       activeModule.slice(1);
+
+    if (activeModule === 'essentials') {
+      const cat = ESSENTIALS_CATEGORIES.find(c => c.slug === activeSubCategory) || ESSENTIALS_CATEGORIES[0];
+      moduleName = cat.label;
+    }
 
 
     el.innerHTML = `
@@ -1728,7 +1877,8 @@ function getModuleLetter(module) {
     listening: 'L',
     reading: 'R',
     writing: 'W',
-    speaking: 'S'
+    speaking: 'S',
+    essentials: 'E'
   };
 
   return letters[module] || 'R';
