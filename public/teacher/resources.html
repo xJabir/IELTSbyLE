@@ -1644,6 +1644,67 @@
   </div>
 
 
+  <!-- CUE CARDS (Speaking only) -->
+
+  <section class="upload-card" id="cueCardSection" style="display:none;">
+
+    <div class="upload-header">
+
+      <div class="upload-title">
+
+        <div class="upload-icon">
+          🎴
+        </div>
+
+        <div>
+
+          <h2>
+            Speaking cue cards
+          </h2>
+
+          <p>
+            Add Part 2 cue cards here. Students draw one at random from
+            the Speaking tab in Resources — the more you add, the bigger
+            their pool gets.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="upload-body">
+
+      <div class="field">
+        <label for="newCueCardText">Cue card text</label>
+        <textarea
+          id="newCueCardText"
+          rows="5"
+          placeholder="Describe a book you recently read.&#10;You should say:&#10;- what the book was about&#10;- why you decided to read it&#10;- what you learned from it&#10;and explain how you felt about it."
+          style="width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;padding:10px;border-radius:8px;border:1px solid var(--line,#ddd);"
+        ></textarea>
+      </div>
+
+      <div class="upload-footer">
+
+        <span id="cueCardError" class="upload-error" style="display:none;"></span>
+
+        <button class="upload-button" id="addCueCardBtn">
+          Add cue card
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div id="cueCardList" style="padding:0 24px 24px;display:flex;flex-wrap:wrap;gap:10px;"></div>
+
+  </section>
+
+
   <!-- UPLOAD -->
 
   <section class="upload-card">
@@ -1921,6 +1982,7 @@ let profile;
 let allResources = [];
 
 let activeModule = 'listening';
+let allCueCards = [];
 
 
 /* ==========================================
@@ -1976,6 +2038,10 @@ let activeModule = 'listening';
             btn.dataset.module;
 
 
+          document.getElementById('cueCardSection').style.display =
+            activeModule === 'speaking' ? '' : 'none';
+
+
           updateSelectedModule();
 
           render();
@@ -2022,11 +2088,19 @@ let activeModule = 'listening';
     });
 
 
+  /* Cue cards */
+
+  document
+    .getElementById('addCueCardBtn')
+    .addEventListener('click', addCueCard);
+
+
   updateSelectedModule();
 
   updateAccessUI();
 
   load();
+  loadCueCards();
 
 })();
 
@@ -2767,6 +2841,134 @@ function updateAccessUI() {
     'active',
     selected?.value === 'false'
   );
+
+}
+
+
+/* ==========================================
+   CUE CARDS
+========================================== */
+
+async function loadCueCards() {
+
+  const { data, error } =
+    await supabase
+      .from('cue_cards')
+      .select('*')
+      .order('order_num', { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  allCueCards = data || [];
+
+  renderCueCards();
+
+}
+
+
+function renderCueCards() {
+
+  const el = document.getElementById('cueCardList');
+  if (!el) return;
+
+  if (!allCueCards.length) {
+
+    el.innerHTML = `
+      <p style="font-size:13px;color:var(--ink-soft,#667085);">
+        No cue cards yet — add the first one above.
+      </p>
+    `;
+
+    return;
+
+  }
+
+  el.innerHTML = allCueCards.map((c, i) => `
+    <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--line,#ddd);border-radius:8px;padding:8px 12px;background:#fff;max-width:100%;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:6px;background:#142b5f;color:#fff;font-weight:700;font-size:12px;flex-shrink:0;">
+        ${i + 1}
+      </span>
+      <span style="font-size:13px;color:#333;white-space:pre-wrap;overflow:hidden;text-overflow:ellipsis;max-width:340px;max-height:2.8em;">
+        ${escapeHtml(c.card_text)}
+      </span>
+      <button
+        class="resource-action danger"
+        data-del-cue="${c.id}"
+        style="margin-left:4px;flex-shrink:0;"
+      >
+        Delete
+      </button>
+    </div>
+  `).join('');
+
+  el.querySelectorAll('[data-del-cue]').forEach(btn =>
+    btn.addEventListener('click', () => deleteCueCard(btn.dataset.delCue))
+  );
+
+}
+
+
+async function addCueCard() {
+
+  const textEl = document.getElementById('newCueCardText');
+  const errEl = document.getElementById('cueCardError');
+  const text = textEl.value.trim();
+
+  errEl.style.display = 'none';
+
+  if (!text) {
+    errEl.textContent = 'Write the cue card text first.';
+    errEl.style.display = '';
+    return;
+  }
+
+  const btn = document.getElementById('addCueCardBtn');
+  btn.disabled = true;
+  btn.textContent = 'Adding...';
+
+  const { error } =
+    await supabase
+      .from('cue_cards')
+      .insert({
+        created_by: profile.id,
+        order_num: allCueCards.length + 1,
+        card_text: text
+      });
+
+  btn.disabled = false;
+  btn.textContent = 'Add cue card';
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = '';
+    return;
+  }
+
+  textEl.value = '';
+  await loadCueCards();
+
+}
+
+
+async function deleteCueCard(id) {
+
+  if (!confirm('Delete this cue card? Students will no longer be able to draw it.')) return;
+
+  const { error } =
+    await supabase
+      .from('cue_cards')
+      .delete()
+      .eq('id', id);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  await loadCueCards();
 
 }
 
