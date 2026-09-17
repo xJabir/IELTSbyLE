@@ -349,6 +349,162 @@ body {
 }
 
 /* =========================================
+   CUE CARD TOOL (Speaking)
+========================================= */
+
+.cue-tool {
+  background: var(--resource-card);
+  border: 1px solid var(--resource-border);
+  border-radius: 16px;
+  box-shadow: var(--resource-shadow);
+  padding: 26px 28px;
+  margin-bottom: 28px;
+}
+
+.cue-tool h2 {
+  margin: 0 0 6px;
+  color: var(--resource-blue);
+  font-size: 18px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.cue-tool p {
+  margin: 0 0 18px;
+  color: var(--resource-text-soft);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.cue-box-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.cue-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--resource-border);
+  background: var(--resource-blue-light);
+  color: var(--resource-blue);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.cue-box.shuffling {
+  background: var(--resource-red);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.cue-box.picked {
+  background: var(--resource-red);
+  color: #fff;
+  transform: scale(1.12);
+  box-shadow: 0 6px 16px rgba(230,57,70,0.35);
+}
+
+.cue-pick-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 10px;
+  border: none;
+  background: var(--resource-red);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.cue-pick-btn:hover:not(:disabled) {
+  background: var(--resource-red-dark);
+  transform: translateY(-1px);
+}
+
+.cue-pick-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.cue-empty {
+  font-size: 13px;
+  color: var(--resource-muted);
+}
+
+.cue-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 200;
+}
+
+.cue-modal {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 480px;
+  width: 100%;
+  padding: 30px;
+  box-shadow: var(--resource-shadow-hover);
+}
+
+.cue-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: var(--resource-blue);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.cue-modal-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--resource-text);
+  white-space: pre-wrap;
+  margin-bottom: 22px;
+}
+
+.cue-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 9px;
+  border: 1px solid var(--resource-border);
+  background: #fff;
+  color: var(--resource-text);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cue-modal-close:hover {
+  background: var(--resource-blue-light);
+}
+
+/* =========================================
    RESOURCE AREA
 ========================================= */
 
@@ -927,6 +1083,22 @@ body {
 
 
   <!-- =========================================
+       CUE CARD TOOL (Speaking only)
+  ========================================= -->
+
+  <section class="cue-tool" id="cueTool" style="display:none;">
+
+    <h2>Speaking cue card</h2>
+    <p>Pick a random Part 2 cue card to practice with. Your teacher adds new ones regularly.</p>
+
+    <div class="cue-box-grid" id="cueBoxGrid"></div>
+
+    <button class="cue-pick-btn" id="pickCueBtn">Pick a cue card</button>
+
+  </section>
+
+
+  <!-- =========================================
        RESOURCE LIST
   ========================================= -->
 
@@ -966,6 +1138,7 @@ body {
 <script>
 
 let allResources = [];
+let allCueCards = [];
 let activeModule = 'listening';
 let currentProfile = null;
 
@@ -1021,6 +1194,9 @@ let currentProfile = null;
 
         activeModule = btn.dataset.module;
 
+        document.getElementById('cueTool').style.display =
+          activeModule === 'speaking' ? '' : 'none';
+
         updateSectionHeading();
 
         render();
@@ -1030,7 +1206,13 @@ let currentProfile = null;
     });
 
 
+  document
+    .getElementById('pickCueBtn')
+    .addEventListener('click', pickCueCard);
+
+
   load();
+  loadCueCards();
 
 })();
 
@@ -1084,6 +1266,129 @@ async function load() {
   updateModuleCounts();
   updateSectionHeading();
   render();
+
+}
+
+
+/* =========================================
+   CUE CARDS
+========================================= */
+
+async function loadCueCards() {
+
+  const { data, error } = await supabase
+    .from('cue_cards')
+    .select('*')
+    .order('order_num', { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  allCueCards = data || [];
+
+  renderCueBoxes();
+
+}
+
+
+function renderCueBoxes() {
+
+  const grid = document.getElementById('cueBoxGrid');
+  const btn = document.getElementById('pickCueBtn');
+
+  if (!allCueCards.length) {
+    grid.innerHTML = `<p class="cue-empty">Your teacher hasn't added any cue cards yet — check back soon.</p>`;
+    btn.disabled = true;
+    return;
+  }
+
+  btn.disabled = false;
+
+  grid.innerHTML = allCueCards.map((c, i) =>
+    `<div class="cue-box" data-cue-box="${i}">${i + 1}</div>`
+  ).join('');
+
+}
+
+
+function pickCueCard() {
+
+  if (!allCueCards.length) return;
+
+  const btn = document.getElementById('pickCueBtn');
+  const boxes = document.querySelectorAll('#cueBoxGrid .cue-box');
+
+  btn.disabled = true;
+  btn.textContent = 'Shuffling…';
+
+  const finalIndex = Math.floor(Math.random() * allCueCards.length);
+
+  let ticks = 0;
+  const maxTicks = 16 + Math.floor(Math.random() * 6);
+  let lastHighlighted = null;
+
+  const interval = setInterval(() => {
+
+    if (lastHighlighted !== null) {
+      boxes[lastHighlighted].classList.remove('shuffling');
+    }
+
+    const randomIndex = Math.floor(Math.random() * boxes.length);
+    boxes[randomIndex].classList.add('shuffling');
+    lastHighlighted = randomIndex;
+
+    ticks++;
+
+    if (ticks >= maxTicks) {
+
+      clearInterval(interval);
+
+      if (lastHighlighted !== null) {
+        boxes[lastHighlighted].classList.remove('shuffling');
+      }
+
+      boxes[finalIndex].classList.add('picked');
+
+      btn.disabled = false;
+      btn.textContent = 'Pick a cue card';
+
+      showCueCardModal(allCueCards[finalIndex], finalIndex);
+
+    }
+
+  }, 80);
+
+}
+
+
+function showCueCardModal(card, index) {
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'cue-modal-backdrop';
+
+  backdrop.innerHTML = `
+    <div class="cue-modal">
+      <div class="cue-modal-badge">${index + 1}</div>
+      <div class="cue-modal-text">${escapeHtml(card.card_text)}</div>
+      <button class="cue-modal-close" id="closeCueModalBtn">Close</button>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+
+  const close = () => {
+    backdrop.remove();
+    const box = document.querySelector(`#cueBoxGrid .cue-box[data-cue-box="${index}"]`);
+    if (box) box.classList.remove('picked');
+  };
+
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  backdrop.querySelector('#closeCueModalBtn').addEventListener('click', close);
 
 }
 
