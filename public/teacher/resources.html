@@ -1639,6 +1639,65 @@
         </span>
       </button>
 
+
+      <button
+        class="module-tab"
+        data-module="essentials"
+      >
+        IELTS Essentials
+        <span
+          class="module-tab-count"
+          id="count-essentials"
+        >
+          0
+        </span>
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ESSENTIALS SUB-CATEGORIES -->
+
+  <div
+    class="module-tabs-wrap"
+    id="essentialsSubTabsWrap"
+    style="display:none;margin-top:-6px;"
+  >
+
+    <div class="module-tabs" id="essentialsSubTabs">
+
+      <button class="module-tab active" data-subcat="vocabulary_builder">
+        📘 Vocabulary Builder
+        <span class="module-tab-count" id="count-sub-vocabulary_builder">0</span>
+      </button>
+
+      <button class="module-tab" data-subcat="grammar_sentence_building">
+        ✍️ Grammar &amp; Sentence Building
+        <span class="module-tab-count" id="count-sub-grammar_sentence_building">0</span>
+      </button>
+
+      <button class="module-tab" data-subcat="collocations">
+        🔗 Collocations
+        <span class="module-tab-count" id="count-sub-collocations">0</span>
+      </button>
+
+      <button class="module-tab" data-subcat="linking_words_cohesion">
+        🧩 Linking Words &amp; Cohesion
+        <span class="module-tab-count" id="count-sub-linking_words_cohesion">0</span>
+      </button>
+
+      <button class="module-tab" data-subcat="paraphrase_bank">
+        🔄 Paraphrase Bank
+        <span class="module-tab-count" id="count-sub-paraphrase_bank">0</span>
+      </button>
+
+      <button class="module-tab" data-subcat="academic_language_bank">
+        🎓 Academic Language Bank
+        <span class="module-tab-count" id="count-sub-academic_language_bank">0</span>
+      </button>
+
     </div>
 
   </div>
@@ -1982,7 +2041,17 @@ let profile;
 let allResources = [];
 
 let activeModule = 'listening';
+let activeSubCategory = 'vocabulary_builder';
 let allCueCards = [];
+
+const ESSENTIALS_CATEGORIES = [
+  { slug: 'vocabulary_builder', label: 'Vocabulary Builder', icon: '📘' },
+  { slug: 'grammar_sentence_building', label: 'Grammar & Sentence Building', icon: '✍️' },
+  { slug: 'collocations', label: 'Collocations', icon: '🔗' },
+  { slug: 'linking_words_cohesion', label: 'Linking Words & Cohesion', icon: '🧩' },
+  { slug: 'paraphrase_bank', label: 'Paraphrase Bank', icon: '🔄' },
+  { slug: 'academic_language_bank', label: 'Academic Language Bank', icon: '🎓' }
+];
 
 
 /* ==========================================
@@ -2041,6 +2110,9 @@ let allCueCards = [];
           document.getElementById('cueCardSection').style.display =
             activeModule === 'speaking' ? '' : 'none';
 
+          document.getElementById('essentialsSubTabsWrap').style.display =
+            activeModule === 'essentials' ? '' : 'none';
+
 
           updateSelectedModule();
 
@@ -2048,6 +2120,31 @@ let allCueCards = [];
 
         }
       );
+
+    });
+
+
+  /* Essentials sub-category tabs */
+
+  document
+    .querySelectorAll('#essentialsSubTabs .module-tab')
+    .forEach(btn => {
+
+      btn.addEventListener('click', () => {
+
+        document
+          .querySelectorAll('#essentialsSubTabs .module-tab')
+          .forEach(b => b.classList.remove('active'));
+
+        btn.classList.add('active');
+
+        activeSubCategory = btn.dataset.subcat;
+
+        updateSelectedModule();
+
+        render();
+
+      });
 
     });
 
@@ -2173,7 +2270,8 @@ function updateCounts() {
     'listening',
     'reading',
     'writing',
-    'speaking'
+    'speaking',
+    'essentials'
   ];
 
 
@@ -2198,6 +2296,27 @@ function updateCounts() {
   });
 
 
+  ESSENTIALS_CATEGORIES.forEach(cat => {
+
+    const count =
+      allResources.filter(
+        r => r.module === 'essentials' && r.sub_category === cat.slug
+      ).length;
+
+
+    const countEl =
+      document.getElementById(
+        `count-sub-${cat.slug}`
+      );
+
+
+    if (countEl) {
+      countEl.textContent = count;
+    }
+
+  });
+
+
   document.getElementById(
     'totalResourceCount'
   ).textContent =
@@ -2212,9 +2331,19 @@ function updateCounts() {
 
 function updateSelectedModule() {
 
-  const label =
+  let label =
     activeModule.charAt(0).toUpperCase() +
     activeModule.slice(1);
+
+  if (activeModule === 'essentials') {
+
+    const cat =
+      ESSENTIALS_CATEGORIES.find(c => c.slug === activeSubCategory) ||
+      ESSENTIALS_CATEGORIES[0];
+
+    label = `IELTS Essentials — ${cat.label}`;
+
+  }
 
 
   document.getElementById(
@@ -2245,7 +2374,8 @@ function render() {
 
   const items =
     allResources.filter(
-      r => r.module === activeModule
+      r => r.module === activeModule &&
+        (activeModule !== 'essentials' || r.sub_category === activeSubCategory)
     );
 
 
@@ -2270,7 +2400,9 @@ function render() {
         </div>
 
         <h3>
-          No ${escapeHtml(activeModule)}
+          No ${activeModule === 'essentials'
+            ? escapeHtml((ESSENTIALS_CATEGORIES.find(c => c.slug === activeSubCategory) || {}).label || '')
+            : escapeHtml(activeModule)}
           resources yet
         </h3>
 
@@ -2657,7 +2789,9 @@ async function uploadResource() {
 
 
     const path =
-      `${activeModule}/${Date.now()}-${safeFileName}`;
+      activeModule === 'essentials'
+        ? `essentials/${activeSubCategory}/${Date.now()}-${safeFileName}`
+        : `${activeModule}/${Date.now()}-${safeFileName}`;
 
 
     /* Upload file */
@@ -2708,6 +2842,9 @@ async function uploadResource() {
 
           module:
             activeModule,
+
+          sub_category:
+            activeModule === 'essentials' ? activeSubCategory : null,
 
           title,
 
