@@ -1178,6 +1178,15 @@ body {
        RESOURCE LIST
   ========================================= -->
 
+  <div id="vocabBuilderBanner" style="display:none;background:linear-gradient(135deg,var(--resource-blue),var(--resource-blue-dark));color:#fff;border-radius:16px;padding:24px 28px;margin-bottom:22px;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#ffd7da;margin-bottom:6px;">Interactive tool</div>
+      <h2 style="margin:0 0 4px;font-size:19px;">Vocabulary Builder</h2>
+      <p style="margin:0;font-size:13.5px;color:rgba(255,255,255,.8);">Search words, save and review them, try the Paraphrase Builder, and test yourself in Practice Mode.</p>
+    </div>
+    <a href="/student/vocabulary.html" style="background:#fff;color:var(--resource-blue);font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;">Open Vocabulary Builder →</a>
+  </div>
+
   <section>
 
     <div class="resource-section-head">
@@ -1288,6 +1297,8 @@ const ESSENTIALS_CATEGORIES = [
 
         if (activeModule === 'essentials') renderEssentialsGrid();
 
+        updateVocabBanner();
+
         updateSectionHeading();
 
         render();
@@ -1301,6 +1312,8 @@ const ESSENTIALS_CATEGORIES = [
     .getElementById('pickCueBtn')
     .addEventListener('click', pickCueCard);
 
+
+  updateVocabBanner();
 
   load();
   loadCueCards();
@@ -1556,11 +1569,22 @@ function renderEssentialsGrid() {
       tile.classList.add('active');
 
       updateSectionHeading();
+      updateVocabBanner();
       render();
 
     });
 
   });
+
+}
+
+
+function updateVocabBanner() {
+
+  const banner = document.getElementById('vocabBuilderBanner');
+
+  banner.style.display =
+    (activeModule === 'essentials' && activeSubCategory === 'vocabulary_builder') ? 'flex' : 'none';
 
 }
 
