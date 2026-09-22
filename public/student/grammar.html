@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar & Sentence Builder | IELTSbyLE</title>
+
+<style>
+:root {
+  --g-red: #e63946;
+  --g-red-dark: #c92f3d;
+  --g-red-light: #fff1f2;
+
+  --g-blue: #142b5f;
+  --g-blue-dark: #0e2048;
+  --g-blue-light: #eef3ff;
+
+  --g-green: #14804a;
+  --g-green-light: #ecfdf3;
+
+  --g-amber: #b45309;
+  --g-amber-light: #fffbeb;
+
+  --g-text: #17233d;
+  --g-text-soft: #667085;
+  --g-muted: #98a2b3;
+
+  --g-bg: #f6f8fc;
+  --g-card: #ffffff;
+  --g-border: #e7ebf2;
+
+  --g-shadow: 0 14px 40px rgba(20, 43, 95, 0.07);
+  --g-shadow-hover: 0 20px 50px rgba(20, 43, 95, 0.11);
+
+  --g-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(230, 57, 70, 0.045), transparent 24%),
+    radial-gradient(circle at 8% 30%, rgba(20, 43, 95, 0.035), transparent 26%),
+    var(--g-bg);
+  color: var(--g-text);
+  font-family: var(--g-sans);
+}
+
+a { color: inherit; }
+
+/* ---------- NAV ---------- */
+
+.g-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(228,233,242,0.8);
+  box-shadow: 0 4px 18px rgba(20,43,95,0.035);
+}
+
+.g-nav-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.g-brand img { height: 44px; display: block; }
+
+.g-nav-links { display: flex; align-items: center; gap: 18px; font-size: 13px; font-weight: 600; }
+.g-nav-links a { text-decoration: none; color: #526078; transition: color .2s; }
+.g-nav-links a:hover { color: var(--g-red); }
+.g-nav-links a.current { color: var(--g-red); }
+
+.g-logout {
+  border: 1px solid rgba(230,57,70,.2);
+  background: #fff;
+  color: var(--g-red);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.g-logout:hover { background: var(--g-red); color: #fff; }
+
+/* ---------- MAIN ---------- */
+
+.g-main { max-width: 1180px; margin: 0 auto; padding: 36px 24px 80px; }
+
+.g-header { margin-bottom: 26px; }
+.g-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--g-red); margin-bottom: 8px; }
+.g-header h1 { font-size: 30px; font-weight: 800; color: var(--g-blue); margin: 0 0 6px; }
+.g-header p { margin: 0; color: var(--g-text-soft); font-size: 14.5px; }
+
+/* Tabs */
+
+.g-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid var(--g-border);
+  border-radius: 14px;
+  padding: 6px;
+  margin-bottom: 26px;
+  box-shadow: var(--g-shadow);
+}
+
+.g-tab {
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--g-text-soft);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  white-space: nowrap;
+}
+.g-tab:hover { background: var(--g-blue-light); color: var(--g-blue); }
+.g-tab.active { background: var(--g-blue); color: #fff; }
+
+.g-view { display: none; }
+.g-view.active { display: block; animation: gfade .25s ease; }
+@keyframes gfade { from { opacity:0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+
+/* Search + filters */
+
+.g-search-wrap { margin-bottom: 18px; }
+
+.g-search {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--g-border);
+  background: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  box-shadow: var(--g-shadow);
+}
+.g-search:focus { outline: none; border-color: var(--g-blue); }
+
+.g-chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+
+.g-chip {
+  border: 1px solid var(--g-border);
+  background: #fff;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--g-text-soft);
+  cursor: pointer;
+  transition: all .15s;
+}
+.g-chip:hover { border-color: var(--g-blue); color: var(--g-blue); }
+.g-chip.active { background: var(--g-red); border-color: var(--g-red); color: #fff; }
+
+.g-topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 10px; margin-bottom: 22px; }
+
+.g-topic-tile {
+  border: 1px solid var(--g-border);
+  background: #fff;
+  border-radius: 11px;
+  padding: 13px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--g-text);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+}
+.g-topic-tile:hover { transform: translateY(-2px); box-shadow: var(--g-shadow); }
+.g-topic-tile.active { border-color: var(--g-red); background: var(--g-red-light); color: var(--g-red-dark); }
+.g-topic-tile span { display:block; font-size: 11px; font-weight: 600; color: var(--g-muted); margin-top:3px; }
+
+.g-result-count { font-size: 12.5px; color: var(--g-muted); margin: 0 0 12px; font-weight: 600; }
+
+/* Grammar point cards */
+
+.g-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; }
+
+.g-card {
+  background: var(--g-card);
+  border: 1px solid var(--g-border);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: var(--g-shadow);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.g-card:hover { transform: translateY(-3px); box-shadow: var(--g-shadow-hover); }
+
+.g-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.g-card-title { font-size: 16.5px; font-weight: 800; color: var(--g-blue); line-height: 1.3; }
+.g-card-cat { font-size: 11px; font-weight: 700; color: var(--g-red); margin-top: 3px; text-transform: uppercase; letter-spacing: .03em; }
+
+.g-diff {
+  font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+}
+.g-diff.beginner { background: var(--g-green-light); color: var(--g-green); }
+.g-diff.intermediate { background: var(--g-amber-light); color: var(--g-amber); }
+.g-diff.advanced { background: var(--g-red-light); color: var(--g-red-dark); }
+
+.g-card-explain { font-size: 13.5px; color: var(--g-text); line-height: 1.5; }
+.g-structure-tag { display: inline-block; font-size: 11.5px; font-family: monospace; background: var(--g-blue-light); color: var(--g-blue); padding: 5px 10px; border-radius: 8px; font-weight: 700; }
+
+.g-card-example { font-size: 12.5px; color: var(--g-text-soft); font-style: italic; border-left: 2px solid var(--g-border); padding-left: 10px; }
+
+.g-error-box { background: var(--g-red-light); border-radius: 9px; padding: 9px 12px; font-size: 12px; }
+.g-error-box .wrong { color: var(--g-red-dark); text-decoration: line-through; display: block; margin-bottom: 3px; }
+.g-error-box .right { color: var(--g-green); font-weight: 700; display: block; }
+
+.g-card-actions { display: flex; gap: 8px; margin-top: 4px; }
+.g-icon-btn {
+  border: 1px solid var(--g-border); background: #fff; border-radius: 8px;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer; transition: all .15s; flex-shrink:0;
+}
+.g-icon-btn:hover { border-color: var(--g-blue); }
+.g-icon-btn.on { background: var(--g-red); border-color: var(--g-red); color: #fff; }
+.g-icon-btn.learned-on { background: var(--g-green); border-color: var(--g-green); color: #fff; }
+
+.g-empty { padding: 60px 20px; text-align: center; color: var(--g-muted); font-size: 14px; }
+
+/* Grammar point detail modal */
+
+.g-modal-backdrop {
+  position: fixed; inset: 0; background: rgba(15,23,42,.55);
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 300;
+}
+.g-modal {
+  background: #fff; border-radius: 18px; max-width: 560px; width: 100%;
+  max-height: 88vh; overflow-y: auto; padding: 30px; box-shadow: var(--g-shadow-hover);
+}
+.g-modal-close {
+  float: right; border: none; background: var(--g-blue-light); color: var(--g-blue);
+  width: 32px; height: 32px; border-radius: 9px; font-size: 16px; cursor: pointer; font-weight:700;
+}
+.g-modal h2 { font-size: 23px; color: var(--g-blue); margin: 0 0 2px; line-height:1.3; }
+.g-modal-row { margin: 16px 0; }
+.g-modal-row h4 { margin: 0 0 6px; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--g-muted); font-weight: 800; }
+.g-modal-row p, .g-modal-row div { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--g-text); }
+.g-tag-row { display:flex; flex-wrap:wrap; gap:6px; }
+.g-tag { font-size: 11.5px; background: var(--g-blue-light); color: var(--g-blue); padding: 4px 10px; border-radius: 999px; font-weight: 700; }
+
+/* Grammar Point of the Day */
+
+.g-gotd-card {
+  background: linear-gradient(135deg, var(--g-blue), var(--g-blue-dark));
+  color: #fff; border-radius: 18px; padding: 32px; box-shadow: var(--g-shadow-hover);
+}
+.g-gotd-card .g-eyebrow { color: #ffd7da; }
+.g-gotd-card h2 { font-size: 26px; margin: 0 0 4px; }
+.g-gotd-card p.explain { font-size: 15.5px; margin: 14px 0; line-height: 1.6; }
+.g-gotd-card .g-card-example { color: rgba(255,255,255,.85); border-left-color: rgba(255,255,255,.35); }
+.g-gotd-cat { display:inline-block; margin-top:10px; font-size:11.5px; background: rgba(255,255,255,.15); padding: 4px 10px; border-radius:999px; }
+.g-gotd-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+.g-btn {
+  border: none; border-radius: 10px; padding: 11px 20px; font-size: 13.5px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+}
+.g-btn-primary { background: #fff; color: var(--g-blue); }
+.g-btn-primary:hover { transform: translateY(-1px); }
+.g-btn-outline { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+.g-btn-outline:hover { background: rgba(255,255,255,.22); }
+.g-btn-solid { background: var(--g-red); color: #fff; }
+.g-btn-solid:hover { background: var(--g-red-dark); }
+.g-btn-ghost { background: #fff; color: var(--g-blue); border: 1px solid var(--g-border); }
+.g-btn-ghost:hover { background: var(--g-blue-light); }
+
+/* Sentence Builder */
+
+.g-sb-card {
+  background: #fff; border: 1px solid var(--g-border); border-radius: 15px;
+  padding: 22px; margin-bottom: 16px; box-shadow: var(--g-shadow);
+}
+.g-sb-cat { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--g-muted); margin-bottom: 10px; }
+.g-sb-label { font-size: 11px; font-weight: 800; color: var(--g-muted); text-transform: uppercase; margin-bottom: 4px; }
+.g-sb-text { font-size: 14.5px; line-height: 1.65; margin-bottom: 14px; }
+.g-swap { background: var(--g-amber-light); color: var(--g-amber); padding: 1px 5px; border-radius: 4px; font-weight: 700; }
+.g-swap-arrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; background: var(--g-blue-light); color: var(--g-blue); padding: 5px 10px; border-radius: 8px; margin: 3px 6px 3px 0; font-weight: 700; }
+
+/* Practice quiz */
+
+.g-quiz-card {
+  background: #fff; border: 1px solid var(--g-border); border-radius: 18px;
+  padding: 30px; box-shadow: var(--g-shadow); max-width: 640px; margin: 0 auto;
+}
+.g-quiz-progress { font-size: 12px; color: var(--g-muted); font-weight: 700; margin-bottom: 10px; }
+.g-quiz-type { display:inline-block; font-size: 11px; font-weight: 800; color: var(--g-red); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; }
+.g-quiz-prompt { font-size: 17px; font-weight: 700; color: var(--g-blue); margin-bottom: 20px; line-height: 1.5; }
+.g-quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.g-quiz-option {
+  border: 1.5px solid var(--g-border); background: #fff; border-radius: 11px;
+  padding: 13px 16px; font-size: 14px; text-align: left; cursor: pointer; transition: all .15s;
+}
+.g-quiz-option:hover { border-color: var(--g-blue); }
+.g-quiz-option.correct { border-color: var(--g-green); background: var(--g-green-light); }
+.g-quiz-option.incorrect { border-color: var(--g-red); background: var(--g-red-light); }
+.g-quiz-option:disabled { cursor: default; }
+.g-quiz-explain { margin-top: 16px; padding: 14px 16px; border-radius: 11px; background: var(--g-blue-light); font-size: 13.5px; line-height: 1.55; color: var(--g-blue-dark); }
+.g-quiz-next { margin-top: 18px; text-align: right; }
+
+.g-quiz-summary { text-align: center; }
+.g-quiz-score { font-size: 44px; font-weight: 800; color: var(--g-blue); margin: 6px 0; }
+.g-revision-list { text-align: left; background: var(--g-amber-light); border-radius: 12px; padding: 16px 18px; margin: 20px 0; }
+.g-revision-list h4 { margin: 0 0 8px; font-size: 12.5px; color: var(--g-amber); text-transform: uppercase; letter-spacing: .04em; }
+.g-revision-list span { display:inline-block; background:#fff; border:1px solid var(--g-border); padding:4px 10px; border-radius:999px; font-size:12.5px; font-weight:700; margin: 3px 4px 0 0; }
+
+/* My grammar */
+
+.g-stat-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 14px; margin-bottom: 24px; }
+.g-stat {
+  background: #fff; border: 1px solid var(--g-border); border-radius: 13px;
+  padding: 18px; text-align: center; box-shadow: var(--g-shadow);
+}
+.g-stat b { display:block; font-size: 26px; color: var(--g-blue); }
+.g-stat span { font-size: 12px; color: var(--g-text-soft); font-weight: 600; }
+
+.g-mv-row { display:flex; gap: 8px; margin-bottom: 16px; }
+
+@media (max-width: 640px) {
+  .g-nav-links { display: none; }
+  .g-main { padding: 24px 16px 60px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="g-nav">
+  <div class="g-nav-inner">
+    <a href="/student/dashboard.html" class="g-brand"><img src="/images/logos.png" alt="IELTSbyLE"></a>
+    <div class="g-nav-links">
+      <a href="/student/dashboard.html">Dashboard</a>
+      <a href="/student/resources.html" class="current">Resources</a>
+      <a href="/student/mock-tests.html">Mock tests</a>
+      <a href="/student/results.html">My results</a>
+      <span id="userName" style="font-weight:700;color:var(--g-blue);font-size:13px;"></span>
+      <a href="#" id="logoutLink" class="g-logout">Log out</a>
+    </div>
+  </div>
+</nav>
+
+<main class="g-main">
+
+  <div class="g-header">
+    <div class="g-eyebrow">IELTS Essentials</div>
+    <h1>Grammar & Sentence Builder</h1>
+    <p>Learn grammar structures the way IELTS actually tests them — build better sentences, not just rules.</p>
+  </div>
+
+  <div class="g-tabs" id="tabs">
+    <button class="g-tab active" data-view="browse">Browse</button>
+    <button class="g-tab" data-view="gotd">Grammar Point of the Day</button>
+    <button class="g-tab" data-view="sentence">Sentence Builder</button>
+    <button class="g-tab" data-view="practice">Practice Mode</button>
+    <button class="g-tab" data-view="mygrammar">My Grammar</button>
+  </div>
+
+  <!-- BROWSE -->
+  <section class="g-view active" id="view-browse">
+
+    <div class="g-search-wrap">
+      <input type="text" class="g-search" id="searchInput" placeholder="Search a grammar point, category, or skill...">
+    </div>
+
+    <div class="g-chip-row" id="skillChips"></div>
+    <div class="g-topic-grid" id="topicGrid"></div>
+
+    <p class="g-result-count" id="resultCount"></p>
+    <div class="g-grid" id="pointGrid"></div>
+
+  </section>
+
+  <!-- GRAMMAR POINT OF THE DAY -->
+  <section class="g-view" id="view-gotd"></section>
+
+  <!-- SENTENCE BUILDER -->
+  <section class="g-view" id="view-sentence">
+    <p style="color:var(--g-text-soft);font-size:13.5px;margin-bottom:18px;">
+      See how a simple sentence can be rebuilt into a more complex, natural, IELTS-appropriate one.
+    </p>
+    <div id="sentenceList"></div>
+  </section>
+
+  <!-- PRACTICE MODE -->
+  <section class="g-view" id="view-practice">
+    <div id="practiceArea"></div>
+  </section>
+
+  <!-- MY GRAMMAR -->
+  <section class="g-view" id="view-mygrammar">
+    <div class="g-stat-grid" id="mgStats"></div>
+    <div class="g-mv-row">
+      <button class="g-chip active" data-mgfilter="all">All</button>
+      <button class="g-chip" data-mgfilter="saved">Saved</button>
+      <button class="g-chip" data-mgfilter="learned">Learned</button>
+      <button class="g-chip" data-mgfilter="review">To review</button>
+    </div>
+    <div class="g-grid" id="myGrammarGrid"></div>
+  </section>
+
+</main>
+
+<div id="modalRoot"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/grammar-data.js"></script>
+<script>
+
+/* =========================================
+   STATE
+========================================= */
+
+let profile = null;
+let progress = new Map();      // point slug -> 'saved' | 'learned'
+let activeView = 'browse';
+let activeSkill = 'all';
+let activeCategory = null;
+let searchQuery = '';
+let mgFilter = 'all';
+
+let quizState = null;
+
+const CATEGORIES = [
+  'Tenses','Conditionals','Passive Voice','Relative Clauses','Comparatives & Superlatives',
+  'Articles','Modals','Complex Sentences','Reported Speech','Parallel Structure',
+  'Punctuation & Cohesion','Common Errors'
+];
+
+function slugOf(title) { return title.toLowerCase().replace(/[^a-z0-9]+/g, '-'); }
+
+/* =========================================
+   INIT
+========================================= */
+
+(async () => {
+
+  profile = await Auth.requireApprovedRole('student');
+  if (!profile) return;
+
+  document.getElementById('userName').textContent = profile.name || 'Student';
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+
+  await loadProgress();
+
+  renderSkillChips();
+  renderTopicGrid();
+  renderPointGrid();
+  renderGrammarOfTheDay();
+  renderSentenceList();
+  renderMyGrammar();
+
+  wireTabs();
+  wireSearch();
+
+})();
+
+async function loadProgress() {
+
+  try {
+    const { data, error } = await supabase
+      .from('grammar_progress')
+      .select('point_slug, status')
+      .eq('student_id', profile.id);
+
+    if (error) { console.error(error); return; }
+
+    progress = new Map((data || []).map(r => [r.point_slug, r.status]));
+
+  } catch (e) {
+    console.error(e);
+  }
+
+}
+
+async function setProgress(title, status) {
+
+  const slug = slugOf(title);
+
+  if (status === null) {
+    progress.delete(slug);
+    await supabase.from('grammar_progress').delete().eq('student_id', profile.id).eq('point_slug', slug);
+  } else {
+    progress.set(slug, status);
+    await supabase.from('grammar_progress').upsert({ student_id: profile.id, point_slug: slug, status, updated_at: new Date().toISOString() });
+  }
+
+  renderPointGrid();
+  renderMyGrammar();
+
+}
+
+/* =========================================
+   TABS
+========================================= */
+
+function wireTabs() {
+
+  document.querySelectorAll('.g-tab').forEach(tab => {
+
+    tab.addEventListener('click', () => {
+
+      document.querySelectorAll('.g-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      document.querySelectorAll('.g-view').forEach(v => v.classList.remove('active'));
+
+      activeView = tab.dataset.view;
+      document.getElementById(`view-${activeView}`).classList.add('active');
+
+      if (activeView === 'practice' && !quizState) startQuiz();
+
+    });
+
+  });
+
+}
+
+/* =========================================
+   BROWSE: search + filters
+========================================= */
+
+function wireSearch() {
+  const input = document.getElementById('searchInput');
+  input.addEventListener('input', () => { searchQuery = input.value.trim().toLowerCase(); renderPointGrid(); });
+}
+
+function renderSkillChips() {
+
+  const skills = [
+    { id: 'all', label: 'All' },
+    { id: 'listening', label: 'Listening' },
+    { id: 'reading', label: 'Reading' },
+    { id: 'writing', label: 'Writing' },
+    { id: 'speaking', label: 'Speaking' }
+  ];
+
+  const el = document.getElementById('skillChips');
+  el.innerHTML = skills.map(s => `<button class="g-chip ${s.id === activeSkill ? 'active' : ''}" data-skill="${s.id}">${s.label}</button>`).join('');
+
+  el.querySelectorAll('[data-skill]').forEach(btn => btn.addEventListener('click', () => {
+    activeSkill = btn.dataset.skill;
+    el.querySelectorAll('.g-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderPointGrid();
+  }));
+
+}
+
+function renderTopicGrid() {
+
+  const el = document.getElementById('topicGrid');
+
+  el.innerHTML = CATEGORIES.map(c => {
+    const count = GRAMMAR_DATA.filter(g => g.category === c).length;
+    return `<button class="g-topic-tile ${c === activeCategory ? 'active' : ''}" data-cat="${c}">${c}<span>${count} points</span></button>`;
+  }).join('');
+
+  el.querySelectorAll('[data-cat]').forEach(btn => btn.addEventListener('click', () => {
+    activeCategory = activeCategory === btn.dataset.cat ? null : btn.dataset.cat;
+    el.querySelectorAll('.g-topic-tile').forEach(c => c.classList.remove('active'));
+    if (activeCategory) btn.classList.add('active');
+    renderPointGrid();
+  }));
+
+}
+
+function filteredPoints() {
+
+  return GRAMMAR_DATA.filter(g => {
+
+    if (activeSkill !== 'all' && !g.skills.includes(activeSkill)) return false;
+    if (activeCategory && g.category !== activeCategory) return false;
+
+    if (searchQuery) {
+      const hay = `${g.title} ${g.category} ${g.skills.join(' ')} ${g.explanation}`.toLowerCase();
+      if (!hay.includes(searchQuery)) return false;
+    }
+
+    return true;
+
+  });
+
+}
+
+function renderPointGrid() {
+
+  const points = filteredPoints();
+  document.getElementById('resultCount').textContent = `${points.length} grammar point${points.length === 1 ? '' : 's'} found`;
+
+  const grid = document.getElementById('pointGrid');
+
+  if (!points.length) {
+    grid.innerHTML = `<div class="g-empty" style="grid-column:1/-1;">No grammar points match your filters yet. Try a different search or category.</div>`;
+    return;
+  }
+
+  grid.innerHTML = points.map(g => pointCardHtml(g)).join('');
+  wirePointCards(grid);
+
+}
+
+function pointCardHtml(g) {
+
+  const slug = slugOf(g.title);
+  const status = progress.get(slug);
+
+  return `
+    <article class="g-card" data-point="${slug}">
+      <div class="g-card-top">
+        <div>
+          <div class="g-card-title">${g.title}</div>
+          <div class="g-card-cat">${g.category}</div>
+        </div>
+        <span class="g-diff ${g.difficulty}">${g.difficulty}</span>
+      </div>
+      <div class="g-card-explain">${g.explanation}</div>
+      <span class="g-structure-tag">${g.structure}</span>
+      <div class="g-card-example">🔊 <span data-speak="${g.example.replace(/"/g,'&quot;')}" style="cursor:pointer;text-decoration:underline;">"${g.example}"</span></div>
+      <div class="g-card-actions">
+        <button class="g-icon-btn ${status === 'saved' ? 'on' : ''}" data-save="${g.title}" title="Save">⭐</button>
+        <button class="g-icon-btn ${status === 'learned' ? 'learned-on' : ''}" data-learn="${g.title}" title="Mark as learned">✓</button>
+      </div>
+    </article>
+  `;
+
+}
+
+function wirePointCards(root) {
+
+  root.querySelectorAll('[data-speak]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); speak(el.dataset.speak); }));
+
+  root.querySelectorAll('[data-save]').forEach(el => el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = progress.get(slugOf(el.dataset.save));
+    setProgress(el.dataset.save, cur === 'saved' ? null : 'saved');
+  }));
+
+  root.querySelectorAll('[data-learn]').forEach(el => el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = progress.get(slugOf(el.dataset.learn));
+    setProgress(el.dataset.learn, cur === 'learned' ? null : 'learned');
+  }));
+
+  root.querySelectorAll('.g-card').forEach(card => card.addEventListener('click', () => openPointModal(card.dataset.point)));
+
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB';
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* =========================================
+   GRAMMAR POINT DETAIL MODAL
+========================================= */
+
+function openPointModal(slug) {
+
+  const g = GRAMMAR_DATA.find(x => slugOf(x.title) === slug);
+  if (!g) return;
+
+  const status = progress.get(slug);
+
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="g-modal-backdrop" id="pointModalBackdrop">
+      <div class="g-modal">
+        <button class="g-modal-close" id="closePointModal">×</button>
+        <h2>${g.title}</h2>
+        <div class="g-tag-row" style="margin-top:8px;"><span class="g-tag">${g.category}</span>${g.skills.map(s => `<span class="g-tag">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`).join('')}</div>
+
+        <div class="g-modal-row">
+          <h4>Explanation</h4>
+          <p>${g.explanation}</p>
+        </div>
+
+        <div class="g-modal-row">
+          <h4>Structure</h4>
+          <span class="g-structure-tag">${g.structure}</span>
+        </div>
+
+        <div class="g-modal-row">
+          <h4>Example sentence</h4>
+          <p style="font-style:italic;">🔊 <span data-speak="${g.example.replace(/"/g,'&quot;')}" style="cursor:pointer;text-decoration:underline;">"${g.example}"</span></p>
+        </div>
+
+        <div class="g-modal-row">
+          <h4>Common mistake</h4>
+          <div class="g-error-box">
+            <span class="wrong">✗ ${g.commonError.wrong}</span>
+            <span class="right">✓ ${g.commonError.right}</span>
+          </div>
+        </div>
+
+        <div class="g-modal-row">
+          <h4>Tip</h4>
+          <p>${g.tip}</p>
+        </div>
+
+        <div class="g-modal-row">
+          <h4>Related grammar points</h4>
+          <div class="g-tag-row">${g.related.map(r => `<span class="g-tag">${r}</span>`).join('')}</div>
+        </div>
+
+        <div class="g-card-actions" style="margin-top:20px;">
+          <button class="g-icon-btn modal-save ${status === 'saved' ? 'on' : ''}" data-save="${g.title}">⭐ Save</button>
+          <button class="g-icon-btn modal-learn ${status === 'learned' ? 'learned-on' : ''}" data-learn="${g.title}" style="width:auto;padding:0 12px;">✓ Mark as learned</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('closePointModal').addEventListener('click', closeModal);
+  document.getElementById('pointModalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'pointModalBackdrop') closeModal(); });
+  wirePointCards(root);
+
+}
+
+function closeModal() {
+  document.getElementById('modalRoot').innerHTML = '';
+}
+
+/* =========================================
+   GRAMMAR POINT OF THE DAY
+========================================= */
+
+function renderGrammarOfTheDay() {
+
+  const dayIndex = Math.floor(Date.now() / 86400000) % GRAMMAR_DATA.length;
+  const g = GRAMMAR_DATA[dayIndex];
+  const status = progress.get(slugOf(g.title));
+
+  document.getElementById('view-gotd').innerHTML = `
+    <div class="g-gotd-card">
+      <div class="g-eyebrow">Grammar Point of the Day</div>
+      <h2>${g.title}</h2>
+      <p class="explain">${g.explanation}</p>
+      <span class="g-structure-tag" style="background:rgba(255,255,255,.15);color:#fff;">${g.structure}</span>
+      <div class="g-card-example" style="margin-top:14px;">"${g.example}"</div>
+      <span class="g-gotd-cat">${g.category}</span>
+      <div class="g-gotd-actions">
+        <button class="g-btn g-btn-primary" id="gotdLearnBtn">Learn This Point</button>
+        <button class="g-btn g-btn-outline" id="gotdSaveBtn">${status === 'saved' ? 'Saved ✓' : 'Add to My Grammar'}</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('gotdLearnBtn').addEventListener('click', () => openPointModal(slugOf(g.title)));
+  document.getElementById('gotdSaveBtn').addEventListener('click', async () => {
+    const cur = progress.get(slugOf(g.title));
+    await setProgress(g.title, cur === 'saved' ? null : 'saved');
+    renderGrammarOfTheDay();
+  });
+
+}
+
+/* =========================================
+   SENTENCE BUILDER
+========================================= */
+
+function highlightSwaps(text, swaps, side) {
+  let out = text;
+  swaps.forEach(pair => {
+    const term = side === 'from' ? pair[0] : pair[1];
+    out = out.split(term).join(`<span class="g-swap">${term}</span>`);
+  });
+  return out;
+}
+
+function renderSentenceList() {
+
+  const el = document.getElementById('sentenceList');
+
+  el.innerHTML = SENTENCE_BUILDER_DATA.map(s => `
+    <div class="g-sb-card">
+      <div class="g-sb-cat">${s.category}</div>
+      <div class="g-sb-label">Simple sentence</div>
+      <div class="g-sb-text">${highlightSwaps(s.simple, s.swaps, 'from')}</div>
+      <div class="g-sb-label">Improved / built-up sentence</div>
+      <div class="g-sb-text">${highlightSwaps(s.improved, s.swaps, 'to')}</div>
+      <div>${s.swaps.map(sw => `<span class="g-swap-arrow">${sw[0]} → ${sw[1]}</span>`).join('')}</div>
+    </div>
+  `).join('');
+
+}
+
+/* =========================================
+   PRACTICE MODE
+========================================= */
+
+const QUESTION_TYPES = ['correct','fixit','category','combine','matchexample','structure'];
+
+function pickRandom(arr, n, excludeIdx) {
+  const pool = arr.map((v,i) => i).filter(i => i !== excludeIdx);
+  const chosen = [];
+  while (chosen.length < n && pool.length) {
+    const i = Math.floor(Math.random() * pool.length);
+    chosen.push(pool.splice(i,1)[0]);
+  }
+  return chosen.map(i => arr[i]);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildQuestion(type, pool) {
+
+  if (type === 'combine') {
+
+    const idx = Math.floor(Math.random() * SENTENCE_BUILDER_DATA.length);
+    const correct = SENTENCE_BUILDER_DATA[idx];
+    const distractors = pickRandom(SENTENCE_BUILDER_DATA, 3, idx);
+    const options = shuffle([{ text: correct.improved, correct: true }, ...distractors.map(d => ({ text: d.improved, correct: false }))]);
+
+    return {
+      type: 'Choose the best upgraded sentence',
+      prompt: `Which is the best way to build up this sentence?\n"${correct.simple}"`,
+      options,
+      explanation: `Key change: ${correct.swaps.map(s => `${s[0]} → ${s[1]}`).join(', ')}.`,
+      revisionTag: correct.category
+    };
+
+  }
+
+  const idx = Math.floor(Math.random() * pool.length);
+  const g = pool[idx];
+  const distractorPoints = pickRandom(GRAMMAR_DATA, 3, GRAMMAR_DATA.indexOf(g));
+
+  if (type === 'correct') {
+    const options = shuffle([{ text: g.example, correct: true }, ...distractorPoints.map(d => ({ text: d.commonError.wrong, correct: false }))]);
+    return { type: 'Choose the grammatically correct sentence', prompt: 'Which sentence is grammatically correct?', options, explanation: `Correct: "${g.example}" — this demonstrates ${g.title.toLowerCase()}.`, revisionTag: g.title };
+  }
+
+  if (type === 'fixit') {
+    const options = shuffle([{ text: g.commonError.right, correct: true }, ...distractorPoints.map(d => ({ text: d.commonError.right, correct: false }))]);
+    return { type: 'Choose the correct fix', prompt: `How should this sentence be corrected?\n"${g.commonError.wrong}"`, options, explanation: g.tip, revisionTag: g.title };
+  }
+
+  if (type === 'category') {
+    const distractorCats = pickRandom(CATEGORIES.filter(c => c !== g.category), 3, -1);
+    const options = shuffle([{ text: g.category, correct: true }, ...distractorCats.map(c => ({ text: c, correct: false }))]);
+    return { type: 'Identify the grammar category', prompt: `Which grammar category does this sentence demonstrate?\n"${g.example}"`, options, explanation: g.explanation, revisionTag: g.title };
+  }
+
+  if (type === 'matchexample') {
+    const options = shuffle([{ text: g.example, correct: true }, ...distractorPoints.map(d => ({ text: d.example, correct: false }))]);
+    return { type: 'Match the rule to the example', prompt: `Which example matches this rule?\n"${g.explanation}"`, options, explanation: `Structure: ${g.structure}`, revisionTag: g.title };
+  }
+
+  if (type === 'structure') {
+    const options = shuffle([{ text: g.structure, correct: true }, ...distractorPoints.map(d => ({ text: d.structure, correct: false }))]);
+    return { type: 'Choose the correct structure', prompt: `Which structure pattern matches "${g.title}"?`, options, explanation: `${g.explanation} Example: "${g.example}"`, revisionTag: g.title };
+  }
+
+}
+
+function startQuiz() {
+
+  const pool = filteredPoints().length >= 6 ? filteredPoints() : GRAMMAR_DATA;
+  const total = 8;
+  const questions = [];
+
+  for (let i = 0; i < total; i++) {
+    const type = QUESTION_TYPES[i % QUESTION_TYPES.length];
+    questions.push(buildQuestion(type, pool));
+  }
+
+  quizState = { questions, index: 0, score: 0, revision: [], answered: false };
+  renderQuiz();
+
+}
+
+function renderQuiz() {
+
+  const area = document.getElementById('practiceArea');
+
+  if (quizState.index >= quizState.questions.length) {
+    renderQuizSummary();
+    return;
+  }
+
+  const q = quizState.questions[quizState.index];
+
+  area.innerHTML = `
+    <div class="g-quiz-card">
+      <div class="g-quiz-progress">Question ${quizState.index + 1} of ${quizState.questions.length} &middot; Score: ${quizState.score}</div>
+      <span class="g-quiz-type">${q.type}</span>
+      <div class="g-quiz-prompt">${q.prompt.split('\n').map(l => `<div>${l}</div>`).join('')}</div>
+      <div class="g-quiz-options" id="quizOptions">
+        ${q.options.map((o, i) => `<button class="g-quiz-option" data-i="${i}">${o.text}</button>`).join('')}
+      </div>
+      <div id="quizFeedback"></div>
+    </div>
+  `;
+
+  document.querySelectorAll('#quizOptions .g-quiz-option').forEach(btn => {
+    btn.addEventListener('click', () => answerQuiz(Number(btn.dataset.i)));
+  });
+
+}
+
+function answerQuiz(i) {
+
+  if (quizState.answered) return;
+  quizState.answered = true;
+
+  const q = quizState.questions[quizState.index];
+  const chosen = q.options[i];
+
+  document.querySelectorAll('#quizOptions .g-quiz-option').forEach((btn, idx) => {
+    btn.disabled = true;
+    if (q.options[idx].correct) btn.classList.add('correct');
+    else if (idx === i) btn.classList.add('incorrect');
+  });
+
+  if (chosen.correct) {
+    quizState.score++;
+  } else if (q.revisionTag) {
+    quizState.revision.push(q.revisionTag);
+  }
+
+  document.getElementById('quizFeedback').innerHTML = `
+    <div class="g-quiz-explain">${chosen.correct ? '✅ Correct! ' : '❌ Not quite. '}${q.explanation}</div>
+    <div class="g-quiz-next"><button class="g-btn g-btn-solid" id="nextQBtn">${quizState.index + 1 >= quizState.questions.length ? 'See results' : 'Next question'}</button></div>
+  `;
+
+  document.getElementById('nextQBtn').addEventListener('click', () => {
+    quizState.index++;
+    quizState.answered = false;
+    renderQuiz();
+  });
+
+}
+
+function renderQuizSummary() {
+
+  const area = document.getElementById('practiceArea');
+  const total = quizState.questions.length;
+  const revisionUnique = [...new Set(quizState.revision)];
+
+  area.innerHTML = `
+    <div class="g-quiz-card g-quiz-summary">
+      <div class="g-eyebrow" style="color:var(--g-red);">Practice complete</div>
+      <div class="g-quiz-score">${quizState.score}/${total}</div>
+      <p style="color:var(--g-text-soft);">${quizState.score === total ? 'Perfect score — excellent work!' : 'Review the points below and try again to improve.'}</p>
+      ${revisionUnique.length ? `
+        <div class="g-revision-list">
+          <h4>Grammar points that need revision</h4>
+          <div>${revisionUnique.map(t => `<span>${t}</span>`).join('')}</div>
+        </div>
+      ` : ''}
+      <div class="g-gotd-actions" style="justify-content:center;">
+        <button class="g-btn g-btn-solid" id="retryQuizBtn">Try again</button>
+        <button class="g-btn g-btn-ghost" id="backBrowseBtn">Back to browse</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('retryQuizBtn').addEventListener('click', startQuiz);
+  document.getElementById('backBrowseBtn').addEventListener('click', () => {
+    document.querySelector('.g-tab[data-view="browse"]').click();
+  });
+
+}
+
+/* =========================================
+   MY GRAMMAR
+========================================= */
+
+function renderMyGrammar() {
+
+  const saved = [...progress.entries()].filter(([,s]) => s === 'saved').map(([slug]) => slug);
+  const learned = [...progress.entries()].filter(([,s]) => s === 'learned').map(([slug]) => slug);
+  const total = progress.size;
+
+  document.getElementById('mgStats').innerHTML = `
+    <div class="g-stat"><b>${total}</b><span>Total saved points</span></div>
+    <div class="g-stat"><b>${learned.length}</b><span>Learned points</span></div>
+    <div class="g-stat"><b>${saved.length}</b><span>Points to review</span></div>
+    <div class="g-stat"><b>${Math.min(total,5)}</b><span>Recently added</span></div>
+  `;
+
+  const grid = document.getElementById('myGrammarGrid');
+  const points = GRAMMAR_DATA.filter(g => progress.has(slugOf(g.title)));
+
+  let shown = points;
+  if (mgFilter === 'saved') shown = points.filter(g => progress.get(slugOf(g.title)) === 'saved');
+  if (mgFilter === 'learned') shown = points.filter(g => progress.get(slugOf(g.title)) === 'learned');
+  if (mgFilter === 'review') shown = points.filter(g => progress.get(slugOf(g.title)) === 'saved');
+
+  if (!shown.length) {
+    grid.innerHTML = `<div class="g-empty" style="grid-column:1/-1;">No grammar points here yet — save or learn some from Browse to build your list.</div>`;
+  } else {
+    grid.innerHTML = shown.map(g => pointCardHtml(g)).join('');
+    wirePointCards(grid);
+  }
+
+  document.querySelectorAll('[data-mgfilter]').forEach(btn => {
+    btn.onclick = () => {
+      mgFilter = btn.dataset.mgfilter;
+      document.querySelectorAll('[data-mgfilter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMyGrammar();
+    };
+  });
+
+}
+
+</script>
+</body>
+</html>
