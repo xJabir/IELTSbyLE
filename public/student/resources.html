@@ -1178,13 +1178,13 @@ body {
        RESOURCE LIST
   ========================================= -->
 
-  <div id="vocabBuilderBanner" style="display:none;background:linear-gradient(135deg,var(--resource-blue),var(--resource-blue-dark));color:#fff;border-radius:16px;padding:24px 28px;margin-bottom:22px;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+  <div id="essentialsToolBanner" style="display:none;background:linear-gradient(135deg,var(--resource-blue),var(--resource-blue-dark));color:#fff;border-radius:16px;padding:24px 28px;margin-bottom:22px;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
     <div>
       <div style="font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#ffd7da;margin-bottom:6px;">Interactive tool</div>
-      <h2 style="margin:0 0 4px;font-size:19px;">Vocabulary Builder</h2>
-      <p style="margin:0;font-size:13.5px;color:rgba(255,255,255,.8);">Search words, save and review them, try the Paraphrase Builder, and test yourself in Practice Mode.</p>
+      <h2 id="essentialsToolTitle" style="margin:0 0 4px;font-size:19px;"></h2>
+      <p id="essentialsToolDesc" style="margin:0;font-size:13.5px;color:rgba(255,255,255,.8);"></p>
     </div>
-    <a href="/student/vocabulary.html" style="background:#fff;color:var(--resource-blue);font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;">Open Vocabulary Builder →</a>
+    <a id="essentialsToolLink" href="#" style="background:#fff;color:var(--resource-blue);font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;"></a>
   </div>
 
   <section>
@@ -1297,7 +1297,7 @@ const ESSENTIALS_CATEGORIES = [
 
         if (activeModule === 'essentials') renderEssentialsGrid();
 
-        updateVocabBanner();
+        updateEssentialsToolBanner();
 
         updateSectionHeading();
 
@@ -1313,7 +1313,7 @@ const ESSENTIALS_CATEGORIES = [
     .addEventListener('click', pickCueCard);
 
 
-  updateVocabBanner();
+  updateEssentialsToolBanner();
 
   load();
   loadCueCards();
@@ -1569,7 +1569,7 @@ function renderEssentialsGrid() {
       tile.classList.add('active');
 
       updateSectionHeading();
-      updateVocabBanner();
+      updateEssentialsToolBanner();
       render();
 
     });
@@ -1579,12 +1579,39 @@ function renderEssentialsGrid() {
 }
 
 
-function updateVocabBanner() {
+// Sub-categories under IELTS Essentials that have their own dedicated
+// interactive tool (as opposed to just a plain PDF resource list).
+const ESSENTIALS_TOOLS = {
+  vocabulary_builder: {
+    title: 'Vocabulary Builder',
+    desc: 'Search words, save and review them, try the Paraphrase Builder, and test yourself in Practice Mode.',
+    url: '/student/vocabulary.html',
+    label: 'Open Vocabulary Builder →'
+  },
+  grammar_sentence_building: {
+    title: 'Grammar & Sentence Builder',
+    desc: 'Browse grammar points, build up simple sentences into complex ones, and test yourself in Practice Mode.',
+    url: '/student/grammar.html',
+    label: 'Open Grammar & Sentence Builder →'
+  }
+};
 
-  const banner = document.getElementById('vocabBuilderBanner');
+function updateEssentialsToolBanner() {
 
-  banner.style.display =
-    (activeModule === 'essentials' && activeSubCategory === 'vocabulary_builder') ? 'flex' : 'none';
+  const banner = document.getElementById('essentialsToolBanner');
+  const tool = activeModule === 'essentials' ? ESSENTIALS_TOOLS[activeSubCategory] : null;
+
+  if (!tool) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  document.getElementById('essentialsToolTitle').textContent = tool.title;
+  document.getElementById('essentialsToolDesc').textContent = tool.desc;
+  document.getElementById('essentialsToolLink').href = tool.url;
+  document.getElementById('essentialsToolLink').textContent = tool.label;
+
+  banner.style.display = 'flex';
 
 }
 
