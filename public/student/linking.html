@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linking Words & Cohesion | IELTSbyLE</title>
+
+<style>
+:root {
+  --l-red: #e63946;
+  --l-red-dark: #c92f3d;
+  --l-red-light: #fff1f2;
+
+  --l-blue: #142b5f;
+  --l-blue-dark: #0e2048;
+  --l-blue-light: #eef3ff;
+
+  --l-green: #14804a;
+  --l-green-light: #ecfdf3;
+
+  --l-amber: #b45309;
+  --l-amber-light: #fffbeb;
+
+  --l-text: #17233d;
+  --l-text-soft: #667085;
+  --l-muted: #98a2b3;
+
+  --l-bg: #f6f8fc;
+  --l-card: #ffffff;
+  --l-border: #e7ebf2;
+
+  --l-shadow: 0 14px 40px rgba(20, 43, 95, 0.07);
+  --l-shadow-hover: 0 20px 50px rgba(20, 43, 95, 0.11);
+
+  --l-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(230, 57, 70, 0.045), transparent 24%),
+    radial-gradient(circle at 8% 30%, rgba(20, 43, 95, 0.035), transparent 26%),
+    var(--l-bg);
+  color: var(--l-text);
+  font-family: var(--l-sans);
+}
+
+a { color: inherit; }
+
+/* ---------- NAV ---------- */
+
+.l-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(228,233,242,0.8);
+  box-shadow: 0 4px 18px rgba(20,43,95,0.035);
+}
+
+.l-nav-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.l-brand img { height: 44px; display: block; }
+
+.l-nav-links { display: flex; align-items: center; gap: 18px; font-size: 13px; font-weight: 600; }
+.l-nav-links a { text-decoration: none; color: #526078; transition: color .2s; }
+.l-nav-links a:hover { color: var(--l-red); }
+.l-nav-links a.current { color: var(--l-red); }
+
+.l-logout {
+  border: 1px solid rgba(230,57,70,.2);
+  background: #fff;
+  color: var(--l-red);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.l-logout:hover { background: var(--l-red); color: #fff; }
+
+/* ---------- MAIN ---------- */
+
+.l-main { max-width: 1180px; margin: 0 auto; padding: 36px 24px 80px; }
+
+.l-header { margin-bottom: 26px; }
+.l-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--l-red); margin-bottom: 8px; }
+.l-header h1 { font-size: 30px; font-weight: 800; color: var(--l-blue); margin: 0 0 6px; }
+.l-header p { margin: 0; color: var(--l-text-soft); font-size: 14.5px; }
+
+/* Tabs */
+
+.l-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid var(--l-border);
+  border-radius: 14px;
+  padding: 6px;
+  margin-bottom: 26px;
+  box-shadow: var(--l-shadow);
+}
+
+.l-tab {
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--l-text-soft);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  white-space: nowrap;
+}
+.l-tab:hover { background: var(--l-blue-light); color: var(--l-blue); }
+.l-tab.active { background: var(--l-blue); color: #fff; }
+
+.l-view { display: none; }
+.l-view.active { display: block; animation: lfade .25s ease; }
+@keyframes lfade { from { opacity:0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+
+/* Search + filters */
+
+.l-search-wrap { margin-bottom: 18px; }
+
+.l-search {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--l-border);
+  background: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  box-shadow: var(--l-shadow);
+}
+.l-search:focus { outline: none; border-color: var(--l-blue); }
+
+.l-chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+
+.l-chip {
+  border: 1px solid var(--l-border);
+  background: #fff;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--l-text-soft);
+  cursor: pointer;
+  transition: all .15s;
+}
+.l-chip:hover { border-color: var(--l-blue); color: var(--l-blue); }
+.l-chip.active { background: var(--l-red); border-color: var(--l-red); color: #fff; }
+
+.l-topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 10px; margin-bottom: 22px; }
+
+.l-topic-tile {
+  border: 1px solid var(--l-border);
+  background: #fff;
+  border-radius: 11px;
+  padding: 13px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--l-text);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+}
+.l-topic-tile:hover { transform: translateY(-2px); box-shadow: var(--l-shadow); }
+.l-topic-tile.active { border-color: var(--l-red); background: var(--l-red-light); color: var(--l-red-dark); }
+.l-topic-tile span { display:block; font-size: 11px; font-weight: 600; color: var(--l-muted); margin-top:3px; }
+
+.l-result-count { font-size: 12.5px; color: var(--l-muted); margin: 0 0 12px; font-weight: 600; }
+
+/* Linking word cards */
+
+.l-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; }
+
+.l-card {
+  background: var(--l-card);
+  border: 1px solid var(--l-border);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: var(--l-shadow);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.l-card:hover { transform: translateY(-3px); box-shadow: var(--l-shadow-hover); }
+
+.l-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.l-card-word { font-size: 18px; font-weight: 800; color: var(--l-blue); line-height: 1.3; }
+.l-card-cat { font-size: 11px; font-weight: 700; color: var(--l-red); margin-top: 3px; text-transform: uppercase; letter-spacing: .03em; }
+
+.l-reg {
+  font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+}
+.l-reg.formal { background: var(--l-blue-light); color: var(--l-blue); }
+.l-reg.neutral { background: var(--l-green-light); color: var(--l-green); }
+.l-reg.informal { background: var(--l-amber-light); color: var(--l-amber); }
+
+.l-card-meaning { font-size: 13.5px; color: var(--l-text); line-height: 1.5; }
+.l-card-position { font-size: 12px; color: var(--l-text-soft); background: #f3f4f7; border-radius: 8px; padding: 7px 10px; }
+.l-card-syn { font-size: 12px; color: var(--l-text-soft); }
+.l-card-syn b { color: var(--l-text); }
+
+.l-card-example { font-size: 12.5px; color: var(--l-text-soft); font-style: italic; border-left: 2px solid var(--l-border); padding-left: 10px; }
+
+.l-card-actions { display: flex; gap: 8px; margin-top: 4px; }
+.l-icon-btn {
+  border: 1px solid var(--l-border); background: #fff; border-radius: 8px;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer; transition: all .15s; flex-shrink:0;
+}
+.l-icon-btn:hover { border-color: var(--l-blue); }
+.l-icon-btn.on { background: var(--l-red); border-color: var(--l-red); color: #fff; }
+.l-icon-btn.learned-on { background: var(--l-green); border-color: var(--l-green); color: #fff; }
+
+.l-empty { padding: 60px 20px; text-align: center; color: var(--l-muted); font-size: 14px; }
+
+/* Detail modal */
+
+.l-modal-backdrop {
+  position: fixed; inset: 0; background: rgba(15,23,42,.55);
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 300;
+}
+.l-modal {
+  background: #fff; border-radius: 18px; max-width: 560px; width: 100%;
+  max-height: 88vh; overflow-y: auto; padding: 30px; box-shadow: var(--l-shadow-hover);
+}
+.l-modal-close {
+  float: right; border: none; background: var(--l-blue-light); color: var(--l-blue);
+  width: 32px; height: 32px; border-radius: 9px; font-size: 16px; cursor: pointer; font-weight:700;
+}
+.l-modal h2 { font-size: 25px; color: var(--l-blue); margin: 0 0 2px; }
+.l-modal-row { margin: 16px 0; }
+.l-modal-row h4 { margin: 0 0 6px; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--l-muted); font-weight: 800; }
+.l-modal-row p, .l-modal-row div { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--l-text); }
+.l-tag-row { display:flex; flex-wrap:wrap; gap:6px; }
+.l-tag { font-size: 11.5px; background: var(--l-blue-light); color: var(--l-blue); padding: 4px 10px; border-radius: 999px; font-weight: 700; }
+
+.l-error-box { background: var(--l-red-light); border-radius: 9px; padding: 9px 12px; font-size: 12.5px; }
+.l-error-box .wrong { color: var(--l-red-dark); text-decoration: line-through; display: block; margin-bottom: 3px; }
+.l-error-box .right { color: var(--l-green); font-weight: 700; display: block; }
+
+/* Linking Word of the Day */
+
+.l-wotd-card {
+  background: linear-gradient(135deg, var(--l-blue), var(--l-blue-dark));
+  color: #fff; border-radius: 18px; padding: 32px; box-shadow: var(--l-shadow-hover);
+}
+.l-wotd-card .l-eyebrow { color: #ffd7da; }
+.l-wotd-card h2 { font-size: 30px; margin: 0 0 4px; }
+.l-wotd-card p.explain { font-size: 15.5px; margin: 14px 0; line-height: 1.6; }
+.l-wotd-card .l-card-example { color: rgba(255,255,255,.85); border-left-color: rgba(255,255,255,.35); }
+.l-wotd-card .l-card-position { background: rgba(255,255,255,.15); color: #fff; }
+.l-wotd-topic { display:inline-block; margin-top:10px; font-size:11.5px; background: rgba(255,255,255,.15); padding: 4px 10px; border-radius:999px; }
+.l-wotd-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+.l-btn {
+  border: none; border-radius: 10px; padding: 11px 20px; font-size: 13.5px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+}
+.l-btn-primary { background: #fff; color: var(--l-blue); }
+.l-btn-primary:hover { transform: translateY(-1px); }
+.l-btn-outline { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+.l-btn-outline:hover { background: rgba(255,255,255,.22); }
+.l-btn-solid { background: var(--l-red); color: #fff; }
+.l-btn-solid:hover { background: var(--l-red-dark); }
+.l-btn-ghost { background: #fff; color: var(--l-blue); border: 1px solid var(--l-border); }
+.l-btn-ghost:hover { background: var(--l-blue-light); }
+
+/* Cohesion Builder */
+
+.l-cb-card {
+  background: #fff; border: 1px solid var(--l-border); border-radius: 15px;
+  padding: 22px; margin-bottom: 16px; box-shadow: var(--l-shadow);
+}
+.l-cb-cat { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--l-muted); margin-bottom: 10px; }
+.l-cb-label { font-size: 11px; font-weight: 800; color: var(--l-muted); text-transform: uppercase; margin-bottom: 4px; }
+.l-cb-text { font-size: 14.5px; line-height: 1.65; margin-bottom: 14px; }
+.l-swap { background: var(--l-amber-light); color: var(--l-amber); padding: 1px 5px; border-radius: 4px; font-weight: 700; }
+.l-swap-arrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; background: var(--l-blue-light); color: var(--l-blue); padding: 5px 10px; border-radius: 8px; margin: 3px 6px 3px 0; font-weight: 700; }
+
+/* Practice quiz */
+
+.l-quiz-card {
+  background: #fff; border: 1px solid var(--l-border); border-radius: 18px;
+  padding: 30px; box-shadow: var(--l-shadow); max-width: 640px; margin: 0 auto;
+}
+.l-quiz-progress { font-size: 12px; color: var(--l-muted); font-weight: 700; margin-bottom: 10px; }
+.l-quiz-type { display:inline-block; font-size: 11px; font-weight: 800; color: var(--l-red); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; }
+.l-quiz-prompt { font-size: 17px; font-weight: 700; color: var(--l-blue); margin-bottom: 20px; line-height: 1.5; }
+.l-quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.l-quiz-option {
+  border: 1.5px solid var(--l-border); background: #fff; border-radius: 11px;
+  padding: 13px 16px; font-size: 14px; text-align: left; cursor: pointer; transition: all .15s;
+}
+.l-quiz-option:hover { border-color: var(--l-blue); }
+.l-quiz-option.correct { border-color: var(--l-green); background: var(--l-green-light); }
+.l-quiz-option.incorrect { border-color: var(--l-red); background: var(--l-red-light); }
+.l-quiz-option:disabled { cursor: default; }
+.l-quiz-explain { margin-top: 16px; padding: 14px 16px; border-radius: 11px; background: var(--l-blue-light); font-size: 13.5px; line-height: 1.55; color: var(--l-blue-dark); }
+.l-quiz-next { margin-top: 18px; text-align: right; }
+
+.l-quiz-summary { text-align: center; }
+.l-quiz-score { font-size: 44px; font-weight: 800; color: var(--l-blue); margin: 6px 0; }
+.l-revision-list { text-align: left; background: var(--l-amber-light); border-radius: 12px; padding: 16px 18px; margin: 20px 0; }
+.l-revision-list h4 { margin: 0 0 8px; font-size: 12.5px; color: var(--l-amber); text-transform: uppercase; letter-spacing: .04em; }
+.l-revision-list span { display:inline-block; background:#fff; border:1px solid var(--l-border); padding:4px 10px; border-radius:999px; font-size:12.5px; font-weight:700; margin: 3px 4px 0 0; }
+
+/* My Linking Words */
+
+.l-stat-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 14px; margin-bottom: 24px; }
+.l-stat {
+  background: #fff; border: 1px solid var(--l-border); border-radius: 13px;
+  padding: 18px; text-align: center; box-shadow: var(--l-shadow);
+}
+.l-stat b { display:block; font-size: 26px; color: var(--l-blue); }
+.l-stat span { font-size: 12px; color: var(--l-text-soft); font-weight: 600; }
+
+.l-mv-row { display:flex; gap: 8px; margin-bottom: 16px; }
+
+@media (max-width: 640px) {
+  .l-nav-links { display: none; }
+  .l-main { padding: 24px 16px 60px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="l-nav">
+  <div class="l-nav-inner">
+    <a href="/student/dashboard.html" class="l-brand"><img src="/images/logos.png" alt="IELTSbyLE"></a>
+    <div class="l-nav-links">
+      <a href="/student/dashboard.html">Dashboard</a>
+      <a href="/student/resources.html" class="current">Resources</a>
+      <a href="/student/mock-tests.html">Mock tests</a>
+      <a href="/student/results.html">My results</a>
+      <span id="userName" style="font-weight:700;color:var(--l-blue);font-size:13px;"></span>
+      <a href="#" id="logoutLink" class="l-logout">Log out</a>
+    </div>
+  </div>
+</nav>
+
+<main class="l-main">
+
+  <div class="l-header">
+    <div class="l-eyebrow">IELTS Essentials</div>
+    <h1>Linking Words &amp; Cohesion</h1>
+    <p>Connect your ideas smoothly and accurately — the difference between a Band 6 and a Band 8 essay is often cohesion, not vocabulary.</p>
+  </div>
+
+  <div class="l-tabs" id="tabs">
+    <button class="l-tab active" data-view="browse">Browse</button>
+    <button class="l-tab" data-view="wotd">Linking Word of the Day</button>
+    <button class="l-tab" data-view="cohesion">Cohesion Builder</button>
+    <button class="l-tab" data-view="practice">Practice Mode</button>
+    <button class="l-tab" data-view="mylinking">My Linking Words</button>
+  </div>
+
+  <!-- BROWSE -->
+  <section class="l-view active" id="view-browse">
+
+    <div class="l-search-wrap">
+      <input type="text" class="l-search" id="searchInput" placeholder="Search a linking word, function, or skill...">
+    </div>
+
+    <div class="l-chip-row" id="skillChips"></div>
+    <div class="l-topic-grid" id="typeGrid"></div>
+
+    <p class="l-result-count" id="resultCount"></p>
+    <div class="l-grid" id="wordGrid"></div>
+
+  </section>
+
+  <!-- LINKING WORD OF THE DAY -->
+  <section class="l-view" id="view-wotd"></section>
+
+  <!-- COHESION BUILDER -->
+  <section class="l-view" id="view-cohesion">
+    <p style="color:var(--l-text-soft);font-size:13.5px;margin-bottom:18px;">
+      See how two choppy, disconnected sentences become one smooth, cohesive sentence with the right linking word.
+    </p>
+    <div id="cohesionList"></div>
+  </section>
+
+  <!-- PRACTICE MODE -->
+  <section class="l-view" id="view-practice">
+    <div id="practiceArea"></div>
+  </section>
+
+  <!-- MY LINKING WORDS -->
+  <section class="l-view" id="view-mylinking">
+    <div class="l-stat-grid" id="mlStats"></div>
+    <div class="l-mv-row">
+      <button class="l-chip active" data-mlfilter="all">All</button>
+      <button class="l-chip" data-mlfilter="saved">Saved</button>
+      <button class="l-chip" data-mlfilter="learned">Learned</button>
+      <button class="l-chip" data-mlfilter="review">To review</button>
+    </div>
+    <div class="l-grid" id="myLinkingGrid"></div>
+  </section>
+
+</main>
+
+<div id="modalRoot"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/linking-data.js"></script>
+<script>
+
+/* =========================================
+   STATE
+========================================= */
+
+let profile = null;
+let progress = new Map();      // word slug -> 'saved' | 'learned'
+let activeView = 'browse';
+let activeSkill = 'all';
+let activeType = null;
+let searchQuery = '';
+let mlFilter = 'all';
+
+let quizState = null;
+
+const TYPES = [
+  'Addition','Contrast','Cause & Effect','Sequence & Time','Giving Examples',
+  'Comparison','Condition','Emphasis','Clarification','Conclusion & Summary'
+];
+
+function slugOf(word) { return word.toLowerCase().replace(/[^a-z0-9]+/g, '-'); }
+
+/* =========================================
+   INIT
+========================================= */
+
+(async () => {
+
+  profile = await Auth.requireApprovedRole('student');
+  if (!profile) return;
+
+  document.getElementById('userName').textContent = profile.name || 'Student';
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+
+  await loadProgress();
+
+  renderSkillChips();
+  renderTypeGrid();
+  renderWordGrid();
+  renderLinkingWordOfTheDay();
+  renderCohesionList();
+  renderMyLinking();
+
+  wireTabs();
+  wireSearch();
+
+})();
+
+async function loadProgress() {
+
+  try {
+    const { data, error } = await supabase
+      .from('linking_progress')
+      .select('word_slug, status')
+      .eq('student_id', profile.id);
+
+    if (error) { console.error(error); return; }
+
+    progress = new Map((data || []).map(r => [r.word_slug, r.status]));
+
+  } catch (e) {
+    console.error(e);
+  }
+
+}
+
+async function setProgress(word, status) {
+
+  const slug = slugOf(word);
+
+  if (status === null) {
+    progress.delete(slug);
+    await supabase.from('linking_progress').delete().eq('student_id', profile.id).eq('word_slug', slug);
+  } else {
+    progress.set(slug, status);
+    await supabase.from('linking_progress').upsert({ student_id: profile.id, word_slug: slug, status, updated_at: new Date().toISOString() });
+  }
+
+  renderWordGrid();
+  renderMyLinking();
+
+}
+
+/* =========================================
+   TABS
+========================================= */
+
+function wireTabs() {
+
+  document.querySelectorAll('.l-tab').forEach(tab => {
+
+    tab.addEventListener('click', () => {
+
+      document.querySelectorAll('.l-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      document.querySelectorAll('.l-view').forEach(v => v.classList.remove('active'));
+
+      activeView = tab.dataset.view;
+      document.getElementById(`view-${activeView}`).classList.add('active');
+
+      if (activeView === 'practice' && !quizState) startQuiz();
+
+    });
+
+  });
+
+}
+
+/* =========================================
+   BROWSE: search + filters
+========================================= */
+
+function wireSearch() {
+  const input = document.getElementById('searchInput');
+  input.addEventListener('input', () => { searchQuery = input.value.trim().toLowerCase(); renderWordGrid(); });
+}
+
+function renderSkillChips() {
+
+  const skills = [
+    { id: 'all', label: 'All' },
+    { id: 'listening', label: 'Listening' },
+    { id: 'reading', label: 'Reading' },
+    { id: 'writing', label: 'Writing' },
+    { id: 'speaking', label: 'Speaking' }
+  ];
+
+  const el = document.getElementById('skillChips');
+  el.innerHTML = skills.map(s => `<button class="l-chip ${s.id === activeSkill ? 'active' : ''}" data-skill="${s.id}">${s.label}</button>`).join('');
+
+  el.querySelectorAll('[data-skill]').forEach(btn => btn.addEventListener('click', () => {
+    activeSkill = btn.dataset.skill;
+    el.querySelectorAll('.l-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderWordGrid();
+  }));
+
+}
+
+function renderTypeGrid() {
+
+  const el = document.getElementById('typeGrid');
+
+  el.innerHTML = TYPES.map(t => {
+    const count = LINKING_DATA.filter(l => l.category === t).length;
+    return `<button class="l-topic-tile ${t === activeType ? 'active' : ''}" data-type="${t}">${t}<span>${count} words</span></button>`;
+  }).join('');
+
+  el.querySelectorAll('[data-type]').forEach(btn => btn.addEventListener('click', () => {
+    activeType = activeType === btn.dataset.type ? null : btn.dataset.type;
+    el.querySelectorAll('.l-topic-tile').forEach(c => c.classList.remove('active'));
+    if (activeType) btn.classList.add('active');
+    renderWordGrid();
+  }));
+
+}
+
+function filteredWords() {
+
+  return LINKING_DATA.filter(l => {
+
+    if (activeSkill !== 'all' && !l.skills.includes(activeSkill)) return false;
+    if (activeType && l.category !== activeType) return false;
+
+    if (searchQuery) {
+      const hay = `${l.word} ${l.category} ${l.skills.join(' ')} ${l.meaning}`.toLowerCase();
+      if (!hay.includes(searchQuery)) return false;
+    }
+
+    return true;
+
+  });
+
+}
+
+function renderWordGrid() {
+
+  const words = filteredWords();
+  document.getElementById('resultCount').textContent = `${words.length} linking word${words.length === 1 ? '' : 's'} found`;
+
+  const grid = document.getElementById('wordGrid');
+
+  if (!words.length) {
+    grid.innerHTML = `<div class="l-empty" style="grid-column:1/-1;">No linking words match your filters yet. Try a different search or function.</div>`;
+    return;
+  }
+
+  grid.innerHTML = words.map(l => wordCardHtml(l)).join('');
+  wireWordCards(grid);
+
+}
+
+function wordCardHtml(l) {
+
+  const slug = slugOf(l.word);
+  const status = progress.get(slug);
+
+  return `
+    <article class="l-card" data-word="${slug}">
+      <div class="l-card-top">
+        <div>
+          <div class="l-card-word">${l.word}</div>
+          <div class="l-card-cat">${l.category}</div>
+        </div>
+        <span class="l-reg ${l.register}">${l.register}</span>
+      </div>
+      <div class="l-card-meaning">${l.meaning}</div>
+      <div class="l-card-position">📍 ${l.position}</div>
+      <div class="l-card-syn"><b>Similar:</b> ${l.synonyms.join(', ')}</div>
+      <div class="l-card-example">🔊 <span data-speak="${l.example.replace(/"/g,'&quot;')}" style="cursor:pointer;text-decoration:underline;">"${l.example}"</span></div>
+      <div class="l-card-actions">
+        <button class="l-icon-btn ${status === 'saved' ? 'on' : ''}" data-save="${l.word}" title="Save">⭐</button>
+        <button class="l-icon-btn ${status === 'learned' ? 'learned-on' : ''}" data-learn="${l.word}" title="Mark as learned">✓</button>
+      </div>
+    </article>
+  `;
+
+}
+
+function wireWordCards(root) {
+
+  root.querySelectorAll('[data-speak]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); speak(el.dataset.speak); }));
+
+  root.querySelectorAll('[data-save]').forEach(el => el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = progress.get(slugOf(el.dataset.save));
+    setProgress(el.dataset.save, cur === 'saved' ? null : 'saved');
+  }));
+
+  root.querySelectorAll('[data-learn]').forEach(el => el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = progress.get(slugOf(el.dataset.learn));
+    setProgress(el.dataset.learn, cur === 'learned' ? null : 'learned');
+  }));
+
+  root.querySelectorAll('.l-card').forEach(card => card.addEventListener('click', () => openWordModal(card.dataset.word)));
+
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB';
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* =========================================
+   DETAIL MODAL
+========================================= */
+
+function openWordModal(slug) {
+
+  const l = LINKING_DATA.find(x => slugOf(x.word) === slug);
+  if (!l) return;
+
+  const status = progress.get(slug);
+
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="l-modal-backdrop" id="wordModalBackdrop">
+      <div class="l-modal">
+        <button class="l-modal-close" id="closeWordModal">×</button>
+        <h2>${l.word}</h2>
+        <div class="l-tag-row" style="margin-top:8px;">
+          <span class="l-tag">${l.category}</span>
+          <span class="l-tag">${l.register}</span>
+          ${l.skills.map(s => `<span class="l-tag">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`).join('')}
+        </div>
+
+        <div class="l-modal-row">
+          <h4>Meaning</h4>
+          <p>${l.meaning}</p>
+        </div>
+
+        <div class="l-modal-row">
+          <h4>Where it goes &amp; punctuation</h4>
+          <p>${l.position}</p>
+        </div>
+
+        <div class="l-modal-row">
+          <h4>Example sentence</h4>
+          <p style="font-style:italic;">🔊 <span data-speak="${l.example.replace(/"/g,'&quot;')}" style="cursor:pointer;text-decoration:underline;">"${l.example}"</span></p>
+        </div>
+
+        <div class="l-modal-row">
+          <h4>Similar linking words</h4>
+          <div class="l-tag-row">${l.synonyms.map(s => `<span class="l-tag">${s}</span>`).join('')}</div>
+        </div>
+
+        <div class="l-modal-row">
+          <h4>Common mistake</h4>
+          <div class="l-error-box">
+            <span class="wrong">✗ ${l.wrongUsage.wrong}</span>
+            <span class="right">✓ ${l.wrongUsage.right}</span>
+          </div>
+        </div>
+
+        <div class="l-modal-row">
+          <h4>Tip</h4>
+          <p>${l.tip}</p>
+        </div>
+
+        <div class="l-modal-row">
+          <h4>Related linking words</h4>
+          <div class="l-tag-row">${l.related.map(r => `<span class="l-tag">${r}</span>`).join('')}</div>
+        </div>
+
+        <div class="l-card-actions" style="margin-top:20px;">
+          <button class="l-icon-btn modal-save ${status === 'saved' ? 'on' : ''}" data-save="${l.word}">⭐ Save</button>
+          <button class="l-icon-btn modal-learn ${status === 'learned' ? 'learned-on' : ''}" data-learn="${l.word}" style="width:auto;padding:0 12px;">✓ Mark as learned</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('closeWordModal').addEventListener('click', closeModal);
+  document.getElementById('wordModalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'wordModalBackdrop') closeModal(); });
+  wireWordCards(root);
+
+}
+
+function closeModal() {
+  document.getElementById('modalRoot').innerHTML = '';
+}
+
+/* =========================================
+   LINKING WORD OF THE DAY
+========================================= */
+
+function renderLinkingWordOfTheDay() {
+
+  const dayIndex = Math.floor(Date.now() / 86400000) % LINKING_DATA.length;
+  const l = LINKING_DATA[dayIndex];
+  const status = progress.get(slugOf(l.word));
+
+  document.getElementById('view-wotd').innerHTML = `
+    <div class="l-wotd-card">
+      <div class="l-eyebrow">Linking Word of the Day</div>
+      <h2>${l.word}</h2>
+      <p class="explain">${l.meaning}</p>
+      <div class="l-card-position">📍 ${l.position}</div>
+      <div class="l-card-example" style="margin-top:14px;">"${l.example}"</div>
+      <span class="l-wotd-topic">${l.category} &middot; ${l.register}</span>
+      <div style="margin-top:14px;font-size:13px;"><b>Similar:</b> ${l.synonyms.join(', ')}</div>
+      <div class="l-wotd-actions">
+        <button class="l-btn l-btn-primary" id="wotdLearnBtn">Learn This Word</button>
+        <button class="l-btn l-btn-outline" id="wotdSaveBtn">${status === 'saved' ? 'Saved ✓' : 'Add to My Linking Words'}</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('wotdLearnBtn').addEventListener('click', () => openWordModal(slugOf(l.word)));
+  document.getElementById('wotdSaveBtn').addEventListener('click', async () => {
+    const cur = progress.get(slugOf(l.word));
+    await setProgress(l.word, cur === 'saved' ? null : 'saved');
+    renderLinkingWordOfTheDay();
+  });
+
+}
+
+/* =========================================
+   COHESION BUILDER
+========================================= */
+
+function highlightSwaps(text, swaps, side) {
+  let out = text;
+  swaps.forEach(pair => {
+    const term = side === 'from' ? pair[0] : pair[1];
+    out = out.split(term).join(`<span class="l-swap">${term}</span>`);
+  });
+  return out;
+}
+
+function renderCohesionList() {
+
+  const el = document.getElementById('cohesionList');
+
+  el.innerHTML = COHESION_BUILDER_DATA.map(c => `
+    <div class="l-cb-card">
+      <div class="l-cb-cat">${c.category}</div>
+      <div class="l-cb-label">Choppy — two separate sentences</div>
+      <div class="l-cb-text">${highlightSwaps(c.simple, c.swaps, 'from')}</div>
+      <div class="l-cb-label">Cohesive — joined naturally</div>
+      <div class="l-cb-text">${highlightSwaps(c.improved, c.swaps, 'to')}</div>
+      <div>${c.swaps.map(sw => `<span class="l-swap-arrow">${sw[0]} → ${sw[1]}</span>`).join('')}</div>
+    </div>
+  `).join('');
+
+}
+
+/* =========================================
+   PRACTICE MODE
+========================================= */
+
+const QUESTION_TYPES = ['meaning','wronguse','category','synonym','fillblank','combine'];
+
+function pickRandom(arr, n, excludeIdx) {
+  const pool = arr.map((v,i) => i).filter(i => i !== excludeIdx);
+  const chosen = [];
+  while (chosen.length < n && pool.length) {
+    const i = Math.floor(Math.random() * pool.length);
+    chosen.push(pool.splice(i,1)[0]);
+  }
+  return chosen.map(i => arr[i]);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildQuestion(type, pool) {
+
+  if (type === 'combine') {
+
+    const idx = Math.floor(Math.random() * COHESION_BUILDER_DATA.length);
+    const correct = COHESION_BUILDER_DATA[idx];
+    const distractors = pickRandom(COHESION_BUILDER_DATA, 3, idx);
+    const options = shuffle([{ text: correct.improved, correct: true }, ...distractors.map(d => ({ text: d.improved, correct: false }))]);
+
+    return { type: 'Choose the best cohesive sentence', prompt: `Which is the best way to connect these ideas?\n"${correct.simple}"`, options, explanation: `Key change: ${correct.swaps.map(s => `${s[0]} → ${s[1]}`).join(', ')}.`, revisionTag: correct.category };
+
+  }
+
+  const idx = Math.floor(Math.random() * pool.length);
+  const l = pool[idx];
+  const distractors = pickRandom(LINKING_DATA, 3, LINKING_DATA.indexOf(l));
+
+  if (type === 'meaning') {
+    const options = shuffle([{ text: l.meaning, correct: true }, ...distractors.map(d => ({ text: d.meaning, correct: false }))]);
+    return { type: 'Choose the correct meaning', prompt: `What does "${l.word}" mean?`, options, explanation: `"${l.word}" means: ${l.meaning}`, revisionTag: l.word };
+  }
+
+  if (type === 'wronguse') {
+    const options = shuffle([{ text: l.wrongUsage.right, correct: true }, ...distractors.map(d => ({ text: d.wrongUsage.right, correct: false }))]);
+    return { type: 'Choose the correct version', prompt: `Which is punctuated/used correctly?\n"${l.wrongUsage.wrong}"`, options, explanation: l.tip, revisionTag: l.word };
+  }
+
+  if (type === 'category') {
+    const distractorCats = pickRandom(TYPES.filter(t => t !== l.category), 3, -1);
+    const options = shuffle([{ text: l.category, correct: true }, ...distractorCats.map(t => ({ text: t, correct: false }))]);
+    return { type: 'Identify the function', prompt: `What function does "${l.word}" perform in a sentence?`, options, explanation: l.meaning, revisionTag: l.word };
+  }
+
+  if (type === 'synonym') {
+    const options = shuffle([{ text: l.synonyms[0], correct: true }, ...distractors.map(d => ({ text: d.synonyms[0], correct: false }))]);
+    return { type: 'Choose a similar linking word', prompt: `Which word could replace "${l.word}" with a similar meaning?`, options, explanation: `"${l.synonyms.join('", "')}" all work similarly to "${l.word}".`, revisionTag: l.word };
+  }
+
+  if (type === 'fillblank') {
+    const blanked = l.example.replace(new RegExp(l.word, 'i'), '_____');
+    const options = shuffle([{ text: l.word, correct: true }, ...distractors.map(d => ({ text: d.word, correct: false }))]);
+    return { type: 'Fill in the blank', prompt: blanked, options, explanation: `The full sentence is: "${l.example}"`, revisionTag: l.word };
+  }
+
+}
+
+function startQuiz() {
+
+  const pool = filteredWords().length >= 6 ? filteredWords() : LINKING_DATA;
+  const total = 8;
+  const questions = [];
+
+  for (let i = 0; i < total; i++) {
+    const type = QUESTION_TYPES[i % QUESTION_TYPES.length];
+    questions.push(buildQuestion(type, pool));
+  }
+
+  quizState = { questions, index: 0, score: 0, revision: [], answered: false };
+  renderQuiz();
+
+}
+
+function renderQuiz() {
+
+  const area = document.getElementById('practiceArea');
+
+  if (quizState.index >= quizState.questions.length) {
+    renderQuizSummary();
+    return;
+  }
+
+  const q = quizState.questions[quizState.index];
+
+  area.innerHTML = `
+    <div class="l-quiz-card">
+      <div class="l-quiz-progress">Question ${quizState.index + 1} of ${quizState.questions.length} &middot; Score: ${quizState.score}</div>
+      <span class="l-quiz-type">${q.type}</span>
+      <div class="l-quiz-prompt">${q.prompt.split('\n').map(t => `<div>${t}</div>`).join('')}</div>
+      <div class="l-quiz-options" id="quizOptions">
+        ${q.options.map((o, i) => `<button class="l-quiz-option" data-i="${i}">${o.text}</button>`).join('')}
+      </div>
+      <div id="quizFeedback"></div>
+    </div>
+  `;
+
+  document.querySelectorAll('#quizOptions .l-quiz-option').forEach(btn => {
+    btn.addEventListener('click', () => answerQuiz(Number(btn.dataset.i)));
+  });
+
+}
+
+function answerQuiz(i) {
+
+  if (quizState.answered) return;
+  quizState.answered = true;
+
+  const q = quizState.questions[quizState.index];
+  const chosen = q.options[i];
+
+  document.querySelectorAll('#quizOptions .l-quiz-option').forEach((btn, idx) => {
+    btn.disabled = true;
+    if (q.options[idx].correct) btn.classList.add('correct');
+    else if (idx === i) btn.classList.add('incorrect');
+  });
+
+  if (chosen.correct) {
+    quizState.score++;
+  } else if (q.revisionTag) {
+    quizState.revision.push(q.revisionTag);
+  }
+
+  document.getElementById('quizFeedback').innerHTML = `
+    <div class="l-quiz-explain">${chosen.correct ? '✅ Correct! ' : '❌ Not quite. '}${q.explanation}</div>
+    <div class="l-quiz-next"><button class="l-btn l-btn-solid" id="nextQBtn">${quizState.index + 1 >= quizState.questions.length ? 'See results' : 'Next question'}</button></div>
+  `;
+
+  document.getElementById('nextQBtn').addEventListener('click', () => {
+    quizState.index++;
+    quizState.answered = false;
+    renderQuiz();
+  });
+
+}
+
+function renderQuizSummary() {
+
+  const area = document.getElementById('practiceArea');
+  const total = quizState.questions.length;
+  const revisionUnique = [...new Set(quizState.revision)];
+
+  area.innerHTML = `
+    <div class="l-quiz-card l-quiz-summary">
+      <div class="l-eyebrow" style="color:var(--l-red);">Practice complete</div>
+      <div class="l-quiz-score">${quizState.score}/${total}</div>
+      <p style="color:var(--l-text-soft);">${quizState.score === total ? 'Perfect score — excellent work!' : 'Review the words below and try again to improve.'}</p>
+      ${revisionUnique.length ? `
+        <div class="l-revision-list">
+          <h4>Linking words that need revision</h4>
+          <div>${revisionUnique.map(w => `<span>${w}</span>`).join('')}</div>
+        </div>
+      ` : ''}
+      <div class="l-wotd-actions" style="justify-content:center;">
+        <button class="l-btn l-btn-solid" id="retryQuizBtn">Try again</button>
+        <button class="l-btn l-btn-ghost" id="backBrowseBtn">Back to browse</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('retryQuizBtn').addEventListener('click', startQuiz);
+  document.getElementById('backBrowseBtn').addEventListener('click', () => {
+    document.querySelector('.l-tab[data-view="browse"]').click();
+  });
+
+}
+
+/* =========================================
+   MY LINKING WORDS
+========================================= */
+
+function renderMyLinking() {
+
+  const saved = [...progress.entries()].filter(([,s]) => s === 'saved').map(([slug]) => slug);
+  const learned = [...progress.entries()].filter(([,s]) => s === 'learned').map(([slug]) => slug);
+  const total = progress.size;
+
+  document.getElementById('mlStats').innerHTML = `
+    <div class="l-stat"><b>${total}</b><span>Total saved words</span></div>
+    <div class="l-stat"><b>${learned.length}</b><span>Learned words</span></div>
+    <div class="l-stat"><b>${saved.length}</b><span>Words to review</span></div>
+    <div class="l-stat"><b>${Math.min(total,5)}</b><span>Recently added</span></div>
+  `;
+
+  const grid = document.getElementById('myLinkingGrid');
+  const words = LINKING_DATA.filter(l => progress.has(slugOf(l.word)));
+
+  let shown = words;
+  if (mlFilter === 'saved') shown = words.filter(l => progress.get(slugOf(l.word)) === 'saved');
+  if (mlFilter === 'learned') shown = words.filter(l => progress.get(slugOf(l.word)) === 'learned');
+  if (mlFilter === 'review') shown = words.filter(l => progress.get(slugOf(l.word)) === 'saved');
+
+  if (!shown.length) {
+    grid.innerHTML = `<div class="l-empty" style="grid-column:1/-1;">No linking words here yet — save or learn some from Browse to build your list.</div>`;
+  } else {
+    grid.innerHTML = shown.map(l => wordCardHtml(l)).join('');
+    wireWordCards(grid);
+  }
+
+  document.querySelectorAll('[data-mlfilter]').forEach(btn => {
+    btn.onclick = () => {
+      mlFilter = btn.dataset.mlfilter;
+      document.querySelectorAll('[data-mlfilter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMyLinking();
+    };
+  });
+
+}
+
+</script>
+</body>
+</html>
