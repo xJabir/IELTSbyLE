@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paraphrase Bank | IELTSbyLE</title>
+
+<style>
+:root {
+  --p-red: #e63946;
+  --p-red-dark: #c92f3d;
+  --p-red-light: #fff1f2;
+
+  --p-blue: #142b5f;
+  --p-blue-dark: #0e2048;
+  --p-blue-light: #eef3ff;
+
+  --p-green: #14804a;
+  --p-green-light: #ecfdf3;
+
+  --p-amber: #b45309;
+  --p-amber-light: #fffbeb;
+
+  --p-text: #17233d;
+  --p-text-soft: #667085;
+  --p-muted: #98a2b3;
+
+  --p-bg: #f6f8fc;
+  --p-card: #ffffff;
+  --p-border: #e7ebf2;
+
+  --p-shadow: 0 14px 40px rgba(20, 43, 95, 0.07);
+  --p-shadow-hover: 0 20px 50px rgba(20, 43, 95, 0.11);
+
+  --p-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(230, 57, 70, 0.045), transparent 24%),
+    radial-gradient(circle at 8% 30%, rgba(20, 43, 95, 0.035), transparent 26%),
+    var(--p-bg);
+  color: var(--p-text);
+  font-family: var(--p-sans);
+}
+
+a { color: inherit; }
+
+/* ---------- NAV ---------- */
+
+.p-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(228,233,242,0.8);
+  box-shadow: 0 4px 18px rgba(20,43,95,0.035);
+}
+
+.p-nav-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.p-brand img { height: 44px; display: block; }
+
+.p-nav-links { display: flex; align-items: center; gap: 18px; font-size: 13px; font-weight: 600; }
+.p-nav-links a { text-decoration: none; color: #526078; transition: color .2s; }
+.p-nav-links a:hover { color: var(--p-red); }
+.p-nav-links a.current { color: var(--p-red); }
+
+.p-logout {
+  border: 1px solid rgba(230,57,70,.2);
+  background: #fff;
+  color: var(--p-red);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.p-logout:hover { background: var(--p-red); color: #fff; }
+
+/* ---------- MAIN ---------- */
+
+.p-main { max-width: 1180px; margin: 0 auto; padding: 36px 24px 80px; }
+
+.p-header { margin-bottom: 26px; }
+.p-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--p-red); margin-bottom: 8px; }
+.p-header h1 { font-size: 30px; font-weight: 800; color: var(--p-blue); margin: 0 0 6px; }
+.p-header p { margin: 0; color: var(--p-text-soft); font-size: 14.5px; }
+
+/* Tabs */
+
+.p-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid var(--p-border);
+  border-radius: 14px;
+  padding: 6px;
+  margin-bottom: 26px;
+  box-shadow: var(--p-shadow);
+}
+
+.p-tab {
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--p-text-soft);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  white-space: nowrap;
+}
+.p-tab:hover { background: var(--p-blue-light); color: var(--p-blue); }
+.p-tab.active { background: var(--p-blue); color: #fff; }
+
+.p-view { display: none; }
+.p-view.active { display: block; animation: pfade .25s ease; }
+@keyframes pfade { from { opacity:0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+
+/* Search + filters */
+
+.p-search-wrap { margin-bottom: 18px; }
+
+.p-search {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--p-border);
+  background: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  box-shadow: var(--p-shadow);
+}
+.p-search:focus { outline: none; border-color: var(--p-blue); }
+
+.p-chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+
+.p-chip {
+  border: 1px solid var(--p-border);
+  background: #fff;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--p-text-soft);
+  cursor: pointer;
+  transition: all .15s;
+}
+.p-chip:hover { border-color: var(--p-blue); color: var(--p-blue); }
+.p-chip.active { background: var(--p-red); border-color: var(--p-red); color: #fff; }
+
+.p-topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 10px; margin-bottom: 22px; }
+
+.p-topic-tile {
+  border: 1px solid var(--p-border);
+  background: #fff;
+  border-radius: 11px;
+  padding: 13px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--p-text);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+}
+.p-topic-tile:hover { transform: translateY(-2px); box-shadow: var(--p-shadow); }
+.p-topic-tile.active { border-color: var(--p-red); background: var(--p-red-light); color: var(--p-red-dark); }
+.p-topic-tile span { display:block; font-size: 11px; font-weight: 600; color: var(--p-muted); margin-top:3px; }
+
+.p-result-count { font-size: 12.5px; color: var(--p-muted); margin: 0 0 12px; font-weight: 600; }
+
+/* Paraphrase cards */
+
+.p-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 16px; }
+
+.p-card {
+  background: var(--p-card);
+  border: 1px solid var(--p-border);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: var(--p-shadow);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.p-card:hover { transform: translateY(-3px); box-shadow: var(--p-shadow-hover); }
+
+.p-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.p-card-tech { font-size: 11px; font-weight: 700; color: var(--p-red); text-transform: uppercase; letter-spacing: .03em; }
+.p-card-topic { font-size: 11px; font-weight: 700; color: var(--p-blue); background: var(--p-blue-light); padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+
+.p-diff {
+  font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+}
+.p-diff.beginner { background: var(--p-green-light); color: var(--p-green); }
+.p-diff.intermediate { background: var(--p-amber-light); color: var(--p-amber); }
+.p-diff.advanced { background: var(--p-red-light); color: var(--p-red-dark); }
+
+.p-label { font-size: 10.5px; font-weight: 800; color: var(--p-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+.p-sent { font-size: 13.5px; color: var(--p-text); line-height: 1.55; }
+.p-swap { background: var(--p-amber-light); color: var(--p-amber); padding: 1px 5px; border-radius: 4px; font-weight: 700; }
+
+.p-card-actions { display: flex; gap: 8px; margin-top: 4px; }
+.p-icon-btn {
+  border: 1px solid var(--p-border); background: #fff; border-radius: 8px;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer; transition: all .15s; flex-shrink:0;
+}
+.p-icon-btn:hover { border-color: var(--p-blue); }
+.p-icon-btn.on { background: var(--p-red); border-color: var(--p-red); color: #fff; }
+.p-icon-btn.learned-on { background: var(--p-green); border-color: var(--p-green); color: #fff; }
+
+.p-empty { padding: 60px 20px; text-align: center; color: var(--p-muted); font-size: 14px; }
+
+/* Bad paraphrase warning box */
+.p-bad-box { background: var(--p-red-light); border-radius: 9px; padding: 10px 12px; font-size: 12.5px; }
+.p-bad-box .label { color: var(--p-red-dark); font-weight: 800; text-transform: uppercase; font-size: 10.5px; letter-spacing: .04em; display: block; margin-bottom: 4px; }
+.p-bad-box .sent { color: var(--p-red-dark); font-style: italic; display: block; margin-bottom: 4px; }
+.p-bad-box .why { color: var(--p-text); }
+
+/* Detail modal */
+
+.p-modal-backdrop {
+  position: fixed; inset: 0; background: rgba(15,23,42,.55);
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 300;
+}
+.p-modal {
+  background: #fff; border-radius: 18px; max-width: 600px; width: 100%;
+  max-height: 88vh; overflow-y: auto; padding: 30px; box-shadow: var(--p-shadow-hover);
+}
+.p-modal-close {
+  float: right; border: none; background: var(--p-blue-light); color: var(--p-blue);
+  width: 32px; height: 32px; border-radius: 9px; font-size: 16px; cursor: pointer; font-weight:700;
+}
+.p-modal h2 { font-size: 21px; color: var(--p-blue); margin: 0 0 2px; line-height:1.4; }
+.p-modal-row { margin: 16px 0; }
+.p-modal-row h4 { margin: 0 0 6px; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--p-muted); font-weight: 800; }
+.p-modal-row p, .p-modal-row div { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--p-text); }
+.p-tag-row { display:flex; flex-wrap:wrap; gap:6px; }
+.p-tag { font-size: 11.5px; background: var(--p-blue-light); color: var(--p-blue); padding: 4px 10px; border-radius: 999px; font-weight: 700; }
+
+/* Paraphrase of the Day */
+
+.p-potd-card {
+  background: linear-gradient(135deg, var(--p-blue), var(--p-blue-dark));
+  color: #fff; border-radius: 18px; padding: 32px; box-shadow: var(--p-shadow-hover);
+}
+.p-potd-card .p-eyebrow { color: #ffd7da; }
+.p-potd-card .p-label { color: rgba(255,255,255,.65); }
+.p-potd-card .p-sent { color: #fff; font-size: 15px; margin-bottom: 14px; }
+.p-potd-topic { display:inline-block; margin-top:6px; font-size:11.5px; background: rgba(255,255,255,.15); padding: 4px 10px; border-radius:999px; }
+.p-potd-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+.p-btn {
+  border: none; border-radius: 10px; padding: 11px 20px; font-size: 13.5px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+}
+.p-btn-primary { background: #fff; color: var(--p-blue); }
+.p-btn-primary:hover { transform: translateY(-1px); }
+.p-btn-outline { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+.p-btn-outline:hover { background: rgba(255,255,255,.22); }
+.p-btn-solid { background: var(--p-red); color: #fff; }
+.p-btn-solid:hover { background: var(--p-red-dark); }
+.p-btn-ghost { background: #fff; color: var(--p-blue); border: 1px solid var(--p-border); }
+.p-btn-ghost:hover { background: var(--p-blue-light); }
+
+/* Task 2 Question Paraphraser */
+
+.p-prompt-card {
+  background: #fff; border: 1px solid var(--p-border); border-radius: 15px;
+  padding: 22px; margin-bottom: 16px; box-shadow: var(--p-shadow);
+}
+.p-prompt-type { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--p-muted); margin-bottom: 10px; }
+
+/* Practice quiz */
+
+.p-quiz-card {
+  background: #fff; border: 1px solid var(--p-border); border-radius: 18px;
+  padding: 30px; box-shadow: var(--p-shadow); max-width: 660px; margin: 0 auto;
+}
+.p-quiz-progress { font-size: 12px; color: var(--p-muted); font-weight: 700; margin-bottom: 10px; }
+.p-quiz-type { display:inline-block; font-size: 11px; font-weight: 800; color: var(--p-red); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; }
+.p-quiz-prompt { font-size: 16.5px; font-weight: 700; color: var(--p-blue); margin-bottom: 20px; line-height: 1.5; }
+.p-quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.p-quiz-option {
+  border: 1.5px solid var(--p-border); background: #fff; border-radius: 11px;
+  padding: 13px 16px; font-size: 14px; text-align: left; cursor: pointer; transition: all .15s;
+}
+.p-quiz-option:hover { border-color: var(--p-blue); }
+.p-quiz-option.correct { border-color: var(--p-green); background: var(--p-green-light); }
+.p-quiz-option.incorrect { border-color: var(--p-red); background: var(--p-red-light); }
+.p-quiz-option:disabled { cursor: default; }
+.p-quiz-explain { margin-top: 16px; padding: 14px 16px; border-radius: 11px; background: var(--p-blue-light); font-size: 13.5px; line-height: 1.55; color: var(--p-blue-dark); }
+.p-quiz-next { margin-top: 18px; text-align: right; }
+
+.p-quiz-summary { text-align: center; }
+.p-quiz-score { font-size: 44px; font-weight: 800; color: var(--p-blue); margin: 6px 0; }
+.p-revision-list { text-align: left; background: var(--p-amber-light); border-radius: 12px; padding: 16px 18px; margin: 20px 0; }
+.p-revision-list h4 { margin: 0 0 8px; font-size: 12.5px; color: var(--p-amber); text-transform: uppercase; letter-spacing: .04em; }
+.p-revision-list span { display:inline-block; background:#fff; border:1px solid var(--p-border); padding:4px 10px; border-radius:999px; font-size:12.5px; font-weight:700; margin: 3px 4px 0 0; }
+
+/* My Paraphrases */
+
+.p-stat-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 14px; margin-bottom: 24px; }
+.p-stat {
+  background: #fff; border: 1px solid var(--p-border); border-radius: 13px;
+  padding: 18px; text-align: center; box-shadow: var(--p-shadow);
+}
+.p-stat b { display:block; font-size: 26px; color: var(--p-blue); }
+.p-stat span { font-size: 12px; color: var(--p-text-soft); font-weight: 600; }
+
+.p-mv-row { display:flex; gap: 8px; margin-bottom: 16px; }
+
+@media (max-width: 640px) {
+  .p-nav-links { display: none; }
+  .p-main { padding: 24px 16px 60px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="p-nav">
+  <div class="p-nav-inner">
+    <a href="/student/dashboard.html" class="p-brand"><img src="/images/logos.png" alt="IELTSbyLE"></a>
+    <div class="p-nav-links">
+      <a href="/student/dashboard.html">Dashboard</a>
+      <a href="/student/resources.html" class="current">Resources</a>
+      <a href="/student/mock-tests.html">Mock tests</a>
+      <a href="/student/results.html">My results</a>
+      <span id="userName" style="font-weight:700;color:var(--p-blue);font-size:13px;"></span>
+      <a href="#" id="logoutLink" class="p-logout">Log out</a>
+    </div>
+  </div>
+</nav>
+
+<main class="p-main">
+
+  <div class="p-header">
+    <div class="p-eyebrow">IELTS Essentials</div>
+    <h1>Paraphrase Bank</h1>
+    <p>Learn to say the same thing differently — without accidentally changing what it means.</p>
+  </div>
+
+  <div class="p-tabs" id="tabs">
+    <button class="p-tab active" data-view="browse">Browse</button>
+    <button class="p-tab" data-view="potd">Paraphrase of the Day</button>
+    <button class="p-tab" data-view="promptbuilder">Task 2 Question Paraphraser</button>
+    <button class="p-tab" data-view="practice">Practice Mode</button>
+    <button class="p-tab" data-view="mybank">My Paraphrase Bank</button>
+  </div>
+
+  <!-- BROWSE -->
+  <section class="p-view active" id="view-browse">
+
+    <div class="p-search-wrap">
+      <input type="text" class="p-search" id="searchInput" placeholder="Search a sentence, technique, topic, or skill...">
+    </div>
+
+    <div class="p-chip-row" id="skillChips"></div>
+    <div class="p-topic-grid" id="techGrid"></div>
+
+    <p class="p-result-count" id="resultCount"></p>
+    <div class="p-grid" id="bankGrid"></div>
+
+  </section>
+
+  <!-- PARAPHRASE OF THE DAY -->
+  <section class="p-view" id="view-potd"></section>
+
+  <!-- TASK 2 QUESTION PARAPHRASER -->
+  <section class="p-view" id="view-promptbuilder">
+    <p style="color:var(--p-text-soft);font-size:13.5px;margin-bottom:18px;">
+      Never copy the essay question into your introduction — see how real Task 2 prompts get paraphrased naturally.
+    </p>
+    <div id="promptList"></div>
+  </section>
+
+  <!-- PRACTICE MODE -->
+  <section class="p-view" id="view-practice">
+    <div id="practiceArea"></div>
+  </section>
+
+  <!-- MY PARAPHRASE BANK -->
+  <section class="p-view" id="view-mybank">
+    <div class="p-stat-grid" id="mbStats"></div>
+    <div class="p-mv-row">
+      <button class="p-chip active" data-mbfilter="all">All</button>
+      <button class="p-chip" data-mbfilter="saved">Saved</button>
+      <button class="p-chip" data-mbfilter="learned">Learned</button>
+      <button class="p-chip" data-mbfilter="review">To review</button>
+    </div>
+    <div class="p-grid" id="myBankGrid"></div>
+  </section>
+
+</main>
+
+<div id="modalRoot"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/paraphrase-bank-data.js"></script>
+<script>
+
+/* =========================================
+   STATE
+========================================= */
+
+let profile = null;
+let progress = new Map();      // entry id -> 'saved' | 'learned'
+let activeView = 'browse';
+let activeSkill = 'all';
+let activeTechnique = null;
+let searchQuery = '';
+let mbFilter = 'all';
+
+let quizState = null;
+
+const TECHNIQUES = PARAPHRASE_TECHNIQUES.map(t => t.name);
+const TOPICS = [...new Set(PARAPHRASE_BANK_DATA.map(p => p.topic))];
+
+/* =========================================
+   INIT
+========================================= */
+
+(async () => {
+
+  profile = await Auth.requireApprovedRole('student');
+  if (!profile) return;
+
+  document.getElementById('userName').textContent = profile.name || 'Student';
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+
+  await loadProgress();
+
+  renderSkillChips();
+  renderTechGrid();
+  renderBankGrid();
+  renderParaphraseOfTheDay();
+  renderPromptList();
+  renderMyBank();
+
+  wireTabs();
+  wireSearch();
+
+})();
+
+async function loadProgress() {
+
+  try {
+    const { data, error } = await supabase
+      .from('paraphrase_progress')
+      .select('entry_id, status')
+      .eq('student_id', profile.id);
+
+    if (error) { console.error(error); return; }
+
+    progress = new Map((data || []).map(r => [r.entry_id, r.status]));
+
+  } catch (e) {
+    console.error(e);
+  }
+
+}
+
+async function setProgress(id, status) {
+
+  if (status === null) {
+    progress.delete(id);
+    await supabase.from('paraphrase_progress').delete().eq('student_id', profile.id).eq('entry_id', id);
+  } else {
+    progress.set(id, status);
+    await supabase.from('paraphrase_progress').upsert({ student_id: profile.id, entry_id: id, status, updated_at: new Date().toISOString() });
+  }
+
+  renderBankGrid();
+  renderMyBank();
+
+}
+
+/* =========================================
+   TABS
+========================================= */
+
+function wireTabs() {
+
+  document.querySelectorAll('.p-tab').forEach(tab => {
+
+    tab.addEventListener('click', () => {
+
+      document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      document.querySelectorAll('.p-view').forEach(v => v.classList.remove('active'));
+
+      activeView = tab.dataset.view;
+      document.getElementById(`view-${activeView}`).classList.add('active');
+
+      if (activeView === 'practice' && !quizState) startQuiz();
+
+    });
+
+  });
+
+}
+
+/* =========================================
+   BROWSE: search + filters
+========================================= */
+
+function wireSearch() {
+  const input = document.getElementById('searchInput');
+  input.addEventListener('input', () => { searchQuery = input.value.trim().toLowerCase(); renderBankGrid(); });
+}
+
+function renderSkillChips() {
+
+  const skills = [
+    { id: 'all', label: 'All' },
+    { id: 'listening', label: 'Listening' },
+    { id: 'reading', label: 'Reading' },
+    { id: 'writing', label: 'Writing' },
+    { id: 'speaking', label: 'Speaking' }
+  ];
+
+  const el = document.getElementById('skillChips');
+  el.innerHTML = skills.map(s => `<button class="p-chip ${s.id === activeSkill ? 'active' : ''}" data-skill="${s.id}">${s.label}</button>`).join('');
+
+  el.querySelectorAll('[data-skill]').forEach(btn => btn.addEventListener('click', () => {
+    activeSkill = btn.dataset.skill;
+    el.querySelectorAll('.p-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderBankGrid();
+  }));
+
+}
+
+function renderTechGrid() {
+
+  const el = document.getElementById('techGrid');
+
+  el.innerHTML = TECHNIQUES.map(t => {
+    const count = PARAPHRASE_BANK_DATA.filter(p => p.technique === t).length;
+    return `<button class="p-topic-tile ${t === activeTechnique ? 'active' : ''}" data-tech="${t}">${t}<span>${count} examples</span></button>`;
+  }).join('');
+
+  el.querySelectorAll('[data-tech]').forEach(btn => btn.addEventListener('click', () => {
+    activeTechnique = activeTechnique === btn.dataset.tech ? null : btn.dataset.tech;
+    el.querySelectorAll('.p-topic-tile').forEach(c => c.classList.remove('active'));
+    if (activeTechnique) btn.classList.add('active');
+    renderBankGrid();
+  }));
+
+}
+
+function filteredBank() {
+
+  return PARAPHRASE_BANK_DATA.filter(p => {
+
+    if (activeSkill !== 'all' && !p.skills.includes(activeSkill)) return false;
+    if (activeTechnique && p.technique !== activeTechnique) return false;
+
+    if (searchQuery) {
+      const hay = `${p.original} ${p.paraphrase} ${p.technique} ${p.topic} ${p.skills.join(' ')}`.toLowerCase();
+      if (!hay.includes(searchQuery)) return false;
+    }
+
+    return true;
+
+  });
+
+}
+
+function highlightSwaps(text, swaps, side) {
+  let out = text;
+  swaps.forEach(pair => {
+    const term = side === 'from' ? pair[0] : pair[1];
+    out = out.split(term).join(`<span class="p-swap">${term}</span>`);
+  });
+  return out;
+}
+
+function renderBankGrid() {
+
+  const items = filteredBank();
+  document.getElementById('resultCount').textContent = `${items.length} paraphrase example${items.length === 1 ? '' : 's'} found`;
+
+  const grid = document.getElementById('bankGrid');
+
+  if (!items.length) {
+    grid.innerHTML = `<div class="p-empty" style="grid-column:1/-1;">No paraphrase examples match your filters yet. Try a different search or technique.</div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map(p => bankCardHtml(p)).join('');
+  wireBankCards(grid);
+
+}
+
+function bankCardHtml(p) {
+
+  const status = progress.get(p.id);
+
+  return `
+    <article class="p-card" data-entry="${p.id}">
+      <div class="p-card-top">
+        <div class="p-card-tech">${p.technique}</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span class="p-card-topic">${p.topic}</span>
+          <span class="p-diff ${p.difficulty}">${p.difficulty}</span>
+        </div>
+      </div>
+      <div>
+        <div class="p-label">Original</div>
+        <div class="p-sent">🔊 <span data-speak="${p.original.replace(/"/g,'&quot;')}" style="cursor:pointer;text-decoration:underline;">${highlightSwaps(p.original, p.swaps, 'from')}</span></div>
+      </div>
+      <div>
+        <div class="p-label">Paraphrase</div>
+        <div class="p-sent">${highlightSwaps(p.paraphrase, p.swaps, 'to')}</div>
+      </div>
+      <div class="p-card-actions">
+        <button class="p-icon-btn ${status === 'saved' ? 'on' : ''}" data-save="${p.id}" title="Save">⭐</button>
+        <button class="p-icon-btn ${status === 'learned' ? 'learned-on' : ''}" data-learn="${p.id}" title="Mark as learned">✓</button>
+      </div>
+    </article>
+  `;
+
+}
+
+function wireBankCards(root) {
+
+  root.querySelectorAll('[data-speak]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); speak(el.textContent); }));
+
+  root.querySelectorAll('[data-save]').forEach(el => el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = progress.get(el.dataset.save);
+    setProgress(el.dataset.save, cur === 'saved' ? null : 'saved');
+  }));
+
+  root.querySelectorAll('[data-learn]').forEach(el => el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = progress.get(el.dataset.learn);
+    setProgress(el.dataset.learn, cur === 'learned' ? null : 'learned');
+  }));
+
+  root.querySelectorAll('.p-card').forEach(card => card.addEventListener('click', () => openBankModal(card.dataset.entry)));
+
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB';
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* =========================================
+   DETAIL MODAL
+========================================= */
+
+function openBankModal(id) {
+
+  const p = PARAPHRASE_BANK_DATA.find(x => x.id === id);
+  if (!p) return;
+
+  const status = progress.get(id);
+
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="p-modal-backdrop" id="bankModalBackdrop">
+      <div class="p-modal">
+        <button class="p-modal-close" id="closeBankModal">×</button>
+        <h2>${p.technique}</h2>
+        <div class="p-tag-row" style="margin-top:8px;">
+          <span class="p-tag">${p.topic}</span>
+          ${p.taskType ? `<span class="p-tag">${p.taskType}</span>` : ''}
+          ${p.skills.map(s => `<span class="p-tag">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`).join('')}
+        </div>
+
+        <div class="p-modal-row">
+          <h4>Original</h4>
+          <p>🔊 <span data-speak="${p.original.replace(/"/g,'&quot;')}" style="cursor:pointer;text-decoration:underline;">${p.original}</span></p>
+        </div>
+
+        <div class="p-modal-row">
+          <h4>Paraphrase</h4>
+          <p>${highlightSwaps(p.paraphrase, p.swaps, 'to')}</p>
+        </div>
+
+        <div class="p-modal-row">
+          <h4>What changed</h4>
+          <div class="p-tag-row">${p.swaps.map(s => `<span class="p-tag">${s[0]} → ${s[1]}</span>`).join('')}</div>
+        </div>
+
+        <div class="p-modal-row">
+          <h4>⚠️ A paraphrase attempt that changes the meaning</h4>
+          <div class="p-bad-box">
+            <span class="label">Don't write this</span>
+            <span class="sent">"${p.badParaphrase.wrong}"</span>
+            <span class="why">${p.badParaphrase.whyWrong}</span>
+          </div>
+        </div>
+
+        <div class="p-modal-row">
+          <h4>Tip</h4>
+          <p>${p.tip}</p>
+        </div>
+
+        <div class="p-modal-row">
+          <h4>Related techniques</h4>
+          <div class="p-tag-row">${p.related.map(r => `<span class="p-tag">${r}</span>`).join('')}</div>
+        </div>
+
+        <div class="p-card-actions" style="margin-top:20px;">
+          <button class="p-icon-btn modal-save ${status === 'saved' ? 'on' : ''}" data-save="${p.id}">⭐ Save</button>
+          <button class="p-icon-btn modal-learn ${status === 'learned' ? 'learned-on' : ''}" data-learn="${p.id}" style="width:auto;padding:0 12px;">✓ Mark as learned</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('closeBankModal').addEventListener('click', closeModal);
+  document.getElementById('bankModalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'bankModalBackdrop') closeModal(); });
+  wireBankCards(root);
+
+}
+
+function closeModal() {
+  document.getElementById('modalRoot').innerHTML = '';
+}
+
+/* =========================================
+   PARAPHRASE OF THE DAY
+========================================= */
+
+function renderParaphraseOfTheDay() {
+
+  const dayIndex = Math.floor(Date.now() / 86400000) % PARAPHRASE_BANK_DATA.length;
+  const p = PARAPHRASE_BANK_DATA[dayIndex];
+  const status = progress.get(p.id);
+
+  document.getElementById('view-potd').innerHTML = `
+    <div class="p-potd-card">
+      <div class="p-eyebrow">Paraphrase of the Day</div>
+      <div class="p-label" style="margin-top:14px;">Original</div>
+      <div class="p-sent">"${p.original}"</div>
+      <div class="p-label">Paraphrase</div>
+      <div class="p-sent">${highlightSwaps(p.paraphrase, p.swaps, 'to')}</div>
+      <span class="p-potd-topic">${p.technique} &middot; ${p.topic}</span>
+      <div class="p-potd-actions">
+        <button class="p-btn p-btn-primary" id="potdLearnBtn">Learn This Example</button>
+        <button class="p-btn p-btn-outline" id="potdSaveBtn">${status === 'saved' ? 'Saved ✓' : 'Add to My Paraphrase Bank'}</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('potdLearnBtn').addEventListener('click', () => openBankModal(p.id));
+  document.getElementById('potdSaveBtn').addEventListener('click', async () => {
+    const cur = progress.get(p.id);
+    await setProgress(p.id, cur === 'saved' ? null : 'saved');
+    renderParaphraseOfTheDay();
+  });
+
+}
+
+/* =========================================
+   TASK 2 QUESTION PARAPHRASER
+========================================= */
+
+function renderPromptList() {
+
+  const el = document.getElementById('promptList');
+
+  el.innerHTML = PROMPT_PARAPHRASE_DATA.map(pr => `
+    <div class="p-prompt-card">
+      <div class="p-prompt-type">${pr.questionType}</div>
+      <div class="p-label">Essay question</div>
+      <div class="p-sent" style="margin-bottom:12px;">${highlightSwaps(pr.prompt, pr.swaps, 'from')}</div>
+      <div class="p-label">Paraphrased introduction</div>
+      <div class="p-sent">${highlightSwaps(pr.paraphrase, pr.swaps, 'to')}</div>
+    </div>
+  `).join('');
+
+}
+
+/* =========================================
+   PRACTICE MODE
+========================================= */
+
+const QUESTION_TYPES = ['identify','spotbad','technique','prompt','swap','topic'];
+
+function pickRandom(arr, n, excludeIdx) {
+  const pool = arr.map((v,i) => i).filter(i => i !== excludeIdx);
+  const chosen = [];
+  while (chosen.length < n && pool.length) {
+    const i = Math.floor(Math.random() * pool.length);
+    chosen.push(pool.splice(i,1)[0]);
+  }
+  return chosen.map(i => arr[i]);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildQuestion(type, pool) {
+
+  if (type === 'prompt') {
+
+    const idx = Math.floor(Math.random() * PROMPT_PARAPHRASE_DATA.length);
+    const correct = PROMPT_PARAPHRASE_DATA[idx];
+    const distractors = pickRandom(PROMPT_PARAPHRASE_DATA, 3, idx);
+    const options = shuffle([{ text: correct.paraphrase, correct: true }, ...distractors.map(d => ({ text: d.paraphrase, correct: false }))]);
+
+    return { type: 'Choose the correct introduction', prompt: `Which is the best paraphrased introduction for this essay question?\n"${correct.prompt}"`, options, explanation: `Key change: ${correct.swaps.map(s => `${s[0]} → ${s[1]}`).join(', ')}`, revisionTag: correct.questionType };
+
+  }
+
+  const idx = Math.floor(Math.random() * pool.length);
+  const p = pool[idx];
+  const distractors = pickRandom(PARAPHRASE_BANK_DATA, 3, PARAPHRASE_BANK_DATA.indexOf(p));
+
+  if (type === 'identify') {
+    const options = shuffle([{ text: p.paraphrase, correct: true }, { text: p.badParaphrase.wrong, correct: false }, ...distractors.slice(0,2).map(d => ({ text: d.badParaphrase.wrong, correct: false }))]);
+    return { type: 'Choose the accurate paraphrase', prompt: `Which option paraphrases this sentence WITHOUT changing its meaning?\n"${p.original}"`, options, explanation: `Correct: "${p.paraphrase}" — key change: ${p.swaps.map(s => `${s[0]} → ${s[1]}`).join(', ')}`, revisionTag: p.technique };
+  }
+
+  if (type === 'spotbad') {
+    const options = shuffle([{ text: p.badParaphrase.whyWrong, correct: true }, ...distractors.map(d => ({ text: d.badParaphrase.whyWrong, correct: false }))]);
+    return { type: 'Spot the meaning change', prompt: `This paraphrase attempt is WRONG — why?\nOriginal: "${p.original}"\nAttempt: "${p.badParaphrase.wrong}"`, options, explanation: p.badParaphrase.whyWrong, revisionTag: p.technique };
+  }
+
+  if (type === 'technique') {
+    const distractorTechs = pickRandom(TECHNIQUES.filter(t => t !== p.technique), 3, -1);
+    const options = shuffle([{ text: p.technique, correct: true }, ...distractorTechs.map(t => ({ text: t, correct: false }))]);
+    return { type: 'Identify the technique', prompt: `Which paraphrasing technique is used here?\nOriginal: "${p.original}"\nParaphrase: "${p.paraphrase}"`, options, explanation: (PARAPHRASE_TECHNIQUES.find(t => t.name === p.technique) || {}).explanation || '', revisionTag: p.technique };
+  }
+
+  if (type === 'swap') {
+    const swap = p.swaps[0];
+    const distractorWords = pickRandom(PARAPHRASE_BANK_DATA, 3, PARAPHRASE_BANK_DATA.indexOf(p)).map(d => d.swaps[0][1]);
+    const options = shuffle([{ text: swap[1], correct: true }, ...distractorWords.map(w => ({ text: w, correct: false }))]);
+    return { type: 'Choose the correct replacement', prompt: `In this sentence, what could safely replace "${swap[0]}"?\n"${p.original}"`, options, explanation: `"${swap[0]}" → "${swap[1]}" keeps the same meaning.`, revisionTag: p.technique };
+  }
+
+  if (type === 'topic') {
+    const distractorTopics = pickRandom(TOPICS.filter(t => t !== p.topic), 3, -1);
+    const options = shuffle([{ text: p.topic, correct: true }, ...distractorTopics.map(t => ({ text: t, correct: false }))]);
+    return { type: 'Identify the topic', prompt: `Which IELTS topic does this sentence relate to?\n"${p.original}"`, options, explanation: `This example is tagged under "${p.topic}".`, revisionTag: p.technique };
+  }
+
+}
+
+function startQuiz() {
+
+  const pool = filteredBank().length >= 6 ? filteredBank() : PARAPHRASE_BANK_DATA;
+  const total = 8;
+  const questions = [];
+
+  for (let i = 0; i < total; i++) {
+    const type = QUESTION_TYPES[i % QUESTION_TYPES.length];
+    questions.push(buildQuestion(type, pool));
+  }
+
+  quizState = { questions, index: 0, score: 0, revision: [], answered: false };
+  renderQuiz();
+
+}
+
+function renderQuiz() {
+
+  const area = document.getElementById('practiceArea');
+
+  if (quizState.index >= quizState.questions.length) {
+    renderQuizSummary();
+    return;
+  }
+
+  const q = quizState.questions[quizState.index];
+
+  area.innerHTML = `
+    <div class="p-quiz-card">
+      <div class="p-quiz-progress">Question ${quizState.index + 1} of ${quizState.questions.length} &middot; Score: ${quizState.score}</div>
+      <span class="p-quiz-type">${q.type}</span>
+      <div class="p-quiz-prompt">${q.prompt.split('\n').map(l => `<div>${l}</div>`).join('')}</div>
+      <div class="p-quiz-options" id="quizOptions">
+        ${q.options.map((o, i) => `<button class="p-quiz-option" data-i="${i}">${o.text}</button>`).join('')}
+      </div>
+      <div id="quizFeedback"></div>
+    </div>
+  `;
+
+  document.querySelectorAll('#quizOptions .p-quiz-option').forEach(btn => {
+    btn.addEventListener('click', () => answerQuiz(Number(btn.dataset.i)));
+  });
+
+}
+
+function answerQuiz(i) {
+
+  if (quizState.answered) return;
+  quizState.answered = true;
+
+  const q = quizState.questions[quizState.index];
+  const chosen = q.options[i];
+
+  document.querySelectorAll('#quizOptions .p-quiz-option').forEach((btn, idx) => {
+    btn.disabled = true;
+    if (q.options[idx].correct) btn.classList.add('correct');
+    else if (idx === i) btn.classList.add('incorrect');
+  });
+
+  if (chosen.correct) {
+    quizState.score++;
+  } else if (q.revisionTag) {
+    quizState.revision.push(q.revisionTag);
+  }
+
+  document.getElementById('quizFeedback').innerHTML = `
+    <div class="p-quiz-explain">${chosen.correct ? '✅ Correct! ' : '❌ Not quite. '}${q.explanation}</div>
+    <div class="p-quiz-next"><button class="p-btn p-btn-solid" id="nextQBtn">${quizState.index + 1 >= quizState.questions.length ? 'See results' : 'Next question'}</button></div>
+  `;
+
+  document.getElementById('nextQBtn').addEventListener('click', () => {
+    quizState.index++;
+    quizState.answered = false;
+    renderQuiz();
+  });
+
+}
+
+function renderQuizSummary() {
+
+  const area = document.getElementById('practiceArea');
+  const total = quizState.questions.length;
+  const revisionUnique = [...new Set(quizState.revision)];
+
+  area.innerHTML = `
+    <div class="p-quiz-card p-quiz-summary">
+      <div class="p-eyebrow" style="color:var(--p-red);">Practice complete</div>
+      <div class="p-quiz-score">${quizState.score}/${total}</div>
+      <p style="color:var(--p-text-soft);">${quizState.score === total ? 'Perfect score — excellent work!' : 'Review the techniques below and try again to improve.'}</p>
+      ${revisionUnique.length ? `
+        <div class="p-revision-list">
+          <h4>Techniques that need revision</h4>
+          <div>${revisionUnique.map(t => `<span>${t}</span>`).join('')}</div>
+        </div>
+      ` : ''}
+      <div class="p-potd-actions" style="justify-content:center;">
+        <button class="p-btn p-btn-solid" id="retryQuizBtn">Try again</button>
+        <button class="p-btn p-btn-ghost" id="backBrowseBtn">Back to browse</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('retryQuizBtn').addEventListener('click', startQuiz);
+  document.getElementById('backBrowseBtn').addEventListener('click', () => {
+    document.querySelector('.p-tab[data-view="browse"]').click();
+  });
+
+}
+
+/* =========================================
+   MY PARAPHRASE BANK
+========================================= */
+
+function renderMyBank() {
+
+  const saved = [...progress.entries()].filter(([,s]) => s === 'saved').map(([id]) => id);
+  const learned = [...progress.entries()].filter(([,s]) => s === 'learned').map(([id]) => id);
+  const total = progress.size;
+
+  document.getElementById('mbStats').innerHTML = `
+    <div class="p-stat"><b>${total}</b><span>Total saved examples</span></div>
+    <div class="p-stat"><b>${learned.length}</b><span>Learned examples</span></div>
+    <div class="p-stat"><b>${saved.length}</b><span>Examples to review</span></div>
+    <div class="p-stat"><b>${Math.min(total,5)}</b><span>Recently added</span></div>
+  `;
+
+  const grid = document.getElementById('myBankGrid');
+  const items = PARAPHRASE_BANK_DATA.filter(p => progress.has(p.id));
+
+  let shown = items;
+  if (mbFilter === 'saved') shown = items.filter(p => progress.get(p.id) === 'saved');
+  if (mbFilter === 'learned') shown = items.filter(p => progress.get(p.id) === 'learned');
+  if (mbFilter === 'review') shown = items.filter(p => progress.get(p.id) === 'saved');
+
+  if (!shown.length) {
+    grid.innerHTML = `<div class="p-empty" style="grid-column:1/-1;">No paraphrase examples here yet — save or learn some from Browse to build your list.</div>`;
+  } else {
+    grid.innerHTML = shown.map(p => bankCardHtml(p)).join('');
+    wireBankCards(grid);
+  }
+
+  document.querySelectorAll('[data-mbfilter]').forEach(btn => {
+    btn.onclick = () => {
+      mbFilter = btn.dataset.mbfilter;
+      document.querySelectorAll('[data-mbfilter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMyBank();
+    };
+  });
+
+}
+
+</script>
+</body>
+</html>
