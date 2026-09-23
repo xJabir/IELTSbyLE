@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collocations | IELTSbyLE</title>
+
+<style>
+:root {
+  --c-red: #e63946;
+  --c-red-dark: #c92f3d;
+  --c-red-light: #fff1f2;
+
+  --c-blue: #142b5f;
+  --c-blue-dark: #0e2048;
+  --c-blue-light: #eef3ff;
+
+  --c-green: #14804a;
+  --c-green-light: #ecfdf3;
+
+  --c-amber: #b45309;
+  --c-amber-light: #fffbeb;
+
+  --c-text: #17233d;
+  --c-text-soft: #667085;
+  --c-muted: #98a2b3;
+
+  --c-bg: #f6f8fc;
+  --c-card: #ffffff;
+  --c-border: #e7ebf2;
+
+  --c-shadow: 0 14px 40px rgba(20, 43, 95, 0.07);
+  --c-shadow-hover: 0 20px 50px rgba(20, 43, 95, 0.11);
+
+  --c-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(230, 57, 70, 0.045), transparent 24%),
+    radial-gradient(circle at 8% 30%, rgba(20, 43, 95, 0.035), transparent 26%),
+    var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--c-sans);
+}
+
+a { color: inherit; }
+
+/* ---------- NAV ---------- */
+
+.c-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(228,233,242,0.8);
+  box-shadow: 0 4px 18px rgba(20,43,95,0.035);
+}
+
+.c-nav-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.c-brand img { height: 44px; display: block; }
+
+.c-nav-links { display: flex; align-items: center; gap: 18px; font-size: 13px; font-weight: 600; }
+.c-nav-links a { text-decoration: none; color: #526078; transition: color .2s; }
+.c-nav-links a:hover { color: var(--c-red); }
+.c-nav-links a.current { color: var(--c-red); }
+
+.c-logout {
+  border: 1px solid rgba(230,57,70,.2);
+  background: #fff;
+  color: var(--c-red);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.c-logout:hover { background: var(--c-red); color: #fff; }
+
+/* ---------- MAIN ---------- */
+
+.c-main { max-width: 1180px; margin: 0 auto; padding: 36px 24px 80px; }
+
+.c-header { margin-bottom: 26px; }
+.c-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--c-red); margin-bottom: 8px; }
+.c-header h1 { font-size: 30px; font-weight: 800; color: var(--c-blue); margin: 0 0 6px; }
+.c-header p { margin: 0; color: var(--c-text-soft); font-size: 14.5px; }
+
+/* Tabs */
+
+.c-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  padding: 6px;
+  margin-bottom: 26px;
+  box-shadow: var(--c-shadow);
+}
+
+.c-tab {
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--c-text-soft);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  white-space: nowrap;
+}
+.c-tab:hover { background: var(--c-blue-light); color: var(--c-blue); }
+.c-tab.active { background: var(--c-blue); color: #fff; }
+
+.c-view { display: none; }
+.c-view.active { display: block; animation: cfade .25s ease; }
+@keyframes cfade { from { opacity:0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+
+/* Search + filters */
+
+.c-search-wrap { margin-bottom: 18px; }
+
+.c-search {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--c-border);
+  background: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  box-shadow: var(--c-shadow);
+}
+.c-search:focus { outline: none; border-color: var(--c-blue); }
+
+.c-chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+
+.c-chip {
+  border: 1px solid var(--c-border);
+  background: #fff;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--c-text-soft);
+  cursor: pointer;
+  transition: all .15s;
+}
+.c-chip:hover { border-color: var(--c-blue); color: var(--c-blue); }
+.c-chip.active { background: var(--c-red); border-color: var(--c-red); color: #fff; }
+
+.c-topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 10px; margin-bottom: 22px; }
+
+.c-topic-tile {
+  border: 1px solid var(--c-border);
+  background: #fff;
+  border-radius: 11px;
+  padding: 13px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-text);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+}
+.c-topic-tile:hover { transform: translateY(-2px); box-shadow: var(--c-shadow); }
+.c-topic-tile.active { border-color: var(--c-red); background: var(--c-red-light); color: var(--c-red-dark); }
+.c-topic-tile span { display:block; font-size: 11px; font-weight: 600; color: var(--c-muted); margin-top:3px; }
+
+.c-result-count { font-size: 12.5px; color: var(--c-muted); margin: 0 0 12px; font-weight: 600; }
+
+/* Collocation cards */
+
+.c-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; }
+
+.c-card {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: var(--c-shadow);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.c-card:hover { transform: translateY(-3px); box-shadow: var(--c-shadow-hover); }
+
+.c-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.c-card-phrase { font-size: 17.5px; font-weight: 800; color: var(--c-blue); line-height: 1.3; }
+.c-card-type { font-size: 11px; font-weight: 700; color: var(--c-red); margin-top: 3px; text-transform: uppercase; letter-spacing: .03em; }
+
+.c-diff {
+  font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+}
+.c-diff.beginner { background: var(--c-green-light); color: var(--c-green); }
+.c-diff.intermediate { background: var(--c-amber-light); color: var(--c-amber); }
+.c-diff.advanced { background: var(--c-red-light); color: var(--c-red-dark); }
+
+.c-card-meaning { font-size: 13.5px; color: var(--c-text); line-height: 1.5; }
+.c-card-alt { font-size: 12px; color: var(--c-text-soft); }
+.c-card-alt b { color: var(--c-text); }
+
+.c-card-example { font-size: 12.5px; color: var(--c-text-soft); font-style: italic; border-left: 2px solid var(--c-border); padding-left: 10px; }
+
+.c-card-actions { display: flex; gap: 8px; margin-top: 4px; }
+.c-icon-btn {
+  border: 1px solid var(--c-border); background: #fff; border-radius: 8px;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer; transition: all .15s; flex-shrink:0;
+}
+.c-icon-btn:hover { border-color: var(--c-blue); }
+.c-icon-btn.on { background: var(--c-red); border-color: var(--c-red); color: #fff; }
+.c-icon-btn.learned-on { background: var(--c-green); border-color: var(--c-green); color: #fff; }
+
+.c-empty { padding: 60px 20px; text-align: center; color: var(--c-muted); font-size: 14px; }
+
+/* Detail modal */
+
+.c-modal-backdrop {
+  position: fixed; inset: 0; background: rgba(15,23,42,.55);
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 300;
+}
+.c-modal {
+  background: #fff; border-radius: 18px; max-width: 560px; width: 100%;
+  max-height: 88vh; overflow-y: auto; padding: 30px; box-shadow: var(--c-shadow-hover);
+}
+.c-modal-close {
+  float: right; border: none; background: var(--c-blue-light); color: var(--c-blue);
+  width: 32px; height: 32px; border-radius: 9px; font-size: 16px; cursor: pointer; font-weight:700;
+}
+.c-modal h2 { font-size: 24px; color: var(--c-blue); margin: 0 0 2px; line-height:1.3; }
+.c-modal-row { margin: 16px 0; }
+.c-modal-row h4 { margin: 0 0 6px; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--c-muted); font-weight: 800; }
+.c-modal-row p, .c-modal-row div { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--c-text); }
+.c-tag-row { display:flex; flex-wrap:wrap; gap:6px; }
+.c-tag { font-size: 11.5px; background: var(--c-blue-light); color: var(--c-blue); padding: 4px 10px; border-radius: 999px; font-weight: 700; }
+
+.c-error-box { background: var(--c-red-light); border-radius: 9px; padding: 9px 12px; font-size: 12.5px; }
+.c-error-box .wrong { color: var(--c-red-dark); text-decoration: line-through; display: block; margin-bottom: 3px; }
+.c-error-box .right { color: var(--c-green); font-weight: 700; display: block; }
+
+/* Collocation of the Day */
+
+.c-cotd-card {
+  background: linear-gradient(135deg, var(--c-blue), var(--c-blue-dark));
+  color: #fff; border-radius: 18px; padding: 32px; box-shadow: var(--c-shadow-hover);
+}
+.c-cotd-card .c-eyebrow { color: #ffd7da; }
+.c-cotd-card h2 { font-size: 28px; margin: 0 0 4px; }
+.c-cotd-card p.explain { font-size: 15.5px; margin: 14px 0; line-height: 1.6; }
+.c-cotd-card .c-card-example { color: rgba(255,255,255,.85); border-left-color: rgba(255,255,255,.35); }
+.c-cotd-topic { display:inline-block; margin-top:10px; font-size:11.5px; background: rgba(255,255,255,.15); padding: 4px 10px; border-radius:999px; }
+.c-cotd-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+.c-btn {
+  border: none; border-radius: 10px; padding: 11px 20px; font-size: 13.5px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+}
+.c-btn-primary { background: #fff; color: var(--c-blue); }
+.c-btn-primary:hover { transform: translateY(-1px); }
+.c-btn-outline { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+.c-btn-outline:hover { background: rgba(255,255,255,.22); }
+.c-btn-solid { background: var(--c-red); color: #fff; }
+.c-btn-solid:hover { background: var(--c-red-dark); }
+.c-btn-ghost { background: #fff; color: var(--c-blue); border: 1px solid var(--c-border); }
+.c-btn-ghost:hover { background: var(--c-blue-light); }
+
+/* Collocation Spotlight */
+
+.c-spot-card {
+  background: #fff; border: 1px solid var(--c-border); border-radius: 15px;
+  padding: 22px; margin-bottom: 16px; box-shadow: var(--c-shadow);
+}
+.c-spot-word { font-size: 22px; font-weight: 800; color: var(--c-blue); margin-bottom: 4px; }
+.c-spot-sub { font-size: 12.5px; color: var(--c-text-soft); margin-bottom: 14px; }
+.c-spot-phrase-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.c-spot-phrase { background: var(--c-blue-light); color: var(--c-blue); font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 999px; }
+.c-spot-ex { font-size: 13px; color: var(--c-text-soft); font-style: italic; margin-top: 8px; padding-left: 10px; border-left: 2px solid var(--c-border); }
+
+/* Practice quiz */
+
+.c-quiz-card {
+  background: #fff; border: 1px solid var(--c-border); border-radius: 18px;
+  padding: 30px; box-shadow: var(--c-shadow); max-width: 640px; margin: 0 auto;
+}
+.c-quiz-progress { font-size: 12px; color: var(--c-muted); font-weight: 700; margin-bottom: 10px; }
+.c-quiz-type { display:inline-block; font-size: 11px; font-weight: 800; color: var(--c-red); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; }
+.c-quiz-prompt { font-size: 17px; font-weight: 700; color: var(--c-blue); margin-bottom: 20px; line-height: 1.5; }
+.c-quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.c-quiz-option {
+  border: 1.5px solid var(--c-border); background: #fff; border-radius: 11px;
+  padding: 13px 16px; font-size: 14px; text-align: left; cursor: pointer; transition: all .15s;
+}
+.c-quiz-option:hover { border-color: var(--c-blue); }
+.c-quiz-option.correct { border-color: var(--c-green); background: var(--c-green-light); }
+.c-quiz-option.incorrect { border-color: var(--c-red); background: var(--c-red-light); }
+.c-quiz-option:disabled { cursor: default; }
+.c-quiz-explain { margin-top: 16px; padding: 14px 16px; border-radius: 11px; background: var(--c-blue-light); font-size: 13.5px; line-height: 1.55; color: var(--c-blue-dark); }
+.c-quiz-next { margin-top: 18px; text-align: right; }
+
+.c-quiz-summary { text-align: center; }
+.c-quiz-score { font-size: 44px; font-weight: 800; color: var(--c-blue); margin: 6px 0; }
+.c-revision-list { text-align: left; background: var(--c-amber-light); border-radius: 12px; padding: 16px 18px; margin: 20px 0; }
+.c-revision-list h4 { margin: 0 0 8px; font-size: 12.5px; color: var(--c-amber); text-transform: uppercase; letter-spacing: .04em; }
+.c-revision-list span { display:inline-block; background:#fff; border:1px solid var(--c-border); padding:4px 10px; border-radius:999px; font-size:12.5px; font-weight:700; margin: 3px 4px 0 0; }
+
+/* My Collocations */
+
+.c-stat-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 14px; margin-bottom: 24px; }
+.c-stat {
+  background: #fff; border: 1px solid var(--c-border); border-radius: 13px;
+  padding: 18px; text-align: center; box-shadow: var(--c-shadow);
+}
+.c-stat b { display:block; font-size: 26px; color: var(--c-blue); }
+.c-stat span { font-size: 12px; color: var(--c-text-soft); font-weight: 600; }
+
+.c-mv-row { display:flex; gap: 8px; margin-bottom: 16px; }
+
+@media (max-width: 640px) {
+  .c-nav-links { display: none; }
+  .c-main { padding: 24px 16px 60px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="c-nav">
+  <div class="c-nav-inner">
+    <a href="/student/dashboard.html" class="c-brand"><img src="/images/logos.png" alt="IELTSbyLE"></a>
+    <div class="c-nav-links">
+      <a href="/student/dashboard.html">Dashboard</a>
+      <a href="/student/resources.html" class="current">Resources</a>
+      <a href="/student/mock-tests.html">Mock tests</a>
+      <a href="/student/results.html">My results</a>
+      <span id="userName" style="font-weight:700;color:var(--c-blue);font-size:13px;"></span>
+      <a href="#" id="logoutLink" class="c-logout">Log out</a>
+    </div>
+  </div>
+</nav>
+
+<main class="c-main">
+
+  <div class="c-header">
+    <div class="c-eyebrow">IELTS Essentials</div>
+    <h1>Collocations</h1>
+    <p>Learn which words naturally go together — the fastest way to sound fluent and natural in IELTS.</p>
+  </div>
+
+  <div class="c-tabs" id="tabs">
+    <button class="c-tab active" data-view="browse">Browse</button>
+    <button class="c-tab" data-view="cotd">Collocation of the Day</button>
+    <button class="c-tab" data-view="spotlight">Collocation Spotlight</button>
+    <button class="c-tab" data-view="practice">Practice Mode</button>
+    <button class="c-tab" data-view="mycolloc">My Collocations</button>
+  </div>
+
+  <!-- BROWSE -->
+  <section class="c-view active" id="view-browse">
+
+    <div class="c-search-wrap">
+      <input type="text" class="c-search" id="searchInput" placeholder="Search a phrase, type, or skill...">
+    </div>
+
+    <div class="c-chip-row" id="skillChips"></div>
+    <div class="c-topic-grid" id="typeGrid"></div>
+
+    <p class="c-result-count" id="resultCount"></p>
+    <div class="c-grid" id="collocGrid"></div>
+
+  </section>
+
+  <!-- COLLOCATION OF THE DAY -->
+  <section class="c-view" id="view-cotd"></section>
+
+  <!-- COLLOCATION SPOTLIGHT -->
+  <section class="c-view" id="view-spotlight">
+    <p style="color:var(--c-text-soft);font-size:13.5px;margin-bottom:18px;">
+      High-frequency verbs pair with many different nouns. See the full family of collocations for each one.
+    </p>
+    <div id="spotlightList"></div>
+  </section>
+
+  <!-- PRACTICE MODE -->
+  <section class="c-view" id="view-practice">
+    <div id="practiceArea"></div>
+  </section>
+
+  <!-- MY COLLOCATIONS -->
+  <section class="c-view" id="view-mycolloc">
+    <div class="c-stat-grid" id="mcStats"></div>
+    <div class="c-mv-row">
+      <button class="c-chip active" data-mcfilter="all">All</button>
+      <button class="c-chip" data-mcfilter="saved">Saved</button>
+      <button class="c-chip" data-mcfilter="learned">Learned</button>
+      <button class="c-chip" data-mcfilter="review">To review</button>
+    </div>
+    <div class="c-grid" id="myCollocGrid"></div>
+  </section>
+
+</main>
+
+<div id="modalRoot"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/collocations-data.js"></script>
+<script>
+
+/* =========================================
+   STATE
+========================================= */
+
+let profile = null;
+let progress = new Map();      // phrase slug -> 'saved' | 'learned'
+let activeView = 'browse';
+let activeSkill = 'all';
+let activeType = null;
+let searchQuery = '';
+let mcFilter = 'all';
+
+let quizState = null;
+
+const TYPES = ['Verb + Noun','Adjective + Noun','Adverb + Adjective','Noun + Noun','Verb + Preposition','Quantifier + Noun'];
+
+function slugOf(phrase) { return phrase.toLowerCase().replace(/[^a-z0-9]+/g, '-'); }
+
+/* =========================================
+   INIT
+========================================= */
+
+(async () => {
+
+  profile = await Auth.requireApprovedRole('student');
+  if (!profile) return;
+
+  document.getElementById('userName').textContent = profile.name || 'Student';
+  document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); Auth.logout(); });
+
+  await loadProgress();
+
+  renderSkillChips();
+  renderTypeGrid();
+  renderCollocGrid();
+  renderCollocationOfTheDay();
+  renderSpotlightList();
+  renderMyColloc();
+
+  wireTabs();
+  wireSearch();
+
+})();
+
+async function loadProgress() {
+
+  try {
+    const { data, error } = await supabase
+      .from('collocation_progress')
+      .select('phrase_slug, status')
+      .eq('student_id', profile.id);
+
+    if (error) { console.error(error); return; }
+
+    progress = new Map((data || []).map(r => [r.phrase_slug, r.status]));
+
+  } catch (e) {
+    console.error(e);
+  }
+
+}
+
+async function setProgress(phrase, status) {
+
+  const slug = slugOf(phrase);
+
+  if (status === null) {
+    progress.delete(slug);
+    await supabase.from('collocation_progress').delete().eq('student_id', profile.id).eq('phrase_slug', slug);
+  } else {
+    progress.set(slug, status);
+    await supabase.from('collocation_progress').upsert({ student_id: profile.id, phrase_slug: slug, status, updated_at: new Date().toISOString() });
+  }
+
+  renderCollocGrid();
+  renderMyColloc();
+
+}
+
+/* =========================================
+   TABS
+========================================= */
+
+function wireTabs() {
+
+  document.querySelectorAll('.c-tab').forEach(tab => {
+
+    tab.addEventListener('click', () => {
+
+      document.querySelectorAll('.c-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      document.querySelectorAll('.c-view').forEach(v => v.classList.remove('active'));
+
+      activeView = tab.dataset.view;
+      document.getElementById(`view-${activeView}`).classList.add('active');
+
+      if (activeView === 'practice' && !quizState) startQuiz();
+
+    });
+
+  });
+
+}
+
+/* =========================================
+   BROWSE: search + filters
+========================================= */
+
+function wireSearch() {
+  const input = document.getElementById('searchInput');
+  input.addEventListener('input', () => { searchQuery = input.value.trim().toLowerCase(); renderCollocGrid(); });
+}
+
+function renderSkillChips() {
+
+  const skills = [
+    { id: 'all', label: 'All' },
+    { id: 'listening', label: 'Listening' },
+    { id: 'reading', label: 'Reading' },
+    { id: 'writing', label: 'Writing' },
+    { id: 'speaking', label: 'Speaking' }
+  ];
+
+  const el = document.getElementById('skillChips');
+  el.innerHTML = skills.map(s => `<button class="c-chip ${s.id === activeSkill ? 'active' : ''}" data-skill="${s.id}">${s.label}</button>`).join('');
+
+  el.querySelectorAll('[data-skill]').forEach(btn => btn.addEventListener('click', () => {
+    activeSkill = btn.dataset.skill;
+    el.querySelectorAll('.c-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderCollocGrid();
+  }));
+
+}
+
+function renderTypeGrid() {
+
+  const el = document.getElementById('typeGrid');
+
+  el.innerHTML = TYPES.map(t => {
+    const count = COLLOCATION_DATA.filter(c => c.type === t).length;
+    return `<button class="c-topic-tile ${t === activeType ? 'active' : ''}" data-type="${t}">${t}<span>${count} phrases</span></button>`;
+  }).join('');
+
+  el.querySelectorAll('[data-type]').forEach(btn => btn.addEventListener('click', () => {
+    activeType = activeType === btn.dataset.type ? null : btn.dataset.type;
+    el.querySelectorAll('.c-topic-tile').forEach(c => c.classList.remove('active'));
+    if (activeType) btn.classList.add('active');
+    renderCollocGrid();
+  }));
+
+}
+
+function filteredColloc() {
+
+  return COLLOCATION_DATA.filter(c => {
+
+    if (activeSkill !== 'all' && !c.skills.includes(activeSkill)) return false;
+    if (activeType && c.type !== activeType) return false;
+
+    if (searchQuery) {
+      const hay = `${c.phrase} ${c.type} ${c.topic} ${c.skills.join(' ')} ${c.meaning}`.toLowerCase();
+      if (!hay.includes(searchQuery)) return false;
+    }
+
+    return true;
+
+  });
+
+}
+
+function renderCollocGrid() {
+
+  const items = filteredColloc();
+  document.getElementById('resultCount').textContent = `${items.length} collocation${items.length === 1 ? '' : 's'} found`;
+
+  const grid = document.getElementById('collocGrid');
+
+  if (!items.length) {
+    grid.innerHTML = `<div class="c-empty" style="grid-column:1/-1;">No collocations match your filters yet. Try a different search or type.</div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map(c => collocCardHtml(c)).join('');
+  wireCollocCards(grid);
+
+}
+
+function collocCardHtml(c) {
+
+  const slug = slugOf(c.phrase);
+  const status = progress.get(slug);
+
+  return `
+    <article class="c-card" data-colloc="${slug}">
+      <div class="c-card-top">
+        <div>
+          <div class="c-card-phrase">${c.phrase}</div>
+          <div class="c-card-type">${c.type}</div>
+        </div>
+        <span class="c-diff ${c.difficulty}">${c.difficulty}</span>
+      </div>
+      <div class="c-card-meaning">${c.meaning}</div>
+      <div class="c-card-alt"><b>Also:</b> ${c.alternatives.join(', ')}</div>
+      <div class="c-card-example">🔊 <span data-speak="${c.example.replace(/"/g,'&quot;')}" style="cursor:pointer;text-decoration:underline;">"${c.example}"</span></div>
+      <div class="c-card-actions">
+        <button class="c-icon-btn ${status === 'saved' ? 'on' : ''}" data-save="${c.phrase}" title="Save">⭐</button>
+        <button class="c-icon-btn ${status === 'learned' ? 'learned-on' : ''}" data-learn="${c.phrase}" title="Mark as learned">✓</button>
+      </div>
+    </article>
+  `;
+
+}
+
+function wireCollocCards(root) {
+
+  root.querySelectorAll('[data-speak]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); speak(el.dataset.speak); }));
+
+  root.querySelectorAll('[data-save]').forEach(el => el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = progress.get(slugOf(el.dataset.save));
+    setProgress(el.dataset.save, cur === 'saved' ? null : 'saved');
+  }));
+
+  root.querySelectorAll('[data-learn]').forEach(el => el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = progress.get(slugOf(el.dataset.learn));
+    setProgress(el.dataset.learn, cur === 'learned' ? null : 'learned');
+  }));
+
+  root.querySelectorAll('.c-card').forEach(card => card.addEventListener('click', () => openCollocModal(card.dataset.colloc)));
+
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB';
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* =========================================
+   DETAIL MODAL
+========================================= */
+
+function openCollocModal(slug) {
+
+  const c = COLLOCATION_DATA.find(x => slugOf(x.phrase) === slug);
+  if (!c) return;
+
+  const status = progress.get(slug);
+
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="c-modal-backdrop" id="collocModalBackdrop">
+      <div class="c-modal">
+        <button class="c-modal-close" id="closeCollocModal">×</button>
+        <h2>${c.phrase}</h2>
+        <div class="c-tag-row" style="margin-top:8px;">
+          <span class="c-tag">${c.type}</span>
+          <span class="c-tag">${c.topic}</span>
+          ${c.skills.map(s => `<span class="c-tag">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`).join('')}
+        </div>
+
+        <div class="c-modal-row">
+          <h4>Meaning</h4>
+          <p>${c.meaning}</p>
+        </div>
+
+        <div class="c-modal-row">
+          <h4>Example sentence</h4>
+          <p style="font-style:italic;">🔊 <span data-speak="${c.example.replace(/"/g,'&quot;')}" style="cursor:pointer;text-decoration:underline;">"${c.example}"</span></p>
+        </div>
+
+        <div class="c-modal-row">
+          <h4>Similar phrases</h4>
+          <div class="c-tag-row">${c.alternatives.map(a => `<span class="c-tag">${a}</span>`).join('')}</div>
+        </div>
+
+        <div class="c-modal-row">
+          <h4>Common mistake</h4>
+          <div class="c-error-box">
+            <span class="wrong">✗ ${c.wrongUsage.wrong}</span>
+            <span class="right">✓ ${c.wrongUsage.right}</span>
+          </div>
+        </div>
+
+        <div class="c-modal-row">
+          <h4>Tip</h4>
+          <p>${c.tip}</p>
+        </div>
+
+        <div class="c-modal-row">
+          <h4>Related collocations</h4>
+          <div class="c-tag-row">${c.related.map(r => `<span class="c-tag">${r}</span>`).join('')}</div>
+        </div>
+
+        <div class="c-card-actions" style="margin-top:20px;">
+          <button class="c-icon-btn modal-save ${status === 'saved' ? 'on' : ''}" data-save="${c.phrase}">⭐ Save</button>
+          <button class="c-icon-btn modal-learn ${status === 'learned' ? 'learned-on' : ''}" data-learn="${c.phrase}" style="width:auto;padding:0 12px;">✓ Mark as learned</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('closeCollocModal').addEventListener('click', closeModal);
+  document.getElementById('collocModalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'collocModalBackdrop') closeModal(); });
+  wireCollocCards(root);
+
+}
+
+function closeModal() {
+  document.getElementById('modalRoot').innerHTML = '';
+}
+
+/* =========================================
+   COLLOCATION OF THE DAY
+========================================= */
+
+function renderCollocationOfTheDay() {
+
+  const dayIndex = Math.floor(Date.now() / 86400000) % COLLOCATION_DATA.length;
+  const c = COLLOCATION_DATA[dayIndex];
+  const status = progress.get(slugOf(c.phrase));
+
+  document.getElementById('view-cotd').innerHTML = `
+    <div class="c-cotd-card">
+      <div class="c-eyebrow">Collocation of the Day</div>
+      <h2>${c.phrase}</h2>
+      <p class="explain">${c.meaning}</p>
+      <div class="c-card-example">"${c.example}"</div>
+      <span class="c-cotd-topic">${c.type} &middot; ${c.topic}</span>
+      <div style="margin-top:14px;font-size:13px;"><b>Also try:</b> ${c.alternatives.join(', ')}</div>
+      <div class="c-cotd-actions">
+        <button class="c-btn c-btn-primary" id="cotdLearnBtn">Learn This Collocation</button>
+        <button class="c-btn c-btn-outline" id="cotdSaveBtn">${status === 'saved' ? 'Saved ✓' : 'Add to My Collocations'}</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('cotdLearnBtn').addEventListener('click', () => openCollocModal(slugOf(c.phrase)));
+  document.getElementById('cotdSaveBtn').addEventListener('click', async () => {
+    const cur = progress.get(slugOf(c.phrase));
+    await setProgress(c.phrase, cur === 'saved' ? null : 'saved');
+    renderCollocationOfTheDay();
+  });
+
+}
+
+/* =========================================
+   COLLOCATION SPOTLIGHT
+   Groups Verb + Noun collocations by their shared headword
+   (e.g. "make", "take", "have") so students see the full
+   family of phrases built from one high-frequency verb.
+========================================= */
+
+function renderSpotlightList() {
+
+  const groups = new Map();
+
+  COLLOCATION_DATA.forEach(c => {
+    if (!c.headword) return;
+    if (!groups.has(c.headword)) groups.set(c.headword, []);
+    groups.get(c.headword).push(c);
+  });
+
+  const el = document.getElementById('spotlightList');
+
+  el.innerHTML = [...groups.entries()].map(([word, items]) => `
+    <div class="c-spot-card">
+      <div class="c-spot-word">${word}</div>
+      <div class="c-spot-sub">${items.length} common collocations with "${word}"</div>
+      <div class="c-spot-phrase-row">${items.map(i => `<span class="c-spot-phrase">${i.phrase}</span>`).join('')}</div>
+      ${items.map(i => `<div class="c-spot-ex">"${i.example}"</div>`).join('')}
+    </div>
+  `).join('');
+
+}
+
+/* =========================================
+   PRACTICE MODE
+========================================= */
+
+const QUESTION_TYPES = ['meaning','wronguse','type','phrase','alternative','headwordmatch'];
+
+function pickRandom(arr, n, excludeIdx) {
+  const pool = arr.map((v,i) => i).filter(i => i !== excludeIdx);
+  const chosen = [];
+  while (chosen.length < n && pool.length) {
+    const i = Math.floor(Math.random() * pool.length);
+    chosen.push(pool.splice(i,1)[0]);
+  }
+  return chosen.map(i => arr[i]);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildQuestion(type, pool) {
+
+  if (type === 'headwordmatch') {
+
+    const withHeadword = COLLOCATION_DATA.filter(c => c.headword);
+    const idx = Math.floor(Math.random() * withHeadword.length);
+    const g = withHeadword[idx];
+    const rest = g.phrase.split(' ').slice(1).join(' ');
+    const distractorWords = [...new Set(pickRandom(withHeadword, 6, COLLOCATION_DATA.indexOf(g)).map(d => d.headword))].filter(w => w !== g.headword).slice(0, 3);
+    const options = shuffle([{ text: g.headword, correct: true }, ...distractorWords.map(w => ({ text: w, correct: false }))]);
+
+    return { type: 'Complete the collocation', prompt: `Which verb completes this phrase: "___ ${rest}"?`, options, explanation: `"${g.phrase}" means: ${g.meaning}`, revisionTag: g.phrase };
+
+  }
+
+  const idx = Math.floor(Math.random() * pool.length);
+  const c = pool[idx];
+  const distractors = pickRandom(COLLOCATION_DATA, 3, COLLOCATION_DATA.indexOf(c));
+
+  if (type === 'meaning') {
+    const options = shuffle([{ text: c.meaning, correct: true }, ...distractors.map(d => ({ text: d.meaning, correct: false }))]);
+    return { type: 'Choose the correct meaning', prompt: `What does "${c.phrase}" mean?`, options, explanation: `"${c.phrase}" means: ${c.meaning}`, revisionTag: c.phrase };
+  }
+
+  if (type === 'wronguse') {
+    const options = shuffle([{ text: c.wrongUsage.right, correct: true }, ...distractors.map(d => ({ text: d.wrongUsage.right, correct: false }))]);
+    return { type: 'Choose the correct fix', prompt: `Which is the correct version of this sentence?\n"${c.wrongUsage.wrong}"`, options, explanation: c.tip, revisionTag: c.phrase };
+  }
+
+  if (type === 'type') {
+    const distractorTypes = pickRandom(TYPES.filter(t => t !== c.type), 3, -1);
+    const options = shuffle([{ text: c.type, correct: true }, ...distractorTypes.map(t => ({ text: t, correct: false }))]);
+    return { type: 'Identify the collocation type', prompt: `What type of collocation is "${c.phrase}"?`, options, explanation: `"${c.phrase}" is a ${c.type} collocation.`, revisionTag: c.phrase };
+  }
+
+  if (type === 'phrase') {
+    const options = shuffle([{ text: c.phrase, correct: true }, ...distractors.map(d => ({ text: d.phrase, correct: false }))]);
+    return { type: 'Choose the correct phrase', prompt: `Which phrase means: "${c.meaning}"`, options, explanation: `"${c.phrase}" means: ${c.meaning}`, revisionTag: c.phrase };
+  }
+
+  if (type === 'alternative') {
+    const options = shuffle([{ text: c.alternatives[0], correct: true }, ...distractors.map(d => ({ text: d.alternatives[0], correct: false }))]);
+    return { type: 'Choose a natural alternative', prompt: `Which phrase could replace "${c.phrase}" with a similar meaning?`, options, explanation: `"${c.alternatives.join('", "')}" are close alternatives to "${c.phrase}".`, revisionTag: c.phrase };
+  }
+
+}
+
+function startQuiz() {
+
+  const pool = filteredColloc().length >= 6 ? filteredColloc() : COLLOCATION_DATA;
+  const total = 8;
+  const questions = [];
+
+  for (let i = 0; i < total; i++) {
+    const type = QUESTION_TYPES[i % QUESTION_TYPES.length];
+    questions.push(buildQuestion(type, pool));
+  }
+
+  quizState = { questions, index: 0, score: 0, revision: [], answered: false };
+  renderQuiz();
+
+}
+
+function renderQuiz() {
+
+  const area = document.getElementById('practiceArea');
+
+  if (quizState.index >= quizState.questions.length) {
+    renderQuizSummary();
+    return;
+  }
+
+  const q = quizState.questions[quizState.index];
+
+  area.innerHTML = `
+    <div class="c-quiz-card">
+      <div class="c-quiz-progress">Question ${quizState.index + 1} of ${quizState.questions.length} &middot; Score: ${quizState.score}</div>
+      <span class="c-quiz-type">${q.type}</span>
+      <div class="c-quiz-prompt">${q.prompt.split('\n').map(l => `<div>${l}</div>`).join('')}</div>
+      <div class="c-quiz-options" id="quizOptions">
+        ${q.options.map((o, i) => `<button class="c-quiz-option" data-i="${i}">${o.text}</button>`).join('')}
+      </div>
+      <div id="quizFeedback"></div>
+    </div>
+  `;
+
+  document.querySelectorAll('#quizOptions .c-quiz-option').forEach(btn => {
+    btn.addEventListener('click', () => answerQuiz(Number(btn.dataset.i)));
+  });
+
+}
+
+function answerQuiz(i) {
+
+  if (quizState.answered) return;
+  quizState.answered = true;
+
+  const q = quizState.questions[quizState.index];
+  const chosen = q.options[i];
+
+  document.querySelectorAll('#quizOptions .c-quiz-option').forEach((btn, idx) => {
+    btn.disabled = true;
+    if (q.options[idx].correct) btn.classList.add('correct');
+    else if (idx === i) btn.classList.add('incorrect');
+  });
+
+  if (chosen.correct) {
+    quizState.score++;
+  } else if (q.revisionTag) {
+    quizState.revision.push(q.revisionTag);
+  }
+
+  document.getElementById('quizFeedback').innerHTML = `
+    <div class="c-quiz-explain">${chosen.correct ? '✅ Correct! ' : '❌ Not quite. '}${q.explanation}</div>
+    <div class="c-quiz-next"><button class="c-btn c-btn-solid" id="nextQBtn">${quizState.index + 1 >= quizState.questions.length ? 'See results' : 'Next question'}</button></div>
+  `;
+
+  document.getElementById('nextQBtn').addEventListener('click', () => {
+    quizState.index++;
+    quizState.answered = false;
+    renderQuiz();
+  });
+
+}
+
+function renderQuizSummary() {
+
+  const area = document.getElementById('practiceArea');
+  const total = quizState.questions.length;
+  const revisionUnique = [...new Set(quizState.revision)];
+
+  area.innerHTML = `
+    <div class="c-quiz-card c-quiz-summary">
+      <div class="c-eyebrow" style="color:var(--c-red);">Practice complete</div>
+      <div class="c-quiz-score">${quizState.score}/${total}</div>
+      <p style="color:var(--c-text-soft);">${quizState.score === total ? 'Perfect score — excellent work!' : 'Review the collocations below and try again to improve.'}</p>
+      ${revisionUnique.length ? `
+        <div class="c-revision-list">
+          <h4>Collocations that need revision</h4>
+          <div>${revisionUnique.map(p => `<span>${p}</span>`).join('')}</div>
+        </div>
+      ` : ''}
+      <div class="c-cotd-actions" style="justify-content:center;">
+        <button class="c-btn c-btn-solid" id="retryQuizBtn">Try again</button>
+        <button class="c-btn c-btn-ghost" id="backBrowseBtn">Back to browse</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('retryQuizBtn').addEventListener('click', startQuiz);
+  document.getElementById('backBrowseBtn').addEventListener('click', () => {
+    document.querySelector('.c-tab[data-view="browse"]').click();
+  });
+
+}
+
+/* =========================================
+   MY COLLOCATIONS
+========================================= */
+
+function renderMyColloc() {
+
+  const saved = [...progress.entries()].filter(([,s]) => s === 'saved').map(([slug]) => slug);
+  const learned = [...progress.entries()].filter(([,s]) => s === 'learned').map(([slug]) => slug);
+  const total = progress.size;
+
+  document.getElementById('mcStats').innerHTML = `
+    <div class="c-stat"><b>${total}</b><span>Total saved phrases</span></div>
+    <div class="c-stat"><b>${learned.length}</b><span>Learned phrases</span></div>
+    <div class="c-stat"><b>${saved.length}</b><span>Phrases to review</span></div>
+    <div class="c-stat"><b>${Math.min(total,5)}</b><span>Recently added</span></div>
+  `;
+
+  const grid = document.getElementById('myCollocGrid');
+  const items = COLLOCATION_DATA.filter(c => progress.has(slugOf(c.phrase)));
+
+  let shown = items;
+  if (mcFilter === 'saved') shown = items.filter(c => progress.get(slugOf(c.phrase)) === 'saved');
+  if (mcFilter === 'learned') shown = items.filter(c => progress.get(slugOf(c.phrase)) === 'learned');
+  if (mcFilter === 'review') shown = items.filter(c => progress.get(slugOf(c.phrase)) === 'saved');
+
+  if (!shown.length) {
+    grid.innerHTML = `<div class="c-empty" style="grid-column:1/-1;">No collocations here yet — save or learn some from Browse to build your list.</div>`;
+  } else {
+    grid.innerHTML = shown.map(c => collocCardHtml(c)).join('');
+    wireCollocCards(grid);
+  }
+
+  document.querySelectorAll('[data-mcfilter]').forEach(btn => {
+    btn.onclick = () => {
+      mcFilter = btn.dataset.mcfilter;
+      document.querySelectorAll('[data-mcfilter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMyColloc();
+    };
+  });
+
+}
+
+</script>
+</body>
+</html>
